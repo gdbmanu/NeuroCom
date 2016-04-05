@@ -1,1 +1,15 @@
 *.pdf
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.log
+*.out
+*.backup
+*~
+*.log
+*.bak*
+*.lof
+*.lot
+*.toc
+*.tmp
