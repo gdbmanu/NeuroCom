@@ -133,7 +133,7 @@ Mot1 \sep Mot2
 Here, we evaluate the algorithms over two synthetic and three real world data sets. Their characteristics are summarized in Table~\ref{table:mce}.
 
 \begin{table}[h]
-	\caption{Summary of the five data sets, including the numbers of instances, features, labels and whether the number of examples in each class are balanced.}
+	\caption{Summary of the three high-dimensional datasets, including the numbers of instances, features, labels and whether the number of examples in each class are balanced.}
 	\label{table:mce}
 	\begin{center}
 		\begin{tabular}{l l l l l}
@@ -145,9 +145,9 @@ Here, we evaluate the algorithms over two synthetic and three real world data se
 			
 			RCV1-v2  & $10^5$ 	& 47236 	& 53 & N\\
 			
-			Letter 	&$2*10^4$	&16	&26	&N\\
+			%Letter 	&$2*10^4$	&16	&26	&N\\
 			
-			Pen-Based &$1.32*10^4$	&16	&10	&N\\
+			%Pen-Based &$1.32*10^4$	&16	&10	&N\\
 		\end{tabular}
 	\end{center}
 \end{table}
@@ -159,9 +159,7 @@ The second data set, denoted by SynNonSep, is constructed  the same way as  SynS
 
 The third data set is collected from the Reuters RCV1-v2 collection\cite{David04RCV}. The original data set is composed by multi-label instances. So we make some preprocessing likes \cite{RB08a}. First, its label hierarchy is reorganized by mapping the data set to the second level of RCV1 topic hierarchy. The documents that have labels of the third or forth level only are mapped to their parent category of the second level; Second, all multi-labelled instances have been removed. This RCV1-v2 is a 53-class,  47236-dimensional real data set of size $10^5$. 
 
-The fourth and fifth data sets are collected from \cite{letter26SC,number10SC}. The fourth data set is to identify each of a large number of black-and-white rectangular pixel displays as one of the 26 capital letters in the English alphabet. The character images were based on 20 different fonts and each letter within these 20 fonts was randomly distorted to produce a file of 20000 unique stimuli. Each stimuli was converted into 16 primitive numerical attributes (statistical moments and edge counts). It forms a 26-class, 16-dimensional real data set of size $20000$. The fifth data set is a digit data base made by collecting 250 samples from 44 writers, using only (x,y) coordinate information represented as constant length feature vectors, which were resampled to 8 points per digit (therefore the data set contains 8 points $\times$ 2 coordinates = 16 features). This one is a 10-class, 16-dimensional real data set of size $10992$.
-
-
+%The fourth and fifth data sets are collected from \cite{letter26SC,number10SC}. The fourth data set is to identify each of a large number of black-and-white rectangular pixel displays as one of the 26 capital letters in the English alphabet. The character images were based on 20 different fonts and each letter within these 20 fonts was randomly distorted to produce a file of 20000 unique stimuli. Each stimuli was converted into 16 primitive numerical attributes (statistical moments and edge counts). It forms a 26-class, 16-dimensional real data set of size $20000$. The fifth data set is a digit data base made by collecting 250 samples from 44 writers, using only (x,y) coordinate information represented as constant length feature vectors, which were resampled to 8 points per digit (therefore the data set contains 8 points $\times$ 2 coordinates = 16 features). This one is a 10-class, 16-dimensional real data set of size $10992$.
 
 \textbf{Results}
 Figures \ref{pic:BPASS} and~\ref{pic:BPASNS} show the experimental results on two synthetic data sets. For SynSep, a separable linear data set, all algorithms except Banditron obtain a good performance; with the non-separable SynNonSep data, Confidit and BPA outperform the other algorithms, even the supervised algorithms.  To different datasets, the parameters of different algorithms refer to Table~\ref{table:bpa}.
@@ -178,9 +176,9 @@ Figures \ref{pic:BPASS} and~\ref{pic:BPASNS} show the experimental results on tw
 			
 			Reuters & null & $C=10^{-2}$ & $\varepsilon =0.4$ & $\eta = 10^2$ & $\varepsilon = 0.2,C = 10^{-2}$\\
 			
-			LR(26 letters) & null &  $C=0.1$ & $\varepsilon = 0.2$& $\eta=10^2$ & $\varepsilon = 0.8,C= 1$ \\
+			%LR(26 letters) & null &  $C=0.1$ & $\varepsilon = 0.2$& $\eta=10^2$ & $\varepsilon = 0.8,C= 1$ \\
 			
-			LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\
+			%LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\
 			
 		\end{tabular}
 	\end{center}
@@ -188,7 +186,8 @@ Figures \ref{pic:BPASS} and~\ref{pic:BPASNS} show the experimental results on tw
 
 %\textcolor{red}{OK-- Il manque les valeurs des paramètres pour les différents algorithmes (faire un tableau comme dans la partie précédente).}
 
-Figures~\ref{pic:BPARCV}, ~\ref{pic:BPALR10} and~\ref{pic:BPALR26} present the result on three real data sets. With the three real data sets, the supervised algorithms, despite their competitive advantage with respect to the ones with bandit feedback, do not significantly depart from BPA and Confidit, with classification results that clearly outperform Banditron. While having a lower computational complexity, BPA approach is even found to outperform Confidit in the most challenging situation, i.e. the high-dimensional case with a large number of classes (RCV1-v2 data set).
+Figure~\ref{pic:BPARCV} %, ~\ref{pic:BPALR10} and~\ref{pic:BPALR26} 
+presents the result on the real dataset. With this dataset, the supervised algorithms, despite their competitive advantage with respect to the ones with bandit feedback, do not significantly depart from BPA and Confidit, with classification results that clearly outperform Banditron. While having a lower computational complexity, BPA approach is even found to outperform Confidit in the most challenging situation, i.e. the high-dimensional case with a large number of classes (RCV1-v2 data set).
 
 The $\epsilon$ parameter represents the exploration rate in Banditron and BPA algorithms. We compare on Figure 3 the average error rates obtained on the two algorithms for different values of $\epsilon$ on the different data sets. In contrast with Banditron, BPA shows that $\epsilon$ has a very little influence on the final error rate, indicating a capability to deal with small exploration rates.
 
