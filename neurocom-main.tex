@@ -132,7 +132,7 @@ Contextual bandit problems play a central role in machine learning, for they emb
 A bandit problem is composed of a universe made of a finite set of arms, numbered from $1$ to $K$, and a gambler. The behavior of the universe is not fully predictible, and not necessarily stationnary. Pulling an arm will provide a reward $g$ that may vary among trials and among arms. The objective for the gambler is to maximise the total amount, which means exploring the universe to have sufficiently reliable inputs about the expected rewards for each arm. Solving the problem thus means both optimizing the final gain, but also \emph{learning the universe from experience}.    
 
 Learning is thus at the core of bandit problems, just as it is for other machine learning schemes. 
-Online supervised classification schemes (see \cite{freund1997decision}, \cite{cesa2005second} or \cite{crammer2006online}) show striking similarities with the contextual bandit setup. Online learning means updating the classifier at each trial, i.e. on the one hand using past experience to classify the current instance $x$, but also, on the other hand, using additional knowledge provided by the new label $y$ to improve future responses. Most supervised learning schemes do not implement curiosity however, for the label values are non stochastic and best matching label provably the optimal choice. 
+Online supervised classification schemes (see \cite{freund1997decision}, \cite{cesa2005second}, \cite{kivinen2004online}, \cite{crammer2006online}) show striking similarities with the contextual bandit setup. Online learning means updating a classifier at each trial, i.e. on the one hand using past experience to classify the current instance $x_t$, but also, on the other hand, using additional knowledge provided by the new label $y_t$ to improve future responses. Most online supervised learning schemes do not implement curiosity however, for the label values are non stochastic and best matching label provably the optimal choice. 
 
 
 %Classiquement, l'apprentissage d'un classifieur repose sur une base d'apprentissage constituée par un ensemble de couples $(x_1,y_1),..., (x_n,y_n)$ où le premier terme du couple est un exemple à classer, généralement représenté sous forme vectorielle,  et le deuxième terme une étiquette indiquant la classe de l'exemple fourni.
@@ -156,23 +156,23 @@ Si $x$ est un exemplaire, $\langle w_1, x \rangle > 0$ signifie que $x$ appartie
 $$\hat{y} = \arg \max_{k \in\{1,..,K\}}  \langle w_k, x \rangle$$
 
 Dans le cadre de l'algorithme ``Banditron'', Kakade propose donc d'apprendre ces hyperplans séparateurs en utilisant un algorithme inspiré du perceptron multiclasse. Il se donne un ensemble de $K$ hyperplans $W_0 = (w^{(1)}_0$, ..., $w^{(K)}_0)$ initialement des vecteurs nuls. A chaque essai, un contexte $x_t$ est lu. Le choix du bras repose sur un tirage aléatoire défini selon~ : $P(\tilde{Y}=k) = (1 - \varepsilon) \mathbf{1}_{k = \hat{y}} + \frac{\varepsilon}{K} $ avec $\varepsilon \in [0,1]$ le paramètre d'exploration. On note $\tilde{y}_t$ le résultat du tirage à l'essai $t$. La mise à jour s'effectue selon~:
-$$ W_t = W_{t-1} + \frac{\mathbf{1}_{\tilde{y}_t = y_t} \Phi(x_t,\tilde{y}_t)}{P(\tilde{Y}=\tilde{y}_t)} - \Phi(x_t,\hat{y}_t)$$   
-avec $\Phi(x_t,k) = (0, ..., 0,  x_t, 0, .., 0)$ une séquence de vecteurs nuls, excepté à la position $k$ où l'on trouve l'exemplaire $x_t$. Kakade montre que son algorithme converge en espérance vers le classifieur du perceptron, et obtient des garanties sur les bornes d'erreur de son algorithme. 
+$$ W_t = W_{t-1} + \frac{\mathbf{1}_{\tilde{y}_t = y_t} X_t^{\tilde{y}_t}}{P(\tilde{Y}=\tilde{y}_t)} - X_t^{\hat{y}_t}$$   
+avec $X_t^k = (0, ..., 0,  x_t, 0, .., 0)$ une séquence de vecteurs nuls, excepté à la position $k$ où l'on trouve l'exemplaire $x_t$. Kakade montre que son algorithme converge en espérance vers le classifieur du perceptron, et obtient des garanties sur les bornes d'erreur de son algorithme. 
 
 Toujours dans le cadre des classifieurs linéaires, plusieurs algorithmes d'apprentissage de bandits contextuels ont été proposés dans la littérature. Dans nos expérimentations numériques, nous considérerons également ici l'algorithme ``Confidit'' proposé par Crammer et Gentile \cite{crammer2013multiclass}, reposant sur le perceptron d'ordre 2 et l'exploration non stochastique basée sur le principe UCB \cite{lai1985asymptotically}, et présentant des profils de convergence plus favorables que le Banditron. 
 
 
 Dans le cas linéairement séparable, l'apprentissage en ligne d'un perceptron multi-classes peut être significativement accéléré en utilisant les principes de l'optimisation quadratique tels que proposés par Vapnik \cite{vapnik1998statistical}. Dans un article récent, Crammer et al \cite{crammer2006online} proposent une méthode d'apprentissage en ligne supervisée reposant sur l'optimisation locale de la fonction de perte ``hinge loss'' définie dans le cadre multi-classe comme : 
 $$
-l_t =[\mathbf{1}_{\hat{y}_t\neq y_t} + \langle W_{t-1}, \Phi(x_t,\hat{y}_t)- \Phi(x_t,y_t)\rangle]_+ 
+l_t =[1 + \max_{s \neq y_t}\langle W_{t-1}, X_t^s- X_t^{y_t}\rangle]_+ 
 $$
 où $[.]_+$ retourne l'identité pour les valeurs positives et 0 pour les valeurs négatives. 
 
 La résolution du problème :
 $$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
 où $C$ correspond au paramètre de raideur, conduit à la mise à jour~:
-$$W_{t} =  W_{t-1} + \frac{l_t}{2\|x_t\|^2 + \frac{1}{2C}} (\Phi(x_t,y_t) - \Phi(x_t,\hat{y}_t))$$
-Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est  borné en $O(\sqrt{(T)})$ dans le cas non séparable.  
+$$W_{t} =  W_{t-1} + \frac{l_t}{2\|x_t\|^2 + \frac{1}{2C}} (X_t^{y_t} - X_t^{s_t})$$
+où $s_t = \arg\max_{s \neq y_t} \langle W_{t-1}, X_t^s \rangle$. Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est  borné en $O(\sqrt{(T)})$ dans le cas non séparable.  
 
 \section{Notre approche}
 
@@ -184,19 +184,21 @@ Soit un classifieur linéaire défini à l'essai $t$ par le jeu de paramètres $
 Après avoir émis la proposition $\tilde{y}_t$, l'apprenant reçoit un gain $g_t$ égal à 1 si la catégorie proposée est correcte et 0 sinon, soit $g_t = \mathbf{1}_{\tilde{y}_t=y_t}$. 
 
 La perte instantanée est ici définie comme :
-$$l_t = [1 + (1 - 2 g_t) \langle W_{t-1}, \Phi(x_t,\tilde{y}_t)\rangle]_+$$
+$$l_t = [1 + (1 - 2 g_t) \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$$
 autrement dit~:
 \begin{itemize}
-	\item[] $l_t = [1 - \langle W_{t-1}, \Phi(x_t,\tilde{y}_t)\rangle]_+$ si $g_t=1$;
-	\item[] $l_t = [1 + \langle W_{t-1}, \Phi(x_t,\tilde{y}_t)\rangle]_+$ sinon
+	\item[] $l_t = [1 - \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$ si $g_t=1$;
+	\item[] $l_t = [1 + \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$ sinon
 \end{itemize}
-Dans le premier cas (le choix est correct), la perte décroît avec $\langle W_{t-1}, \Phi(x_t,\tilde{y}_t)\rangle$ jusqu'à 0. Au contraire, dans le second cas (choix incorrect), la perte augmente avec le produit $\langle W_{t-1}, \Phi(x_t,\tilde{y}_t)\rangle$.
-Minimiser la perte revient donc à faire croître le produit $\langle W_{t-1}, \Phi(x_t,\tilde{y}_t)\rangle$ dans le premier cas, et à faire décroître le produit $\langle W_{t-1}, \Phi(x_t,\tilde{y}_t)\rangle$  dans le second cas.
+Dans le premier cas (le choix est correct), la perte décroît avec $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ jusqu'à 0. Au contraire, dans le second cas (choix incorrect), la perte augmente avec le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$.
+Minimiser la perte revient donc à faire croître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ dans le premier cas, et à faire décroître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$  dans le second cas.
+
+\emph{NB : the same objective is assigned in the ``one-vs-all'' scheme in the multi-class classification scheme. It is a non-conservative (normative) objective function. In case the dataset is separable, $\exists U$ such that $\forall t, l_t = 0$  }
 
 La résolution du problème d'optimisation suivant~:
 $$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
 où $C$ correspond au paramètre de raideur, conduit à la mise à jour~:
-$$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2g_t - 1) \Phi(x_t,\tilde{y}_t)$$
+$$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2g_t - 1) X_t^{\tilde{y}_t}$$
 
 \paragraph{Bandit Passive-Aggressive (BPA)}
 %\caption{BPA}
@@ -206,14 +208,14 @@ $$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2g_t - 1) \Phi(x_t,\t
 	\STATE Set $W_0 = 0$ (null vector)
 	\FOR {each round $t$ = 1,\dots, $T$}
 	\STATE Observe $x_t$.
-	\STATE Set $\hat{y}_t = \underset{i = 1,\dots,K}{\text{argmax}}\left\langle W_{t-1} ,\Phi(x_t,i)\right\rangle$
+	\STATE Set $\hat{y}_t = \underset{i = 1,\dots,K}{\text{argmax}}\left\langle W_{t-1} ,X_t^i\right\rangle$
 	\FORALL {$i \in [1,...,K]$}
 	\STATE $p_{i,t}= (1-\varepsilon)\mathbf{1}_{i = \hat{y}_t} + \frac{\varepsilon}{K}$
 	\ENDFOR
 	\STATE Draw $\tilde{y}_t$ randomly from $p_t = \left(p_{1,t},\dots ,p_{K,t}\right)$.
 	\STATE Observe $g_t = \mathbf{1}_{(\tilde{y}_t=y_t)}$.
-	\STATE Set $l_t = [ 1+(1-2g_t)\left\langle W_{t-1},\Phi(x_t,\tilde{y}_t)\right\rangle]_{+}$ 
-	\STATE $W_t = W_{t-1} + (2g_t-1)\frac{l_t}{\parallel\Phi(x_t,\tilde{y}_t)\parallel^2 + \frac{1}{2C}}\cdot\Phi(x_t,\tilde{y}_t)$
+	\STATE Set $l_t = \left[ 1+(1-2g_t)\langle W_{t-1},X_t^{\tilde{y}_t}\rangle\right]_{+}$ 
+	\STATE $W_t = W_{t-1} + (2g_t-1)\frac{l_t}{\parallel X_t^{\tilde{y}_t}\parallel^2 + \frac{1}{2C}}\cdot X_t^{\tilde{y}_t}$
 	\ENDFOR
 \end{algorithmic}
 
@@ -245,23 +247,23 @@ Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_
 	
 	Using the definition of update : %in Eq.\ref{eq:,
 	\begin{align}
-	\Delta_t =& -2\left\langle (W_{t-1} - U), (2g_t-1)\frac{l_t}{\parallel{x_t}\parallel^2}\Phi(x_t,\tilde{y}_t)\right\rangle \nonumber\\
-	&- \left\| \frac{l_t}{\parallel{x_t}\parallel^2}\Phi(x_t,\tilde{y}_t)\right\|^2
+	\Delta_t =& -2\left\langle (W_{t-1} - U), (2g_t-1)\frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\rangle \nonumber\\
+	&- \left\| \frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\|^2
 	\nonumber
 	\end{align}
 	%With    and   ,
 	So, remarking that~:
 	\begin{itemize}
-		\item[] $l_t = [1+(1-2g_t)\cdot\langle W_{t-1},\Phi(x_t,\tilde{y}_t)\rangle]_+$
-		\item[] $l_t^{\ast} = [1+(1-2g_t)\cdot\langle U,\Phi(x_t,\tilde{y}_t)\rangle]_+$
-		\item[] $\parallel{\Phi(x_t,\tilde{y}_t)}\parallel = \parallel x_t\parallel$
+		\item[] $l_t = [1+(1-2g_t)\cdot\langle W_{t-1},X_t^{\tilde{y}_t}\rangle]_+$
+		\item[] $l_t^{\ast} = [1+(1-2g_t^\ast)\cdot\langle U,X_t^{\tilde{y}_t^\ast}\rangle]_+$
+		\item[] $\parallel{X_t^{\tilde{y}_t}}\parallel = \parallel x_t\parallel$
 	\end{itemize}
 	it comes:
 	\begin{align}
-	\Delta_t =& 2l_t\frac{(1-2g_t)\langle W_{t-1}, \Phi(x_t,\tilde{y}_t)\rangle - (1-2g_t)\langle U, \Phi(x_t,\tilde{y}_t)\rangle}{\|x_t\|^2} \nonumber\\
-	&-\left( \frac{l_t}{\parallel{x_t}\parallel^2}\parallel{\Phi(x_t,\tilde{y}_t)}\parallel \right)^2\nonumber
+	\Delta_t =& 2l_t\frac{(1-2g_t)\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle - (1-2g_t)\langle U, X_t^{\tilde{y}_t}\rangle}{\|x_t\|^2} \nonumber\\
+	&-\left( \frac{l_t}{\parallel{x_t}\parallel^2}\parallel{X_t^{\tilde{y}_t}}\parallel \right)^2\nonumber
 	\end{align}
-	Noting that $\Delta_t = 0$ when $l_t = 0$, and $l^*_t \geq  1+(1-2g_t)\cdot\langle U,\Phi(x_t,\tilde{y}_t)\rangle$, it comes : 
+	Noting that $\Delta_t = 0$ when $l_t = 0$, and $l^*_t \geq  1+(1-2g_t)\cdot\langle U,X_t^{\tilde{y}_t}\rangle$, it comes : 
 	\begin{align}
 	\Delta_t\geqslant& 2l_t\frac{l_t - l_t^{\ast}}{\parallel{x_t}\parallel^2}-\left( \frac{l_t}{\parallel{x_t}\parallel^2}\parallel x_t\parallel \right)^2\nonumber\\
 	=& \frac{l_t^2-2l_t l_t^{\ast}}{\parallel x_t\parallel^2}\nonumber
@@ -283,22 +285,23 @@ Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_
 \begin{proof}
 	By the proof of Theorem \ref{theo:BPAT1}, 
 	\[\sum_{t=1}^{T}l_t^2 \leqslant R^2\cdot \parallel{U}\parallel^2 + 2\sum_{t=1}^{T}l_t l_t^{\ast}\]
-	To upper bound the right side of the above inequality, we denote $A_t = \sqrt{\sum_{t=1}^{T}l_t^2}$ and $B_t = \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}$, 
+	To upper bound the right side of the above inequality, we denote $a_t = \sqrt{\sum_{t=1}^{T}l_t^2}$ and $b_t = \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}$, 
 	\begin{align}
-	2(A_tB_t)^2-2(\sum_{t=1}^{T}l_tl_t^{\ast})^2 =& \sum_{i=1}^{T}\sum_{j=1}^{T}l_i^2(l_j^{\ast})^2+\sum_{i=1}^{T}\sum_{j=1}^{T}l_j^2(l_i^{\ast})^2 \nonumber\\
+	2(a_tb_t)^2-2(\sum_{t=1}^{T}l_tl_t^{\ast})^2 =& \sum_{i=1}^{T}\sum_{j=1}^{T}l_i^2(l_j^{\ast})^2+\sum_{i=1}^{T}\sum_{j=1}^{T}l_j^2(l_i^{\ast})^2 \nonumber\\
 	&- 2\sum_{i=1}^{T}\sum_{j=1}^{T}l_il_jl_i^{\ast}l_j^{\ast}\nonumber\\
 	=& \sum_{i=1}^{T}\sum_{j=1}^{T}(l_il_j^{\ast}-l_jl_i^{\ast})^2 \geqslant 0 \nonumber
 	\end{align}
 	
 	\begin{align}
-	\sum_{t=1}^{T}l_t^2 \leqslant R^2 \cdot \parallel{U}\parallel^2+2\sum_{t=1}^{T}l_tl_t^{\ast}\leqslant R^2 \cdot \parallel{U}\parallel^2+2A_tB_t\nonumber
+	\sum_{t=1}^{T}l_t^2 \leqslant R^2 \cdot \parallel{U}\parallel^2+2\sum_{t=1}^{T}l_tl_t^{\ast}\leqslant R^2 \cdot \parallel{U}\parallel^2+2a_tb_t\nonumber
 	\end{align}
 	then considering:
-	\[A_t^2 -2 A_tB_t+B_t^2\leqslant R^2\parallel{U}\parallel^2+B_t^2\]
+	\[a_t^2 -2 a_tb_t+b_t^2\leqslant R^2\parallel{U}\parallel^2+b_t^2\]
+	%the largest possible $a_t$ respecting the inequality is $b_t+\sqrt{R^2\parallel{U}\parallel^2+b_t^2}$
 	we obtain :
-	\[A_t \leqslant B_t+\sqrt{R^2\parallel{U}\parallel^2+B_t^2}\]
+	\[a_t \leqslant b_t+\sqrt{R^2\parallel{U}\parallel^2+b_t^2}\]
 	and using the fact that $\sqrt{a+b}\leqslant \sqrt{a}+\sqrt{b}$,
-	\[A_t \leqslant R\parallel{U}\parallel+2 B_t\]
+	\[a_t \leqslant R\parallel{U}\parallel+2 b_t\]
 	so that :
 	\[\sum_{t=1}^{T}l_t^2 \leqslant \left(R\parallel{U}\parallel+2 \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}\right)^2 \]
 \end{proof}
