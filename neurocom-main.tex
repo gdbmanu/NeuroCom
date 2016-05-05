@@ -161,6 +161,46 @@ avec $X_t^k = (0, ..., 0,  x_t, 0, .., 0)$ une séquence de vecteurs nuls, excep
 
 Toujours dans le cadre des classifieurs linéaires, plusieurs algorithmes d'apprentissage de bandits contextuels ont été proposés dans la littérature. Dans nos expérimentations numériques, nous considérerons également ici l'algorithme ``Confidit'' proposé par Crammer et Gentile \cite{crammer2013multiclass}, reposant sur le perceptron d'ordre 2 et l'exploration non stochastique basée sur le principe UCB \cite{lai1985asymptotically}, et présentant des profils de convergence plus favorables que le Banditron. 
 
+\section{Notre approche}
+
+\subsection{Preliminary}
+
+Multiclass classification requires  finding an appropriate class $k \in \{1,... K\}$ for every observation vector $x \in \mathbb{R}^d$.
+The linear approach to classification requires to separate the input space in regions, each region being defined by a separating hyperplane (or a set of separating hyperplanes). We consider here the case of a margin-optimal classifier $W = (w_1,..,w_k) \in \mathbb{R}^{K \times d}$ defined as a set of $K$ separating hyperplanes. The separating hyperplanes are expected to optimally separate the input space according to the misclassification risk. This risk can for instance be minimized through a margin principle (see \cite{vapnik1998statistical}), imposing a non-zero distance of known class exemplars to the classification boundaries . 
+
+Under an \textit{offline} setting, such a classifier can be obtained through the quadratic optimization of a loss function $L(D)$ over a finite set of classified exemplars  $D = \{(x_1, y_1), ..., (x_n, y_n)\}$ (see \cite{vapnik1998statistical}). 
+Different loss function may be defined in that case. 
+One can distinguish two principal margin constraint schemes : the \emph{normative} and the \emph{relative} schemes.
+\begin{itemize}
+	\item in a \emph{normative} scheme (\emph{aka} one-vs-all), the classifier is expected to provide a normal response, i.e. $$\forall k,i \left\{
+	\begin{array}{l}
+	\langle w_k, x_i \rangle \geq 1 \text{ if } y_i = k \\
+	\langle w_k, x_i \rangle \leq -1 \text{ if }y_i \neq k.
+	\end{array}
+	\right. 
+	$$
+	and a hinge loss function is :
+	$$ L(D) = \sum_{i=1}^{n} \sum_{k=1}^K \left[1 + (1 - 2 \delta(y_i,k)) \langle w_k,x_i \rangle\right]_+
+	$$
+	with $\delta(i,j) =1$ if $i = j$ and 0 elsewhere, and $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
+	\item in a \emph{relative} scheme (aka conservative, see \cite{crammer2003ultraconservative}), the linear score $\langle w_k, x_i\rangle$ is expected to be significantly greater than the linear score of other separatrices if $y_i =k$, i.e.
+	$$ \forall k,i, \langle w_{y_i}, x_i \rangle \geq 1 + \max_{k \neq y_i} \langle w_k, x_i \rangle  $$
+	and a hinge loss function is :
+	$$ L(D) = \sum_{i=1}^n \left[ 1 +  \langle w_{y_i}, x_i \rangle - \max_{k \neq y_i} \langle w_k, x_i\rangle\right]_+$$
+\end{itemize} 
+
+
+In the online setting, there is no definite database of examples. 
+The observation vectors arrive sequentially according to a temporal index $t$. When facing a new exemplar $x_t$, the classifier provides a categorical response $\tilde{y}_t \in \{1,... K\}$ and then obtains a feedback $f_t$. The feedback provides an indication about the correctness of the choice. In the supervised setting, the feedback is equal to the expected response $f_t = y_t \in \{1,... K\}$. In the non-supervised setting, the feedback is null. The intermediary case we consider here is the \emph{binary feedback} case where the feedback is composed of a single bit of information $f_t \in\{0,1\}$, i.e. $f_t = 1$ if the response is correct and 0 otherwise. 
+
+
+The misclasification risk needs to be minimised through local measures of $l_t$  (the loss function) that estimates the correctness of the current response. The loss function combines the feedback signal $f_t$ with the actual response $\tilde{y}_t$ and the current classifier's parameters to provide additional information about the direction to be followed for future classification improvement (i.e. risk minimization). 
+The loss thus relies on a combination of \emph{internal} information (current classifier's parameters, current choice) and \emph{external} information (input vector, feedback). On contrary to the offline setting, the classifier's current value $W_t$ plays a significant role in defining the future direction. 
+
+The different multiclass online learning algorithms fall either into the normative or the relative category. The multiclass perceptron (see  \cite{freund1999large}), while not margin aware, is a typical normative multiclass approach for it  imposes a positive fit with class-compliant exemplars, and a negative fit with class-negative exemplars.  
+On contrary, the multiclass passive-agressive scheme proposed in \cite{crammer2006online} obeys to a relative approach to online multiclass learning.   
+
+
 
 Dans le cas linéairement séparable, l'apprentissage en ligne d'un perceptron multi-classes peut être significativement accéléré en utilisant les principes de l'optimisation quadratique tels que proposés par Vapnik \cite{vapnik1998statistical}. Dans un article récent, Crammer et al \cite{crammer2006online} proposent une méthode d'apprentissage en ligne supervisée reposant sur l'optimisation locale de la fonction de perte ``hinge loss'' définie dans le cadre multi-classe comme : 
 $$
@@ -172,9 +212,10 @@ La résolution du problème :
 $$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
 où $C$ correspond au paramètre de raideur, conduit à la mise à jour~:
 $$W_{t} =  W_{t-1} + \frac{l_t}{2\|x_t\|^2 + \frac{1}{2C}} (X_t^{y_t} - X_t^{s_t})$$
-où $s_t = \arg\max_{s \neq y_t} \langle W_{t-1}, X_t^s \rangle$. Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est  borné en $O(\sqrt{(T)})$ dans le cas non séparable.  
+où $s_t = \arg\max_{s \neq y_t} \langle W_{t-1}, X_t^s \rangle$. Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est  borné en $O(\sqrt{(T)})$ dans le cas non séparable.
 
-\section{Notre approche}
+  
+
 
 \subsection{Principe}
 L'approche adoptée dans le cadre de cet article est une généralisation assez directe des principes d'optimisation quadratique en ligne proposés par Crammer au cas des bandits contextuels. Cette extension nécessite de définir une fonction de perte spécifique. 
@@ -221,7 +262,7 @@ $$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2g_t - 1) X_t^{\tilde
 
 
 \subsection{Analyse}
-Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_t^{\ast}$ la perte obtenue par ce classifieur à l'instant $t$. On démontre les deux théorèmes suivants (en négligeant la constante de raideur $C$ pour simplifier) :
+Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_t^{\ast}$ la perte obtenue par ce classifieur à l'instant $t$ lorsque la réponse $\tilde{y}_t$ est produite. On démontre les deux théorèmes suivants (en négligeant la constante de raideur $C$ pour simplifier) :
 
 \begin{theorem}
 	\label{theo:BPAT1}
@@ -239,7 +280,7 @@ Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_
 	\sum_{t=1}^{T}\Delta_t &= \sum_{t=1}^{T} \left( \parallel{W_{t-1} - U}\parallel^2-\parallel{W_t - U}\parallel^2 \right)\nonumber\\ 
 	&= \parallel{W_0 - U}\parallel^2-\parallel{W_t-U}\parallel^2\nonumber
 	\end{align}	
-	By the initiation of $W_0 = \vec{0}$, 
+	By the initialization of $W_0 = \vec{0}$, 
 	\begin{equation}
 	\label{equa:delta}
 	\sum_{t=1}^{T}\Delta_t = \parallel{U}\parallel^2 - \parallel{W_t-U}\parallel^2 \leqslant \parallel{U}\parallel^2 
@@ -247,25 +288,25 @@ Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_
 	
 	Using the definition of update : %in Eq.\ref{eq:,
 	\begin{align}
-	\Delta_t =& -2\left\langle (W_{t-1} - U), (2g_t-1)\frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\rangle \nonumber\\
-	&- \left\| \frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\|^2
+	\Delta_t = -2\left\langle (W_{t-1} - U), (2g_t-1)\frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\rangle 
+	- \left\| \frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\|^2
 	\nonumber
 	\end{align}
 	%With    and   ,
-	So, remarking that~:
+	So, taking~:
 	\begin{itemize}
 		\item[] $l_t = [1+(1-2g_t)\cdot\langle W_{t-1},X_t^{\tilde{y}_t}\rangle]_+$
-		\item[] $l_t^{\ast} = [1+(1-2g_t^\ast)\cdot\langle U,X_t^{\tilde{y}_t^\ast}\rangle]_+$
+		\item[] $l_t^{\ast} = [1+(1-2g_t)\cdot\langle U,X_t^{\tilde{y}_t}\rangle]_+$
 		\item[] $\parallel{X_t^{\tilde{y}_t}}\parallel = \parallel x_t\parallel$
 	\end{itemize}
 	it comes:
 	\begin{align}
-	\Delta_t =& 2l_t\frac{(1-2g_t)\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle - (1-2g_t)\langle U, X_t^{\tilde{y}_t}\rangle}{\|x_t\|^2} \nonumber\\
-	&-\left( \frac{l_t}{\parallel{x_t}\parallel^2}\parallel{X_t^{\tilde{y}_t}}\parallel \right)^2\nonumber
+	\Delta_t =& 2l_t\frac{(1-2g_t)\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle - (1-2g_t)\langle U, X_t^{\tilde{y}_t}\rangle}{\|x_t\|^2}
+	-\frac{l_t^2}{\parallel{x_t}\parallel^2}\nonumber
 	\end{align}
 	Noting that $\Delta_t = 0$ when $l_t = 0$, and $l^*_t \geq  1+(1-2g_t)\cdot\langle U,X_t^{\tilde{y}_t}\rangle$, it comes : 
 	\begin{align}
-	\Delta_t\geqslant& 2l_t\frac{l_t - l_t^{\ast}}{\parallel{x_t}\parallel^2}-\left( \frac{l_t}{\parallel{x_t}\parallel^2}\parallel x_t\parallel \right)^2\nonumber\\
+	\Delta_t\geqslant& 2l_t\frac{l_t - l_t^{\ast}}{\parallel{x_t}\parallel^2}-\frac{l_t^2}{\parallel{x_t}\parallel^2}\nonumber\\
 	=& \frac{l_t^2-2l_t l_t^{\ast}}{\parallel x_t\parallel^2}\nonumber
 	\end{align}
 	If all examples are separable, $\exists U$ such that $\forall t \in [1,...,T]$ , $l_t^{\ast} = 0$ ,
