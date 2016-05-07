@@ -166,30 +166,43 @@ Toujours dans le cadre des classifieurs linéaires, plusieurs algorithmes d'appr
 \subsection{Preliminary}
 
 Multiclass classification requires  finding an appropriate class $k \in \{1,... K\}$ for every observation vector $x \in \mathbb{R}^d$.
-The linear approach to classification requires to separate the input space in regions, each region being defined by a separating hyperplane (or a set of separating hyperplanes). We consider here the case of a  classifier $W = (w_1,..,w_k) \in \mathbb{R}^{K \times d}$ defined as a set of $K$ separating hyperplanes. The separating hyperplanes are expected to optimally separate the input space according to the misclassification risk. This risk can for instance be minimized through a margin principle (see \cite{vapnik1998statistical}), imposing a non-zero distance of known class exemplars to the classification boundaries. 
+The linear approach to classification means to separate the input space in regions, each region being defined by a separating hyperplane (or a set of separating hyperplanes). We consider here the case of a  classifier $W = (w_1,..,w_k) \in \mathbb{R}^{K \times d}$ defined as a set of $K$ separating hyperplanes. The separating hyperplanes are expected to optimally separate the input space according to the misclassification risk. This risk can for instance be minimized through a margin principle (see \cite{vapnik1998statistical}), imposing a non-zero distance of known class exemplars to the classification boundaries. 
 
 Typical learning schemes rely on minimizing a convex \emph{loss} over $W$.  
 Different loss function may be defined in that case. 
-Under the multiclass setting, one can distinguish two principal constraint schemes : the \emph{normative} and the \emph{relative} schemes. In a \emph{normative} scheme, a classifier is expected to provide a normal response. A typical normative scheme is the one-vs-all (OVA) scheme, i.e. $$\forall k,i \left\{
+Under the multiclass setting, one can distinguish two principal constraint schemes : the \emph{normative} and the \emph{relative} schemes. In a \emph{normative} scheme, a classifier is expected to provide a response that relates to a reference value $a$. A typical normative scheme is the one-vs-all (OVA) scheme, having an $a = 1$ reference for class-compliant examples and $a = -1$ for class-differing examples,  i.e. $$\forall k,i \left\{
 \begin{array}{l}
 \langle w_k, x_i \rangle \geq 1 \text{ if } y_i = k \\
 \langle w_k, x_i \rangle \leq -1 \text{ if }y_i \neq k.
 \end{array}
 \right. 
 $$
- and a typical loss function is the normative multiclass \emph{hinge loss}:  
+ and a corresponding loss function can be the normative multiclass \emph{hinge loss}:  
 $$ l(x_i,W,y_i) = \sum_{k=1}^K \left[1 + (1 - 2 \delta(y_i,k)) \langle w_k,x_i \rangle\right]_+
 $$
 with $\delta(i,j) =1$ if $i = j$ and 0 elsewhere, and $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
-Under  a \emph{relative} scheme (aka conservative, see \cite{crammer2003ultraconservative}), the linear score $\langle w_k, x_i\rangle$ is expected to be significantly greater than the linear score of the other separatrices if $y_i =k$, i.e.
+Under  a \emph{relative} scheme (aka conservative, see \cite{crammer2003ultraconservative}), there is no reference value and the linear score of the class-compliant separatrix $\langle w_{y_i}, x_i\rangle$ is expected to be significantly greater than the other linear scores, i.e.
 $$ \forall i, \langle w_{y_i}, x_i \rangle \geq 1 + \max_{k \neq y_i} \langle w_k, x_i \rangle  $$
 and a typical loss function is the conservative multiclass \emph{hinge loss}:
 	$$ l (x_i,W,y_i) =  \left[ 1 +  \langle w_{y_i}, x_i \rangle - \max_{k \neq y_i} \langle w_k, x_i\rangle\right]_+$$
 
 
-Under an \textit{offline} setting, such a classifier can be obtained through the quadratic optimization of a loss function $L(D)$ over a finite set of classified exemplars  $D = \{(x_1, y_1), ..., (x_n, y_n)\}$ (see \cite{vapnik1998statistical}). 
-In contrast with the offline setting, there is in principle no predefinite database  under the \emph{online} setting. 
-The observation vectors arrive sequentially according to a temporal index $t$. When facing a new exemplar $x_t$, the classifier provides a categorical response $\tilde{y}_t \in \{1,... K\}$ and then obtains a feedback $f_t$. The feedback provides an indication about the correctness of the choice. In the supervised setting, the feedback is equal to the expected response $f_t = y_t \in \{1,... K\}$. In the non-supervised setting, the feedback is null. The intermediary case we consider here is the \emph{binary feedback} case where the feedback is composed of a single bit of information $f_t \in\{0,1\}$, i.e. $f_t = 1$ if the class proposed by the clasiffier is correct and 0 otherwise. 
+In contrast with the \textit{offline} setting, where the classifiers are obtained through quadratic optimization over a finite set of classified exemples  $D = \{(x_1, y_1), ..., (x_n, y_n)\}$ (see \cite{vapnik1998statistical}), no predefinite database is considered under the \emph{online} setting. 
+The observation vectors arrive sequentially according to a temporal index $t$ (temporal order). When facing a new example $x_t$, the learner emits a categorical response $\tilde{y}_t \in \{1,... K\}$ and then obtains a feedback $f_t$. The feedback provides an indication about the correctness of the learner's choice. In the supervised setting, the feedback is equal to the expected response $f_t = y_t \in \{1,... K\}$. In the non-supervised setting, the feedback is null. The intermediary case we consider here is the \emph{binary feedback} case where the feedback is composed of a single bit of information $f_t \in\{0,1\}$, i.e. $f_t = 1$ if the class proposed by the clasifier is correct and 0 otherwise. 
+
+Following \cite{crammer2006online}, online learning implements a sequential approach to optimization, relying on a specific sequence of observations, decisions and feedbacks.
+Our objective is to show the different types of feedbacks encompassed by this approach include bandit feedback and  reinforcement learning feedbacks. 
+ 
+%given an objective (or loss) function considered defined over the full input space.
+%A feedback is a \emph{local} measure of  learning achievement (or failure), 
+
+
+The online learning setting is considered more general than the offline setting, for it encompasses a larger 
+
+
+
+differs from the offline setting for it  setting by many respects.  
+
 
 online learning : choice-dependent vs. choice independent
 
