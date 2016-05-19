@@ -51,7 +51,7 @@
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}
 
-
+\usepackage{color}
 
 %% The lineno packages adds line numbers. Start line numbering with
 %% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
@@ -127,8 +127,15 @@ Mot1 \sep Mot2
 \label{sec:lentete}
 
 
-Online multiclass learning problems constitute a specific class of learning problems in which (i) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and (ii) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$.  Online multiclass learning encompass two well-documented classes of learning problems, i.e. the contextual bandits (see \cite{lai1985asymptotically} and \cite{auer2002finite}) and supervised online learning (see  \cite{duda1973pattern} and \cite{freund1999large}), the two classes of problems mainly differing by the nature of the feedback. Whether abundant or scarce, deterministic or stochastic, stationary or adversarial, the feedback characteristics critically shape the design of the learning algorithms.  The case we will address in the following is the one-bit feedback, occasionally called bandit feedback (see \cite{kakade2008efficient}), that is a prototypical case lying at the crossroad of the two approaches.  
+Categorical online learning is an old and well-documented class of learning problems in which (i) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and (ii) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$. In contrast with the offline approach, online learning takes the form of an iterative process, relying on a time-ordered sequence of observations, queries and feedback.   
+Two well-known setups obey to this class, i.e. the contextual bandits (see  \cite{lai1985asymptotically} and \cite{auer2002finite}) and supervised online learning (see  \cite{rosenblatt1958perceptron}, \cite{duda1973pattern} and \cite{freund1999large}), the two setups mainly differing by the nature of the feedback. Whether abundant or scarce, deterministic or stochastic, stationary or adversarial, the feedback characteristics critically shape the design of the learning algorithms.  
 
+The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback (see \cite{kakade2008efficient}). This case lies at the crossroad of the online learning and bandit approaches.  A one-bit feedback reflects ``hit-or-miss'' learning situations, in which the single bit of feedback indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, the problem is specific to the online approach and was only recently identified and analyzed by the community (see \cite{kakade2008efficient}, \cite{gentile2012multilabel}, etc.). 
+
+{\color{magenta} After a stepwise introduction on the main findings and issues, we present a ...}
+
+
+{\color{green}
 STRUCTURE OF ONLINE LEARNING ALGORITHMS - 
 
 All online learning algorithms share a similar structure, that dates back to the Perceptron \cite{rosenblatt1958perceptron}.  ...
@@ -149,6 +156,65 @@ The richer structure of online learning problems was outlined previously by LeCu
 	\item non-stationarity
 
 \end{itemize}
+}
+
+\section{Outlook}
+
+Online learning is a \textit{process} in which an agent (the ``learner'') probes its environment sequentially to obtain \textit{information} that is eventually used to improve its \textit{fitness}.
+The universe being initially hidden, the online approach works on probing the database (universe) through individual queries that step-by-step unveil the environment. 
+
+The sequential organization of learning is present in the most traditional setups such as the Bandit problems (see \cite{robbins1952bandit}) and in the Perceptron algorithm (see \cite{rosenblatt1958perceptron}). The general setup we consider here is the case of an ``open-loop'' \textit{actionnable} universe. The time-indexed observations $x_1$, ..., $x_t$, ... are independent (causally disconnected). Each observation causes the learner to output a single action $\tilde{y}_t$ out of $K > 1$ possible actions. Every action provides a feedback $f_t$ that is an \textit{information} about a \textit{value of interest} (or reward) $r_t$ that needs to be maximized over time. The feedback is \textit{explicit} in most contextual bandit setups, i.e. $f_t=r_t$ (see \cite{lai1985asymptotically} and \cite{auer2002finite}) while it takes the form of a category $f_t=y_t$ in traditional online learning setups, that \textit{indirectly} provides a quantity to maximise through a loss function $r_t = -l(x_t,\tilde{y}_t, y_t)$ (see  \cite{duda1973pattern}, \cite{freund1999large}, \cite{kivinen2004online}, \cite{crammer2006online}). Solving the problem thus means both  learning the universe from experience and optimizing the final reward. 
+
+The one-bit feedback is a specific online learning setup implementing, in a principled way, the scarce labelling information case. After reading $\tilde{y}_t$, instead of providing a label, the universe provides a single bit of information called the \textit{label hit}, i.e. $f_t = 1$ if  $\tilde{y}_t=y_t$ and $f_t = 0$ elsewhere.  
+
+The \textit{decision function} (or politics) $h$ embodies both prior information about the structure of the universe and experience-based information.
+% distributions of rewards biased by a context $x$ that is given to the gambler before decision making. The universe is now made of couples (context, rewards distribution). 
+To every different context may correspond a different distribution of rewards. Most of the time, however, a metric exists in the context space so that close-by contexts are expected to provide close-by rewards distributions.  
+This is the essence of the linear approach that stipulates that rewards linearly relates to the context, i.e. r 
+
+ The exploration/exploitation trade-off (see \cite ) 
+
+{\color{blue}
+So all online learning algorithms share a same structure~:
+\begin{itemize}
+	\item %the knowledge of the universe relies on a \emph{model}. 
+ 
+	\item \textit{Experiments} (probing) consisting in three parts : first read a context $x_t$ from the environment; second elaborate a response $\tilde{y}_t \in \{1,...,K\}$ and third read feedback $f_t$ from the environment.
+	\item A \textit{time index} $t$ organizing individual experiments in a sequence that allow to settle a \textit{disclosure dynamics} with related quantities such as  improvement, cumulated error, regret, memory etc.
+	\item An objective mapping over the space of decision functions, that provides directions to improve the decision function. Each new experiment provides additional information, that can be used to update the politics according to the objective.
+\end{itemize}
+}
+
+{\color{red}
+ Third, learning is \textit{active} (see \cite{settles2010active}). Searching information (exploration) is balanced against choosing to exploit the actual knowledge to get rewards (see \cite{auer2003using}).}
+
+{\color{green}
+On the one hand, bandit problems consider a universe made of a finite set of arms, numbered from $1$ to $K$, and a gambler. Pulling an arm provides a reward $g$ that may vary among trials and among arms. The objective for the gambler is to maximise the total reward amount, which means exploring the universe to have sufficiently reliable inputs about the expected rewards for each arm. On the other hand, a perceptron relies on  a linear mapping $W$ that is probed against sequential data samples $x_1$, ..., $x_t$, ...   
+Every decision $\tilde{y}_t$ is confronted to the real label $y_t$, and the response function is updated so as to avoid mislabelling errors.  }
+
+The behavior of the universe is not fully predictible, and not necessarily stationnary. 
+
+ 
+
+
+
+
+ and share many common features. First, in both cases, the universe is initially hidden. 
+
+
+
+
+
+
+
+Two principal approaches are identified in the supervised setting. On the one hand, second order gradient descent methods such as natural gradient (see \cite{amari2000adaptive}), Gauss-Newton (see \cite{le2004large}), and second order perceptron (see \cite{cesa2005second}) provide almost optimal convergence rates while scaling quadratically with exemplar dimension.
+%Sequential gradient descent/Markov chain approach to learning is now commonplace in supervised learning for its prominent regularization (see \cite{le2004large}) and auto-encoding 
+%properties, powerfully exploited in the RBM approach (see \cite{hinton2006fast}).
+On the other hand, the quadratic optimization approach (see \cite{anlauf1989adatron}, \cite{crammer2006online}) only provide upper bounds on the error rate but display linear scaling in size and more generally provide a smaller memory footprint. 
+
+
+
+%Solutions to the online learning problem include the perceptron (\see{} 
 
 
 CONSERVATISM VS PROGRESSISM
@@ -157,7 +223,7 @@ LA STRUCTURE SEQUENTIELLE DE L'APPRENTISSAGE IMPLIQUE LA NOTION D'UNIVERS, AVEC 
 
 OBJECTIVE, FEEDBACK, REWARD, REGRET ETC... 
 
-A one-bit feedback, sometimes called bandit feedback in multiclass classification (see \cite{kakade2008efficient}), reflects ``hit-or-miss'' learning situations, in which a single bit feedback information indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss'').
+
 
 
 
@@ -175,18 +241,20 @@ We first unfold the many interesting aspects and issues of online learning multi
 
 \section{Online multiclass learning}
 
-A bandit problem (see \cite{robbins1952bandit}) is composed of a universe made of a finite set of arms, numbered from $1$ to $K$, and a gambler. The behavior of the universe is not fully predictible, and not necessarily stationnary. Pulling an arm will provide a reward $g$ that may vary among trials and among arms. The objective for the gambler is to maximise the total amount, which means exploring the universe to have sufficiently reliable inputs about the expected rewards for each arm. Solving the problem thus means both optimizing the final gain, but also \emph{learning the universe from experience}. 
+
 
 
 %Les problèmes de bandit simples se généralisent au cas des bandits dits contextuels \cite{langford2008epoch}. 
-Contextual bandit problems (see \cite{lai1985asymptotically} and \cite{auer2002finite}) provide sensibly richer universes with distributions of rewards biased by a context $x$ that is given to the gambler before decision making. The universe is now made of couples (context, rewards distribution). To every different context may correspond a different distribution of rewards. Most of the time, however, a metric exists in the context space so that close-by contexts are expected to provide close-by rewards distributions.   
+Contextual bandit problems  provide sensibly richer universes with
+
+
 
 %Un problème de bandit contextuel est également défini par un univers et un apprenant. . Autrement dit, à chaque contexte distinct correspond une distribution de gains distincte sur l'ensemble des $K$ bras. On peut rajouter une hypothèse supplémentaire selon laquelle à des contextes proches correspondent des distributions proches. 
 
 
 
 
-The structure of \textit{online} multiclass classification problems (see  \cite{duda1973pattern} and \cite{freund1999large}) is very close to that of contextual bandit problems. 
+The structure of \textit{online} multiclass classification problems  is very close to that of contextual bandit problems. 
 
 Le lien avec les problèmes de classification se fait naturellement en considérant des contextes décrits sur des espaces vectoriels, et des catégories décrites par une distribution de gains sur $K$ bras. Dans le cas que nous considérons, à tout contexte $x$ correspond une étiquette unique $y \in \{1,...,K\}$. Autrement dit, en présence de l'exemple $x$, choisir le bras $y$ apporte un gain positif ($g=1$). Pour tout autre choix, le gain est nul ($g=0$). Une expérience consiste ici, en présence du contexte $x$, à choisir une réponse $\tilde{y} \in \{1,...,K\}$. Si $\tilde{y} = y$, le gain vaut 1 sinon il vaut 0. On note $\mathbf{1}_{\tilde{y} = y}$ le gain obtenu dans le cadre de cette expérience. 
 
@@ -196,8 +264,8 @@ Le lien avec les problèmes de classification se fait naturellement en considér
 From this large class of online learning problems come profound questions about decision-making in non fully disclosed universes. 
 \begin{itemize}
 	\item First a temporal order needs to be considered that sets the cadence of a \emph{diclosure dynamics}. This order is described by a time index $t$. At time $t$, the gambler can only use its knowledge from past experiments ($t^\prime < t$) to make its choice. This is the essence of \textit{online} learning.
-	\item Second, the knowledge of the universe relies on a \emph{model}. This model embodies both prior information about the structure of the universe and experience-based information. Each new experiment provides additional model information, also called \textit{feedback}, that can be used to update the model.
-	\item Third, the construction of the model is constrained by choice optimality.  Contrary to a mere information seeking, each choice relies on a balance between information and final gain. Putative additional information may sometimes be sacrified against putative high reward opportunity.  This is the essence of the exploration/exploitation trade-off, but it also draws a clear connection between bandit problems and the active learning framework \cite{settles2010active}. In that respect, choice may also be referred as \textit{action} for the actual choice (information vs. reward) plays a significant role in the model update.
+	\item Second, 
+	\item Third, the construction of the model is constrained by choice optimality.  Contrary to a mere information seeking, each choice relies on a balance between information and final gain. Putative additional information may sometimes be sacrified against putative high reward opportunity.  This is the essence of the exploration/exploitation trade-off, but it also draws a clear connection between bandit problems and the active learning framework . In that respect, choice may also be referred as \textit{action} for the actual choice (information vs. reward) plays a significant role in the model update.
 	\item  Fourth, a universe is not a mere dataset. The way information is disclosed both depends on individual choices and environment responsiveness to information seeking.  A consequence is that model construction is \textit{dependent} on many factors among which the politics of choice (information seeking against reward) plays a central role and may offer garanties about converging on a satisfying model with respect to a fully disclosed universe (or dataset). 
 \end{itemize}  
 
