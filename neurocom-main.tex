@@ -160,16 +160,49 @@ The richer structure of online learning problems was outlined previously by LeCu
 
 \section{Outlook}
 
-Online learning is a \textit{process} in which an agent (the ``learner'') probes its environment sequentially to obtain \textit{information} that is eventually used to improve its \textit{fitness}.
+\paragraph{Online learning} Online learning is a \textit{process} in which an agent (the ``learner'') probes its environment sequentially to obtain \textit{information} that is eventually used to improve its \textit{fitness}.
 The universe being initially hidden, the online approach works on probing the database (universe) through individual queries that step-by-step unveil the environment. 
 
-The sequential organization of learning is present in the most traditional setups such as the Bandit problems (see \cite{robbins1952bandit}) and in the Perceptron algorithm (see \cite{rosenblatt1958perceptron}). The general setup we consider here is the case of an ``open-loop'' \textit{actionnable} universe. The time-indexed observations $x_1$, ..., $x_t$, ... are independent (causally disconnected). Each observation causes the learner to output a single action $\tilde{y}_t$ out of $K > 1$ possible actions. Every action provides a feedback $f_t$ that is an \textit{information} about a \textit{value of interest} (or reward) $r_t$ that needs to be maximized over time. The feedback is \textit{explicit} in most contextual bandit setups, i.e. $f_t=r_t$ (see \cite{lai1985asymptotically} and \cite{auer2002finite}) while it takes the form of a category $f_t=y_t$ in traditional online learning setups, that \textit{indirectly} provides a quantity to maximise through a loss function $r_t = -l(x_t,\tilde{y}_t, y_t)$ (see  \cite{duda1973pattern}, \cite{freund1999large}, \cite{kivinen2004online}, \cite{crammer2006online}). Solving the problem thus means both  learning the universe from experience and optimizing the final reward. 
+The sequential organization of learning is present in the most traditional setups such as the Bandit problems (see \cite{robbins1952bandit}) and in the Perceptron algorithm (see \cite{rosenblatt1958perceptron}). The general setup we consider here is the case of an ``open-loop'' \textit{actionnable} universe. The time-indexed observations $x_1$, ..., $x_t$, ... are independent (causally disconnected). Each observation causes the learner to output a single action $\tilde{y}_t$ out of $K > 1$ possible actions. Every action provides a feedback $f_t$ that is an \textit{information} about a \textit{value of interest} (or reward) $r_t$ that needs to be maximized over time. The feedback is \textit{explicit} in most contextual bandit setups, i.e. $f_t=r_t$ (see \cite{lai1985asymptotically} and \cite{auer2002finite}) while it takes the form of a category $f_t=y_t$ in traditional online learning setups, that \textit{indirectly} provides a quantity to maximise through a loss function $r(x_t, y_t) = -l(x_t,\tilde{y}_t, y_t)$ (see  \cite{duda1973pattern}, \cite{freund1999large}, \cite{kivinen2004online}, \cite{crammer2006online}). Solving the problem thus means both  learning the universe from experience and optimizing the final reward. 
 
-The one-bit feedback is a specific online learning setup implementing, in a principled way, the scarce labelling information case. After reading $\tilde{y}_t$, instead of providing a label, the universe provides a single bit of information called the \textit{label hit}, i.e. $f_t = 1$ if  $\tilde{y}_t=y_t$ and $f_t = 0$ elsewhere.  
+\paragraph{Linear models}
+The \textit{decision function} (or politics) $\tilde{y}_t \sim h(x_t)$ embodies both prior information about the regularity of the universe and experience-based information. A reasonable assumption  is to consider that  close-by contexts should provide close-by rewards distributions. This assumption is  implemented through 
+linear models that consider, for every categorical response $k$, a linear mapping $w_k$ such that $r(x_t,y_t) \simeq  \langle w_k, x_t\rangle$. This assumption allows (i) to 
+settle choice (or action) on reward prediction and (ii) to update models over prediction accuracy.
 
-The \textit{decision function} (or politics) $h$ embodies both prior information about the structure of the universe and experience-based information.
+Multiclass linear models then rely on a set of linear mappings $W = (w_1,...,w_K)$ that can either be considered class-prototypes or class-separatrices. The first case implements a \textit{model-based} approach, and the second a \textit{discriminant-based} approach.
 % distributions of rewards biased by a context $x$ that is given to the gambler before decision making. The universe is now made of couples (context, rewards distribution). 
-To every different context may correspond a different distribution of rewards. Most of the time, however, a metric exists in the context space so that close-by contexts are expected to provide close-by rewards distributions.  
+%Two principal approaches are identified in the supervised setting. 
+In the first case,  second order gradient descent methods such as natural gradient (see \cite{amari2000adaptive}), Gauss-Newton (see \cite{le2004large}), and second order perceptron (see \cite{cesa2005second}) provide almost optimal convergence rates while scaling quadratically with exemplar dimension.
+%Sequential gradient descent/Markov chain approach to learning is now commonplace in supervised learning for its prominent regularization (see \cite{le2004large}) and auto-encoding 
+%properties, powerfully exploited in the RBM approach (see \cite{hinton2006fast}).
+In the second case, the quadratic optimization approach (see \cite{anlauf1989adatron}, \cite{crammer2006online}) only provide upper bounds on the error rate but display linear scaling in size and more generally provide a smaller memory footprint. 
+
+
+\paragraph{One-bit feedback}
+The one-bit feedback is a specific online learning setup that implements, in a principled way, the scarce labelling information problem. After reading $\tilde{y}_t$, instead of providing a label, the universe provides a single bit of information called the \textit{label hit}, i.e. $f_t = 1$ if  $\tilde{y}_t=y_t$ and $f_t = 0$ elsewhere. The objective, just as in the supervised case, is to avoid label misses and maximise labels hits. A specific update function needs to be defined to allow label hit improvement over time. 
+
+
+
+
+This problem was coined the ``bandit feedback classification problem'' by \cite{kakade2008efficient}. Taking inspiration from the multiclass perceptron (\cite{duda1973pattern}), a time-effective algorithm, called the ``Banditron'', is established:
+$K$ linear mappings $w_1, ..., w_K$ are defined and class-decision relies on a best-match politics, i.e.
+ $$\hat{y} = \arg \max_{k \in\{1,..,K\}}  \langle w_k, x \rangle$$
+ the final choice relying on an $\varepsilon-greedy$ random draw:
+ $$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ with $\varepsilon \in [0,1]$.
+ 
+Si $x$ est un exemplaire, $\langle w_1, x \rangle > 0$ signifie que $x$ appartient à la classe 1, et $\langle w_1, x \rangle < 0$ qu'il n'appartient pas à la classe 1. Si $x$ est un exemplaire inconnu, on définit généralement la réponse du classifieur comme~:
+
+
+Kakade propose donc d'apprendre ces hyperplans séparateurs en utilisant un algorithme inspiré du perceptron multiclasse. Il se donne un ensemble de $K$ hyperplans $W_0 = (w^{(1)}_0$, ..., $w^{(K)}_0)$ initialement des vecteurs nuls. A chaque essai, un contexte $x_t$ est lu. Le choix du bras repose sur un tirage aléatoire défini selon~ :  On note $\tilde{y}_t$ le résultat du tirage à l'essai $t$. La mise à jour s'effectue selon~:
+$$ W_t = W_{t-1} + \frac{\mathbf{1}_{\tilde{y}_t = y_t} X_t^{\tilde{y}_t}}{P(\tilde{Y}=\tilde{y}_t)} - X_t^{\hat{y}_t}$$   
+avec $X_t^k = (0, ..., 0,  x_t, 0, .., 0)$ une séquence de vecteurs nuls, excepté à la position $k$ où l'on trouve l'exemplaire $x_t$. Kakade montre que son algorithme converge en espérance vers le classifieur du perceptron, et obtient des garanties sur les bornes d'erreur de son algorithme. 
+
+
+
+ 
+
+
 This is the essence of the linear approach that stipulates that rewards linearly relates to the context, i.e. r 
 
  The exploration/exploitation trade-off (see \cite ) 
@@ -207,10 +240,6 @@ The behavior of the universe is not fully predictible, and not necessarily stati
 
 
 
-Two principal approaches are identified in the supervised setting. On the one hand, second order gradient descent methods such as natural gradient (see \cite{amari2000adaptive}), Gauss-Newton (see \cite{le2004large}), and second order perceptron (see \cite{cesa2005second}) provide almost optimal convergence rates while scaling quadratically with exemplar dimension.
-%Sequential gradient descent/Markov chain approach to learning is now commonplace in supervised learning for its prominent regularization (see \cite{le2004large}) and auto-encoding 
-%properties, powerfully exploited in the RBM approach (see \cite{hinton2006fast}).
-On the other hand, the quadratic optimization approach (see \cite{anlauf1989adatron}, \cite{crammer2006online}) only provide upper bounds on the error rate but display linear scaling in size and more generally provide a smaller memory footprint. 
 
 
 
@@ -299,18 +328,6 @@ Il existe cependant de nombreuses situations d'apprentissage dans lesquelles les
 
 
 
-
-
-
-
-
-Le lien entre ce problème et les problèmes de classification linéaire a été proposé par Kakade \cite{kakade2008efficient}. Dans le cas de la classification linéaire, des hyperplans séparateurs $w_1, ..., w_K$ définissent les frontières entre les différentes classes dans l'espace des exemplaires.  
-Si $x$ est un exemplaire, $\langle w_1, x \rangle > 0$ signifie que $x$ appartient à la classe 1, et $\langle w_1, x \rangle < 0$ qu'il n'appartient pas à la classe 1. Si $x$ est un exemplaire inconnu, on définit généralement la réponse du classifieur comme~:
-$$\hat{y} = \arg \max_{k \in\{1,..,K\}}  \langle w_k, x \rangle$$
-
-Dans le cadre de l'algorithme ``Banditron'', Kakade propose donc d'apprendre ces hyperplans séparateurs en utilisant un algorithme inspiré du perceptron multiclasse. Il se donne un ensemble de $K$ hyperplans $W_0 = (w^{(1)}_0$, ..., $w^{(K)}_0)$ initialement des vecteurs nuls. A chaque essai, un contexte $x_t$ est lu. Le choix du bras repose sur un tirage aléatoire défini selon~ : $P(\tilde{Y}=k) = (1 - \varepsilon) \mathbf{1}_{k = \hat{y}} + \frac{\varepsilon}{K} $ avec $\varepsilon \in [0,1]$ le paramètre d'exploration. On note $\tilde{y}_t$ le résultat du tirage à l'essai $t$. La mise à jour s'effectue selon~:
-$$ W_t = W_{t-1} + \frac{\mathbf{1}_{\tilde{y}_t = y_t} X_t^{\tilde{y}_t}}{P(\tilde{Y}=\tilde{y}_t)} - X_t^{\hat{y}_t}$$   
-avec $X_t^k = (0, ..., 0,  x_t, 0, .., 0)$ une séquence de vecteurs nuls, excepté à la position $k$ où l'on trouve l'exemplaire $x_t$. Kakade montre que son algorithme converge en espérance vers le classifieur du perceptron, et obtient des garanties sur les bornes d'erreur de son algorithme. 
 
 Toujours dans le cadre des classifieurs linéaires, plusieurs algorithmes d'apprentissage de bandits contextuels ont été proposés dans la littérature. Dans nos expérimentations numériques, nous considérerons également ici l'algorithme ``Confidit'' proposé par Crammer et Gentile \cite{crammer2013multiclass}, reposant sur le perceptron d'ordre 2 et l'exploration non stochastique basée sur le principe UCB \cite{lai1985asymptotically}, et présentant des profils de convergence plus favorables que le Banditron. 
 
