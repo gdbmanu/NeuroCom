@@ -131,32 +131,9 @@ Categorical online learning is an old and well-documented class of learning prob
 Two well-known setups obey to this class, i.e. the contextual bandits (see  \cite{lai1985asymptotically} and \cite{auer2002finite}) and supervised online learning (see  \cite{rosenblatt1958perceptron}, \cite{duda1973pattern} and \cite{freund1999large}), the two setups mainly differing by the nature of the feedback. Whether abundant or scarce, deterministic or stochastic, stationary or adversarial, the feedback characteristics critically shape the design of the learning algorithms.  
 
 The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback (see \cite{kakade2008efficient}). This case lies at the crossroad of the online learning and bandit approaches.  A one-bit feedback reflects ``hit-or-miss'' learning situations, in which the single bit of feedback indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, the problem is specific to the online approach and was only recently identified and analyzed by the community (see \cite{kakade2008efficient}, \cite{gentile2012multilabel}, etc.). 
+Apart from the original work of \cite{kakade2008efficient}, most recent approaches to this problem are based on regularized linear models (see \cite{li2010contextual}, \cite{crammer2013multiclass}, \cite{ngo2013upper}), to which the powerful methods of contextual bandit, including UCB-like non-stochastic exploration strategy (see \cite{auer2002finite}), do apply. While providing almost optimal convergence rates, model-based approaches suffer from a quadratic complexity in space that limits their applicability to large-dimensional datasets.  On contrary, discriminant-based approaches to online classification (see \cite{anlauf1989adatron}, \cite{crammer2006online}) only provide upper bounds on the error rate, but display linear scaling in size with smaller memory footprint. 
 
-{\color{magenta} After a stepwise introduction on the main findings and issues, we present a ...}
-
-
-{\color{green}
-STRUCTURE OF ONLINE LEARNING ALGORITHMS - 
-
-All online learning algorithms share a similar structure, that dates back to the Perceptron \cite{rosenblatt1958perceptron}.  ...
-The richer structure of online learning problems was outlined previously by LeCun (NIPS 2003) and XXX (NIPS 2014)
-\begin{itemize}
-	\item online learning is expected to address the case where data is abundant (many examples, high dimensions, ...)
-	\begin{itemize}
-		\item sparsity
-		\item second order methods?
-		\item regularization?
-	\end{itemize}
-	\item allow quantifying progress
-	\begin{itemize}
-		\item learning and forget
-		\item progrssism vs. conservatism
-	\end{itemize}
-	\item information search.
-	\item non-stationarity
-
-\end{itemize}
-}
+We adapt in this paper the quadratic optimization approach proposed by \cite{crammer2006online} to the one-bit feedback case. Online learning relies on a local norm minimization under standard linear-convex constraints. Our conservative approach allows to determine similar regret bounds than in the original paper of \cite{crammer2006online}, providing strong garanties on our convergence capabilities, that are confronted to the other methods over synthetic and real datasets.  
 
 \section{Outlook}
 
@@ -188,143 +165,63 @@ The one-bit feedback is a specific online learning setup that implements, in a p
 This problem was coined the ``bandit feedback classification problem'' by \cite{kakade2008efficient}. Taking inspiration from the multiclass perceptron (\cite{duda1973pattern}), a time-effective algorithm, called the ``Banditron'', is established:
 $K$ linear mappings $w_1, ..., w_K$ are defined and class-decision relies on a best-match politics, i.e.
  $$\hat{y} = \arg \max_{k \in\{1,..,K\}}  \langle w_k, x \rangle$$
- the final choice relying on an $\varepsilon-greedy$ random draw:
+Contrarily to the supervised case, an \textit{exploration} politics needs to be defined to efficiently sample the decision space. The Banditron adopts a simple  $\varepsilon-greedy$ search allowing the non-reward maximal responses to be occasionally chosen in a uniform way:
  $$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ with $\varepsilon \in [0,1]$.
- 
-Si $x$ est un exemplaire, $\langle w_1, x \rangle > 0$ signifie que $x$ appartient à la classe 1, et $\langle w_1, x \rangle < 0$ qu'il n'appartient pas à la classe 1. Si $x$ est un exemplaire inconnu, on définit généralement la réponse du classifieur comme~:
+Given an initial set of $K$ null-vector hyperplanes $W_0 = (w^{1}_0$, ..., $w^{K}_0)$, the update at time $t$ is ~:
+$$ W_t = W_{t-1} + \frac{\delta(\tilde{y}_t ,y_t) X_t^{\tilde{y}_t}}{P(\tilde{Y}=\tilde{y}_t)} - X_t^{\hat{y}_t}$$   
+with the convention $X_t^k = (0, ..., 0,  x_t, 0, .., 0)$ a sequence of null vectors, except at position $k$ where the observation vector $x_t$ is found. The expectation of the update is shown to be that of the multiclass perceptron, and a convergence to the correponding perceptron classifier is obtained, with finite bounds on the cumulative error in linearly separable cases. 
+
+\paragraph{The conservative approach to online classification}
+
+%In contrast with the \textit{offline} setting, where the classifiers are obtained through quadratic optimization over a finite set of classified exemples (see \cite{vapnik1998statistical}), no predefinite database is considered under the online setting. 
+%The observation vectors arrive sequentially according to a temporal index $t$ (temporal order). 
+%When facing a new observation vector $x_t$, the learner emits a categorical response $\tilde{y}_t \in \{1,... K\}$ and then obtains a feedback $f_t$. The feedback provides an indication about the correctness of the learner's choice. 
+Following \cite{kivinen2004online} and \cite{crammer2006online}, we consider online learning implements a sequential approach to optimization, relying on a specific sequence of observations, decisions and feedbacks.
+%In the supervised setting, the feedback is equal to the expected response $f_t = y_t \in \{1,... K\}$. In the non-supervised setting, no feedback is provided.
+%Our objective here is to provide a way to extend those local online optimization approaches  to the \emph{binary feedback} case, where the feedback is composed of a single bit of information $f_t \in\{0,1\}$, i.e. $f_t = 1$ if the class proposed by the clasifier is correct and 0 otherwise. This setup may provide avenues toward the more general contextual bandit and  reinforcement learning setups.
+%given an objective (or loss) function considered defined over the full input space.
+%A feedback is a \emph{local} measure of  learning achievement (or failure), 
+The misclassification risk needs to be minimised through local measures of $l_t = l(x_t,\tilde{y}_t,f_t,W_t)$  (the loss function) that estimates the correctness of the current response. The loss function combines the feedback signal $f_t$ with the actual response $\tilde{y}_t$ and the current classifier's parameters $W_t$ to provide additional information about the direction to be followed for future classification improvement (i.e. risk minimization). 
+%The loss thus relies on a combination of \emph{internal} information (current classifier's parameters, current choice) and \emph{external} information (input vector, feedback). On contrary to the offline setting, the classifier's current value $W_t$ plays a significant role in defining the future direction. 
+
+Typical learning schemes rely on minimizing a convex \emph{loss} over $W$.  
+Different loss function may be defined in that case. 
+Under the multiclass setting, one can distinguish two principal constraint schemes : the \emph{normative} and the \emph{relative} schemes. In a \emph{normative} scheme, a classifier is expected to provide a response that relates to a reference value $a$. A typical normative scheme is the one-vs-all (OVA) scheme, having an $a = 1$ reference for class-compliant examples and $a = -1$ for class-differing examples,  i.e. $$\forall k,i \left\{
+\begin{array}{l}
+\langle w_k, x \rangle \geq 1 \text{ if } y = k \\
+\langle w_k, x \rangle \leq -1 \text{ if }y \neq k.
+\end{array}
+\right. 
+$$
+and a corresponding loss function can be the normative multiclass \emph{hinge loss}:  
+$$ l(x,W,y) = \sum_{k=1}^K \left[1 + (1 - 2 \delta(y,k)) \langle w_k,x \rangle\right]_+
+$$
+with $\delta(i,j) =1$ if $i = j$ and 0 elsewhere, and $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
+Under  a \emph{relative} scheme (see \cite{crammer2003ultraconservative}), there is no reference value and the linear score of the class-compliant separatrix $\langle w_{y}, x\rangle$ is expected to be significantly greater than the other linear scores, i.e.
+$$ \langle w_{y}, x \rangle \geq 1 + \max_{k \neq y} \langle w_k, x \rangle  $$
+and a typical loss function is the conservative multiclass \emph{hinge loss}:
+$$ l (x,W,y) =  \left[ 1 +  \langle w_y, x \rangle - \max_{k \neq y} \langle w_k, x\rangle\right]_+$$
+
+The different multiclass online learning algorithms fall either into the normative or the relative category. The multiclass perceptron (see  \cite{duda1973pattern} and \cite{freund1999large}), while not margin aware, is a typical normative multiclass approach for it  imposes a positive fit with class-compliant exemplars, and a negative fit with class-negative exemplars.  
+On contrary, the multiclass passive-agressive scheme proposed in \cite{crammer2006online} obeys to a relative approach to online multiclass learning.   
+
+Notion de conservatisme vs exhausivité (Anlauf) et progressisme (Kivinen).
 
 
-Kakade propose donc d'apprendre ces hyperplans séparateurs en utilisant un algorithme inspiré du perceptron multiclasse. Il se donne un ensemble de $K$ hyperplans $W_0 = (w^{(1)}_0$, ..., $w^{(K)}_0)$ initialement des vecteurs nuls. A chaque essai, un contexte $x_t$ est lu. Le choix du bras repose sur un tirage aléatoire défini selon~ :  On note $\tilde{y}_t$ le résultat du tirage à l'essai $t$. La mise à jour s'effectue selon~:
-$$ W_t = W_{t-1} + \frac{\mathbf{1}_{\tilde{y}_t = y_t} X_t^{\tilde{y}_t}}{P(\tilde{Y}=\tilde{y}_t)} - X_t^{\hat{y}_t}$$   
-avec $X_t^k = (0, ..., 0,  x_t, 0, .., 0)$ une séquence de vecteurs nuls, excepté à la position $k$ où l'on trouve l'exemplaire $x_t$. Kakade montre que son algorithme converge en espérance vers le classifieur du perceptron, et obtient des garanties sur les bornes d'erreur de son algorithme. 
-
-
-
- 
-
-
-This is the essence of the linear approach that stipulates that rewards linearly relates to the context, i.e. r 
-
- The exploration/exploitation trade-off (see \cite ) 
-
-{\color{blue}
-So all online learning algorithms share a same structure~:
-\begin{itemize}
-	\item %the knowledge of the universe relies on a \emph{model}. 
- 
-	\item \textit{Experiments} (probing) consisting in three parts : first read a context $x_t$ from the environment; second elaborate a response $\tilde{y}_t \in \{1,...,K\}$ and third read feedback $f_t$ from the environment.
-	\item A \textit{time index} $t$ organizing individual experiments in a sequence that allow to settle a \textit{disclosure dynamics} with related quantities such as  improvement, cumulated error, regret, memory etc.
-	\item An objective mapping over the space of decision functions, that provides directions to improve the decision function. Each new experiment provides additional information, that can be used to update the politics according to the objective.
-\end{itemize}
-}
-
-{\color{red}
- Third, learning is \textit{active} (see \cite{settles2010active}). Searching information (exploration) is balanced against choosing to exploit the actual knowledge to get rewards (see \cite{auer2003using}).}
-
-{\color{green}
-On the one hand, bandit problems consider a universe made of a finite set of arms, numbered from $1$ to $K$, and a gambler. Pulling an arm provides a reward $g$ that may vary among trials and among arms. The objective for the gambler is to maximise the total reward amount, which means exploring the universe to have sufficiently reliable inputs about the expected rewards for each arm. On the other hand, a perceptron relies on  a linear mapping $W$ that is probed against sequential data samples $x_1$, ..., $x_t$, ...   
-Every decision $\tilde{y}_t$ is confronted to the real label $y_t$, and the response function is updated so as to avoid mislabelling errors.  }
-
-The behavior of the universe is not fully predictible, and not necessarily stationnary. 
-
- 
-
-
-
-
- and share many common features. First, in both cases, the universe is initially hidden. 
-
-
-
-
-
-
-
-
-
-
-%Solutions to the online learning problem include the perceptron (\see{} 
-
-
-CONSERVATISM VS PROGRESSISM
-
-LA STRUCTURE SEQUENTIELLE DE L'APPRENTISSAGE IMPLIQUE LA NOTION D'UNIVERS, AVEC REPONSE AUX SOLLICITATIONS, MEMOIRE, ACCROISSEMENT DE L'EXPERIENCE, ET POSSIBLEMENT NON-STATIONNARITE
-
-OBJECTIVE, FEEDBACK, REWARD, REGRET ETC... 
-
-
-
-
-
-
-
- plays a central role in machine learning, for it embodies, in a simple way, the general question of optimality in decision-making through \emph{active} information seeking. 
-
-
-We consider here 1-bit feedback online multiclass  learning as part of a more
-
-
- Efforts to concile the two approaches are not new, for they 
-
-We first unfold the many interesting aspects and issues of online learning multiclas classification problems. Then in a second part, ... 
-
-\section{Online multiclass learning}
+%\section{Online multiclass learning}
 
 
 
 
 %Les problèmes de bandit simples se généralisent au cas des bandits dits contextuels \cite{langford2008epoch}. 
-Contextual bandit problems  provide sensibly richer universes with
+
+%Contextual bandit problems  provide sensibly richer universes with
 
 
 
 %Un problème de bandit contextuel est également défini par un univers et un apprenant. . Autrement dit, à chaque contexte distinct correspond une distribution de gains distincte sur l'ensemble des $K$ bras. On peut rajouter une hypothèse supplémentaire selon laquelle à des contextes proches correspondent des distributions proches. 
 
 
-
-
-The structure of \textit{online} multiclass classification problems  is very close to that of contextual bandit problems. 
-
-Le lien avec les problèmes de classification se fait naturellement en considérant des contextes décrits sur des espaces vectoriels, et des catégories décrites par une distribution de gains sur $K$ bras. Dans le cas que nous considérons, à tout contexte $x$ correspond une étiquette unique $y \in \{1,...,K\}$. Autrement dit, en présence de l'exemple $x$, choisir le bras $y$ apporte un gain positif ($g=1$). Pour tout autre choix, le gain est nul ($g=0$). Une expérience consiste ici, en présence du contexte $x$, à choisir une réponse $\tilde{y} \in \{1,...,K\}$. Si $\tilde{y} = y$, le gain vaut 1 sinon il vaut 0. On note $\mathbf{1}_{\tilde{y} = y}$ le gain obtenu dans le cadre de cette expérience. 
-
-
-2. ACTION/DECISION IN NON-FULLY DISCLOSED UNIVERSES (ACTIVE LEARNING)
-
-From this large class of online learning problems come profound questions about decision-making in non fully disclosed universes. 
-\begin{itemize}
-	\item First a temporal order needs to be considered that sets the cadence of a \emph{diclosure dynamics}. This order is described by a time index $t$. At time $t$, the gambler can only use its knowledge from past experiments ($t^\prime < t$) to make its choice. This is the essence of \textit{online} learning.
-	\item Second, 
-	\item Third, the construction of the model is constrained by choice optimality.  Contrary to a mere information seeking, each choice relies on a balance between information and final gain. Putative additional information may sometimes be sacrified against putative high reward opportunity.  This is the essence of the exploration/exploitation trade-off, but it also draws a clear connection between bandit problems and the active learning framework . In that respect, choice may also be referred as \textit{action} for the actual choice (information vs. reward) plays a significant role in the model update.
-	\item  Fourth, a universe is not a mere dataset. The way information is disclosed both depends on individual choices and environment responsiveness to information seeking.  A consequence is that model construction is \textit{dependent} on many factors among which the politics of choice (information seeking against reward) plays a central role and may offer garanties about converging on a satisfying model with respect to a fully disclosed universe (or dataset). 
-\end{itemize}  
-
-
-When decision implies making a choice among $K$ possibilities, a learner needs 
-to balance experience (expectations from the past) and curiosity (trying new ways for better achievement).
-Different \textit{politics} may be adopted to address this 
- 
-In the first case, called the ``conservative'' case, the learner's choice illustrates either self-confidence or environment stationarity. In the second case, called the ``progressive'' case, it illustrate either a lack of knowledge or adaptivity to change, such as in the adversarial setting \cite{auer1995gambling},
- or in non-stationary environments (\cite{kivinen2004online}). Balancing self-confidence and adaptivity to change is thus the essence of the exploration/exploitation trade-off.
- 
- 
- Dans ce cadre, on notera un algorithme d'apprentissage selon sa capacité à minimiser le \textit{regret}, qui correspond à l'espérance de la différence entre les gains obtenus à la fin de la partie et le gain qu'on aurait obtenu en appliquant la politique optimale. 
- Ainsi, si on considère une séquence de $T$ expériences, le regret se définit comme :
- $$R_t = \mathbb{E} \sum_{t=1}^T g_t^* - g_t$$
- où $g_t^*$ est le gain obtenu en appliquant la politique optimale et $g_t$ le gain obtenu par l'algorithme d'apprentissage.
- Both stochastic
- (see \cite{auer2003nonstochastic}) and non-stochastic strategies (see \cite{auer2002finite}) can be shown efficient in regulating this delicate balance. 
-
-
-Les problèmes de bandit offrent donc un cadre à l'apprentissage actif, au sens où l'information collectée ne dépend pas uniquement des données présentes dans l'univers, mais également des choix particuliers effectués par l'apprenant. 
-
-Learning is thus at the core of bandit problems, just as it is for other machine learning schemes. 
-Online supervised classification schemes (see \cite{freund1997decision}, \cite{cesa2005second}, \cite{kivinen2004online}, \cite{crammer2006online}) show striking similarities with the contextual bandit setup. Online learning means updating a classifier at each trial, i.e. on the one hand using past experience to classify the current instance $x_t$, but also, on the other hand, using additional knowledge provided by the new label $y_t$ to improve future responses. Most online supervised learning schemes do not implement curiosity however, for the label values are non stochastic and the best matching label provably the optimal choice. 
-
-
-%Classiquement, l'apprentissage d'un classifieur repose sur une base d'apprentissage constituée par un ensemble de couples $(x_1,y_1),..., (x_n,y_n)$ où le premier terme du couple est un exemple à classer, généralement représenté sous forme vectorielle,  et le deuxième terme une étiquette indiquant la classe de l'exemple fourni.
-%L'apprentissage consiste alors à déduire une règle générale de classification à partir de ces exemples, pour pouvoir ensuite classer des exemples inconnus.
-
-Il existe cependant de nombreuses situations d'apprentissage dans lesquelles les étiquettes ne sont pas disponibles telles quelles mais sont un peu ``difficiles'' à obtenir. Nous considérons ici le cas du ``bandit contextuel'' qui est une extension des problèmes de bandit manchot au cas de la classification. 
 
 
 
@@ -339,45 +236,6 @@ Multiclass classification requires  finding an appropriate class $k \in \{1,... 
 The linear approach to classification means to separate the input space in regions, each region being defined by a separating hyperplane (or a set of separating hyperplanes). We consider here the case of a  classifier $W = (w_1,..,w_k) \in \mathbb{R}^{K \times d}$ defined as a set of $K$ separating hyperplanes. The separating hyperplanes are expected to optimally separate the input space according to the misclassification risk. This risk can for instance be minimized through a margin principle (see \cite{vapnik1998statistical}), imposing a non-zero distance of known class exemplars to the classification boundaries. 
 
 
-
-
-In contrast with the \textit{offline} setting, where the classifiers are obtained through quadratic optimization over a finite set of classified exemples (see \cite{vapnik1998statistical}), no predefinite database is considered under the \emph{online} setting. 
-The observation vectors arrive sequentially according to a temporal index $t$ (temporal order). When facing a new example $x_t$, the learner emits a categorical response $\tilde{y}_t \in \{1,... K\}$ and then obtains a feedback $f_t$. The feedback provides an indication about the correctness of the learner's choice. Following \cite{kivinen2004online} and \cite{crammer2006online}, we consider online learning implements a sequential approach to optimization, relying on a specific sequence of observations, decisions and feedbacks.
-In the supervised setting, the feedback is equal to the expected response $f_t = y_t \in \{1,... K\}$. In the non-supervised setting, no feedback is provided.
-Our objective here is to provide a way to extend those local online optimization approaches  to the \emph{binary feedback} case, where the feedback is composed of a single bit of information $f_t \in\{0,1\}$, i.e. $f_t = 1$ if the class proposed by the clasifier is correct and 0 otherwise. This setup may provide avenues toward the more general contextual bandit and  reinforcement learning setups.
-
-
- 
-%given an objective (or loss) function considered defined over the full input space.
-%A feedback is a \emph{local} measure of  learning achievement (or failure), 
-
-
-The misclassification risk needs to be minimised through local measures of $l_t$  (the loss function) that estimates the correctness of the current response. The loss function combines the feedback signal $f_t$ with the actual response $\tilde{y}_t$ and the current classifier's parameters to provide additional information about the direction to be followed for future classification improvement (i.e. risk minimization). 
-The loss thus relies on a combination of \emph{internal} information (current classifier's parameters, current choice) and \emph{external} information (input vector, feedback). On contrary to the offline setting, the classifier's current value $W_t$ plays a significant role in defining the future direction. 
-
-
-Typical learning schemes rely on minimizing a convex \emph{loss} over $W$.  
-Different loss function may be defined in that case. 
-Under the multiclass setting, one can distinguish two principal constraint schemes : the \emph{normative} and the \emph{relative} schemes. In a \emph{normative} scheme, a classifier is expected to provide a response that relates to a reference value $a$. A typical normative scheme is the one-vs-all (OVA) scheme, having an $a = 1$ reference for class-compliant examples and $a = -1$ for class-differing examples,  i.e. $$\forall k,i \left\{
-\begin{array}{l}
-\langle w_k, x_i \rangle \geq 1 \text{ if } y_i = k \\
-\langle w_k, x_i \rangle \leq -1 \text{ if }y_i \neq k.
-\end{array}
-\right. 
-$$
-and a corresponding loss function can be the normative multiclass \emph{hinge loss}:  
-$$ l(x_i,W,y_i) = \sum_{k=1}^K \left[1 + (1 - 2 \delta(y_i,k)) \langle w_k,x_i \rangle\right]_+
-$$
-with $\delta(i,j) =1$ if $i = j$ and 0 elsewhere, and $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
-Under  a \emph{relative} scheme (see \cite{crammer2003ultraconservative}), there is no reference value and the linear score of the class-compliant separatrix $\langle w_{y_i}, x_i\rangle$ is expected to be significantly greater than the other linear scores, i.e.
-$$ \forall i, \langle w_{y_i}, x_i \rangle \geq 1 + \max_{k \neq y_i} \langle w_k, x_i \rangle  $$
-and a typical loss function is the conservative multiclass \emph{hinge loss}:
-$$ l (x_i,W,y_i) =  \left[ 1 +  \langle w_{y_i}, x_i \rangle - \max_{k \neq y_i} \langle w_k, x_i\rangle\right]_+$$
-
-The different multiclass online learning algorithms fall either into the normative or the relative category. The multiclass perceptron (see  \cite{duda1973pattern} and \cite{freund1999large}), while not margin aware, is a typical normative multiclass approach for it  imposes a positive fit with class-compliant exemplars, and a negative fit with class-negative exemplars.  
-On contrary, the multiclass passive-agressive scheme proposed in \cite{crammer2006online} obeys to a relative approach to online multiclass learning.   
-
-Notion de conservatisme vs exhausivité (Anlauf) et progressisme (Kivinen).
 
 
 Dans le cas linéairement séparable, l'apprentissage en ligne d'un perceptron multi-classes peut être significativement accéléré en utilisant les principes de l'optimisation quadratique tels que proposés par Vapnik \cite{vapnik1998statistical}. Dans un article récent, Crammer et al \cite{crammer2006online} proposent une méthode d'apprentissage en ligne supervisée reposant sur l'optimisation locale de la fonction de perte ``hinge loss'' définie dans le cadre multi-classe comme : 
