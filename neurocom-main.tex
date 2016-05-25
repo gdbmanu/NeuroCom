@@ -127,13 +127,13 @@ Mot1 \sep Mot2
 \label{sec:lentete}
 
 
-Categorical online learning is an old and well-documented class of learning problems in which (i) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and (ii) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$. In contrast with the offline approach, online learning takes the form of an iterative process, relying on a time-ordered sequence of observations, queries and feedback.   
-Two well-known setups obey to this class, i.e. the contextual bandits (see  \cite{lai1985asymptotically} and \cite{auer2002finite}) and supervised online learning (see  \cite{rosenblatt1958perceptron}, \cite{duda1973pattern} and \cite{freund1999large}), the two setups mainly differing by the nature of the feedback. Whether abundant or scarce, deterministic or stochastic, stationary or adversarial, the feedback characteristics critically shape the design of the learning algorithms.  
+Categorical online learning is a well-documented class of learning problems in which ($i$) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and ($ii$) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$. The multiclass learning task typically addresses object recognition such as OCR, face recognition, speech recognition etc. In contrast with the offline approach, online learning takes the form of an iterative process, relying on a time-ordered sequence of observations, queries and feedbacks.   
+Two well-known setups obey to this class, i.e. the contextual bandit setup (see  \cite{lai1985asymptotically} and \cite{auer2002finite}) and supervised online learning setup (see  \cite{rosenblatt1958perceptron}, \cite{duda1973pattern} and \cite{freund1999large}), the two setups mainly differing by the nature of the feedback. Whether abundant or scarce, deterministic or stochastic, stationary or adversarial, the feedback characteristics critically shape the design of the learning algorithms.  
 
-The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback (see \cite{kakade2008efficient}). This case lies at the crossroad of the online learning and bandit approaches.  A one-bit feedback reflects ``hit-or-miss'' learning situations, in which the single bit of feedback indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, the problem is specific to the online approach and was only recently identified and analyzed by the community (see \cite{kakade2008efficient}, \cite{gentile2012multilabel}, etc.). 
-Apart from the original work of \cite{kakade2008efficient}, most recent approaches to this problem are based on regularized linear models (see \cite{li2010contextual}, \cite{crammer2013multiclass}, \cite{ngo2013upper}), to which the powerful methods of contextual bandit, including UCB-like non-stochastic exploration strategy (see \cite{auer2002finite}), do apply. While providing almost optimal convergence rates, model-based approaches suffer from a quadratic complexity in space that limits their applicability to large-dimensional datasets.  On contrary, discriminant-based approaches to online classification (see \cite{anlauf1989adatron}, \cite{crammer2006online}) only provide upper bounds on the error rate, but display linear scaling in size with smaller memory footprint. 
+The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback (see \cite{kakade2008efficient}). This case lies at the crossroad of the supervised online learning setup and the bandit setup.  A one-bit feedback reflects a ``hit-or-miss'' learning situations, in which a single bit indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, the problem is specific to the online approach and was only recently identified and analyzed by the community (see \cite{kakade2008efficient}, \cite{gentile2012multilabel}, etc.). 
+Apart from the original work of \cite{kakade2008efficient}, most recent approaches to this problem are based on regularized linear models (see \cite{li2010contextual}, \cite{crammer2013multiclass}, \cite{ngo2013upper}), to which the powerful methods of contextual bandit, including UCB-like non-stochastic exploration strategy (see \cite{lai1985asymptotically}), do apply. While providing almost optimal convergence rates, model-based approaches suffer from a quadratic complexity in space that limits their applicability to large-dimensional datasets.  On contrary, discriminant-based approaches to online classification (see \cite{anlauf1989adatron}, \cite{crammer2006online}) only provide upper bounds on the error rate, but display linear scaling in size with smaller memory footprint. 
 
-We adapt in this paper the quadratic optimization approach proposed by \cite{crammer2006online} to the one-bit feedback case. Online learning relies on a local norm minimization under standard linear-convex constraints. Our conservative approach allows to determine similar regret bounds than in the original paper of \cite{crammer2006online}, providing strong garanties on our convergence capabilities, that are confronted to the other methods over synthetic and real datasets.  
+We adapt in this paper the quadratic optimization approach proposed by \cite{crammer2006online} to the one-bit feedback case. Online learning relies on a local norm minimization under standard linear-convex constraints. Our conservative approach allows to determine similar regret bounds than in the original paper of \cite{crammer2006online}, providing strong garanties on  convergence capabilities, that are confronted to the other methods over synthetic and real datasets.  
 
 \section{Outlook}
 
@@ -144,8 +144,8 @@ The sequential organization of learning is present in the most traditional setup
 
 \paragraph{Linear models}
 The \textit{decision function} (or politics) $\tilde{y}_t \sim h(x_t)$ embodies both prior information about the regularity of the universe and experience-based information. A reasonable assumption  is to consider that  close-by contexts should provide close-by rewards distributions. This assumption is  implemented through 
-linear models that consider, for every categorical response $k$, a linear mapping $w_k$ such that $r(x_t,y_t) \simeq  \langle w_k, x_t\rangle$. This assumption allows (i) to 
-settle choice (or action) on reward prediction and (ii) to update models over prediction accuracy.
+linear models that consider, for every categorical response $k$, a linear mapping $w_k$ such that $r(x_t,y_t) \simeq  \langle w_k, x_t\rangle$. This assumption allows ($i$) to 
+settle choice (or action) on reward prediction and ($ii$) to update models over prediction accuracy.
 
 Multiclass linear models then rely on a set of linear mappings $W = (w_1,...,w_K)$ that can either be considered class-prototypes or class-separatrices. The first case implements a \textit{model-based} approach, and the second a \textit{discriminant-based} approach.
 % distributions of rewards biased by a context $x$ that is given to the gambler before decision making. The universe is now made of couples (context, rewards distribution). 
@@ -165,11 +165,11 @@ The one-bit feedback is a specific online learning setup that implements, in a p
 This problem was coined the ``bandit feedback classification problem'' by \cite{kakade2008efficient}. Taking inspiration from the multiclass perceptron (\cite{duda1973pattern}), a time-effective algorithm, called the ``Banditron'', is established:
 $K$ linear mappings $w_1, ..., w_K$ are defined and class-decision relies on a best-match politics, i.e.
  $$\hat{y} = \arg \max_{k \in\{1,..,K\}}  \langle w_k, x \rangle$$
-Contrarily to the supervised case, an \textit{exploration} politics needs to be defined to efficiently sample the decision space. The Banditron adopts a simple  $\varepsilon-greedy$ search allowing the non-reward maximal responses to be occasionally chosen in a uniform way:
+Contrarily to the supervised case, an \textit{exploration} politics needs to be defined to efficiently sample the decision space. The Banditron adopts a simple  $\varepsilon-greedy$ search allowing the non-maximal responses to be occasionally chosen in a uniform way:
  $$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ with $\varepsilon \in [0,1]$.
 Given an initial set of $K$ null-vector hyperplanes $W_0 = (w^{1}_0$, ..., $w^{K}_0)$, the update at time $t$ is ~:
 $$ W_t = W_{t-1} + \frac{\delta(\tilde{y}_t ,y_t) X_t^{\tilde{y}_t}}{P(\tilde{Y}=\tilde{y}_t)} - X_t^{\hat{y}_t}$$   
-with the convention $X_t^k = (0, ..., 0,  x_t, 0, .., 0)$ a sequence of null vectors, except at position $k$ where the observation vector $x_t$ is found. The expectation of the update is shown to be that of the multiclass perceptron, and a convergence to the correponding perceptron classifier is obtained, with finite bounds on the cumulative error in linearly separable cases. 
+with the convention $X_t^k = (0, ..., 0,  x_t, 0, .., 0)$ a sequence of null vectors, except at position $k$ where the observation vector $x_t$ is found, so that $\langle W, X^k\rangle = \langle w^k, x\rangle$. The expectation of the update is shown to be that of the multiclass perceptron, and a convergence to the correponding perceptron classifier is obtained, with a finite bound on the cumulative error in linearly separable cases. 
 
 \paragraph{The conservative approach to online classification}
 
@@ -181,29 +181,33 @@ Following \cite{kivinen2004online} and \cite{crammer2006online}, we consider onl
 %Our objective here is to provide a way to extend those local online optimization approaches  to the \emph{binary feedback} case, where the feedback is composed of a single bit of information $f_t \in\{0,1\}$, i.e. $f_t = 1$ if the class proposed by the clasifier is correct and 0 otherwise. This setup may provide avenues toward the more general contextual bandit and  reinforcement learning setups.
 %given an objective (or loss) function considered defined over the full input space.
 %A feedback is a \emph{local} measure of  learning achievement (or failure), 
-The misclassification risk needs to be minimised through local measures of $l_t = l(x_t,\tilde{y}_t,f_t,W_t)$  (the loss function) that estimates the correctness of the current response. The loss function combines the feedback signal $f_t$ with the actual response $\tilde{y}_t$ and the current classifier's parameters $W_t$ to provide additional information about the direction to be followed for future classification improvement (i.e. risk minimization). 
+The classifier is updated through local measures of $l_t = l(x_t,\tilde{y}_t,f_t,W_t)$  (a loss function) that estimates the correctness of the current response regarding a given misclassification risk minimization constraint.
+Combined with a quadratic norm-minimal update condition $\min_W ||W - W_t||^2$, the solution of the optimization problem provides a locally optimal classifier. This local optimization is moreover prone to global improvement, i.e. the total number of updates is shown to be bounded when the input data is linearly-separable.
+
+%,  The loss function combines the feedback signal $f_t$ with the actual response $\tilde{y}_t$ and the current classifier's parameters $W_t$ to provide additional information about the direction to be followed for future classification improvement (i.e. risk minimization). 
 %The loss thus relies on a combination of \emph{internal} information (current classifier's parameters, current choice) and \emph{external} information (input vector, feedback). On contrary to the offline setting, the classifier's current value $W_t$ plays a significant role in defining the future direction. 
 
-Typical learning schemes rely on minimizing a convex \emph{loss} over $W$.  
 Different loss function may be defined in that case. 
-Under the multiclass setting, one can distinguish two principal constraint schemes : the \emph{normative} and the \emph{relative} schemes. In a \emph{normative} scheme, a classifier is expected to provide a response that relates to a reference value $a$. A typical normative scheme is the one-vs-all (OVA) scheme, having an $a = 1$ reference for class-compliant examples and $a = -1$ for class-differing examples,  i.e. $$\forall k,i \left\{
+Under the multiclass setting, one can distinguish two principal constraint schemes : the \emph{normative} and the \emph{relative} schemes. In a \emph{normative} scheme, a classifier is expected to provide a response that relates to a reference value $a$. A typical normative scheme is the one-vs-all (OVA) scheme, having  $a = 1$ for reference for class-compliant examples and $a = -1$ for class-differing examples,  i.e. $$\forall k \left\{
 \begin{array}{l}
-\langle w_k, x \rangle \geq 1 \text{ if } y = k \\
-\langle w_k, x \rangle \leq -1 \text{ if }y \neq k.
+\langle w^k, x \rangle \geq 1 \text{ if } y = k \\
+\langle w^k, x \rangle \leq -1 \text{ if }y \neq k.
 \end{array}
 \right. 
 $$
 and a corresponding loss function can be the normative multiclass \emph{hinge loss}:  
-$$ l(x,W,y) = \sum_{k=1}^K \left[1 + (1 - 2 \delta(y,k)) \langle w_k,x \rangle\right]_+
+$$ l(x,W,y) = \sum_{k=1}^K \left[1 + (1 - 2 \delta(y,k)) \langle w^k,x \rangle\right]_+
 $$
 with $\delta(i,j) =1$ if $i = j$ and 0 elsewhere, and $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
-Under  a \emph{relative} scheme (see \cite{crammer2003ultraconservative}), there is no reference value and the linear score of the class-compliant separatrix $\langle w_{y}, x\rangle$ is expected to be significantly greater than the other linear scores, i.e.
-$$ \langle w_{y}, x \rangle \geq 1 + \max_{k \neq y} \langle w_k, x \rangle  $$
+Under  a \emph{relative} scheme (see \cite{crammer2003ultraconservative}), \emph{aka} ``Winner-Takes-All'' (WTA), there is no reference value and the linear score of the class-compliant separatrix $\langle w^y, x\rangle$ is expected to be significantly greater than the other linear scores, i.e.
+$$ \langle w^y, x \rangle \geq 1 + \max_{k \neq y} \langle w^k, x \rangle  $$
 and a typical loss function is the conservative multiclass \emph{hinge loss}:
-$$ l (x,W,y) =  \left[ 1 +  \langle w_y, x \rangle - \max_{k \neq y} \langle w_k, x\rangle\right]_+$$
+$$ l (x,W,y) =  \left[ 1 +  \langle w^y, x \rangle - \max_{k \neq y} \langle w^k, x\rangle\right]_+$$
 
-The different multiclass online learning algorithms fall either into the normative or the relative category. The multiclass perceptron (see  \cite{duda1973pattern} and \cite{freund1999large}), while not margin aware, is a typical normative multiclass approach for it  imposes a positive fit with class-compliant exemplars, and a negative fit with class-negative exemplars.  
-On contrary, the multiclass passive-agressive scheme proposed in \cite{crammer2006online} obeys to a relative approach to online multiclass learning.   
+{\color{red} Except for the multiclass perceptron (see  \cite{duda1973pattern} and \cite{freund1999large}), which does not rely on 
+Not all multiclass online learning algorithms fall either into the normative or the relative category. 
+ while not margin aware, is a typical normative multiclass approach for it  imposes a positive fit with class-compliant exemplars, and a negative fit with class-negative exemplars.  
+On contrary, the multiclass passive-agressive scheme proposed in \cite{crammer2006online} obeys to a relative approach to online multiclass learning.   }
 
 Notion de conservatisme vs exhausivité (Anlauf) et progressisme (Kivinen).
 
