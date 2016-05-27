@@ -239,19 +239,57 @@ The normative setup is clearly overconstrained regarding the classification task
 
 \section{Our approach}
 
-The one-bit feedback provides an asymmetrical situation in which prediction miss provide a poor classification information (eliminates one reponse out of $K$ possibilities) while prediction hit provide a rich classification information (eliminates $K-1$ reponses out of $K$ possibilities). The consequence is that on average little classification information is obtained in the first steps of the learning procedure, slowering convergence rates in proportion. \cite{kakade2008efficient} {\color{red}(see eq. XXX)} solves the asymmetry problem through providing higher weight to the prediction hits update at the risk of an increased variance of its update sequence.
 
-In contrast with the perceptron update, the passive-agressive update, as proposed by \cite{crammer2006online}, regulates the weight of the classifier according to a quadratic update minimization objective under a class-accuracy linear constraint, encapsulated in a loss function 
+The one-bit feedback provides an asymmetrical situation in which prediction miss provide a poor classification information (eliminates one response out of $K$ possibilities) while prediction hit provide a rich classification information (eliminates $K-1$ responses out of $K$ possibilities). 
+In the initial situation where little information is provided, a learner is suggested to try labels at random until a label hit is obtained. This is not necessary the case in the subsequent steps where enough information has been gathered, providing better classification accuracy. 
+This intuition needs to be carefully considered, for the effective information (or innovation) gathered is the difference between prediction and actual response. Mistakes (predicting a hit and obtaining a miss, or vice-versa) are  more informative than actual classification achievements (this point is e.g. exemplified  in the perceptron algorithm where only mistakes provide classifier update). The choice of an exploration strategy thus depends on the focus put either on gathering information or optimizing rewards. 
+
+Model-based setups (see \cite{lai1985asymptotically}, \cite{auer2003nonstochastic}, \cite{crammer2013multiclass}) generally use model information (number of visits, hits variance, etc.) to optimize rewards. 
+Discriminant-based setups (see \cite{kakade2008efficient}, \cite{zhong2015esann}) put a greater focus on classification information gathering through  
+%$\varepsilon$-greedy policies giving a constant budget ($1-\varepsilon + \frac{\varepsilon}{K}$) to the actual prediction and $\frac{\varepsilon}{K}$ to the other choices 
+a constant exploration rate $\varepsilon$ that balances hits and misses prediction against actual hits and misses
+(see eq. (\ref{eq:kaka-policy})).
+Unpredicted hits play a particular role for they are given a higher weight in the update, reflecting a "prediction surprise" (see for instance eq. (\ref{eq:kaka-update})). This information-weigted update is however done at the risk of an increased variance of the update sequence and of course of a linear regret.
+%, where pure exploration ($\varepsilon = 1$ i.e. uniform prediction) and pure greediness ($\varepsilon = 0$, i.e. hit prediction only) are special cases.
+
+
+%address the asymmetry problem
+%The unpredicted hits obtained in the second case 
+%
+%is systematized in the form of an \textit{exploration policy} that sets the balance between exploration and exploitation.     
+
+%The consequence is that on average little classification information is obtained in the first steps of the learning procedure, slowering convergence rates in proportion. 
+
+%A one-bit feedback approach mainly differs from the supervised case by considering with more care exploration requirements.  
+
+Moreover, the computational efficiency of the perceptron (\cite{rosenblatt1958perceptron}, as well as the SVM \cite{vapnik1998statistical},  critically relies on their sparsity, i.e. their capability to separate the example  set between relevant and irrelevant observation vectors, given the classification task. Fewer vectors in a classifier provide better generalization capabilities and participate in regularization.
+On contrary to their supervised counterpart, information-weighted updates such as Banditron (\cite{kakade2008efficient}) and PAB (\cite{zhong2015esann}) show a dense classifier update, loosing the Kernel-extension capability (at reasonable computational cost). 
+
+The ability to choose example vectors is however  a critical property of the discriminant approach that needs to be conserved in the partially supervised setup considered here. 
+Taking inspiration from \cite{crammer2006online}, we consider a specific one-bit feedback loss function, under one-vs-all multiclass classification framework (see eq. (\ref{eq:BPA-loss})). A rapid inspection shows that label misses provide enough information to update one class separatrix, while label hits give the capability to update $K$ separatrices. For sparsity reasons however, and following the "ultraconservative" approach proposed by \cite{crammer2003ultraconservative}, only the error-set is considered for the classifier update, i.e. only a single separatrix may be updated under non-zero loss condition.
+
+{\color{blue}
+La perte instantanée est ici définie comme :
+$$l_t = [1 + (1 - 2 g_t) \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$$
+autrement dit~:
+\begin{itemize}
+	\item[] $l_t = [1 - \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$ si $g_t=1$;
+	\item[] $l_t = [1 + \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$ sinon
+\end{itemize}
+Dans le premier cas (le choix est correct), la perte décroît avec $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ jusqu'à 0. Au contraire, dans le second cas (choix incorrect), la perte augmente avec le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$.
+Minimiser la perte revient donc à faire croître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ dans le premier cas, et à faire décroître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$  dans le second cas.}
+
+Contrarily to the information-based approach, the weight attributed to each relevant example vector relies on a quadratic update minimization objective under a class-accuracy linear constraint
 $ l_t $.
 The weight update is the solution of ~:
 $$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
 where $C$ is an optional misclassification stiffness parameter.
 
-The relative multiclass hinge loss {\color{red}(see eq. XXX)} used in the supervised case gives the following update~:
-$$W_{t} =  W_{t-1} + \frac{l_t}{2\|x_t\|^2 + \frac{1}{2C}} (X_t^{y_t} - X_t^{s_t})$$
-where $s_t = \arg\max_{s \neq y_t} \langle W_{t-1}, X_t^s \rangle$
 
-Combined with a variance reduction technique, we use in \cite{zhong2015esann} the multiclass passive agressive update as a baseline to the one-bit feedback update, showing effective convergence rates in large-scale real-world problems. The approach however suffers from a lack of 
+%The use of a relative multiclass hinge loss {\color{red}(see eq. XXX)} provides the following update~:
+%$$W_{t} =  W_{t-1} + \frac{l_t}{2\|x_t\|^2 + \frac{1}{2C}} (X_t^{y_t} - X_t^{s_t})$$
+%where $s_t = \arg\max_{s \neq y_t} \langle W_{t-1}, X_t^s \rangle$.
+%Combined with a variance reduction technique, this update term was used as a baseline in \cite{zhong2015esann} to address the one-bit feedback, showing effective convergence rates in large-scale real-world problems. {\color{red} However, like the Banditron and like most model-based setups, this initial approach suffers from a lack of parsimony, i.e. implements a }
 
 
 In line with \cite{kakade2008efficient},  we adapted the multiclass passive-agressive update to the one-bit feedback case  and show in practice faster convergence rates than the Banditron . 
@@ -276,15 +314,7 @@ Soit un classifieur linéaire défini à l'essai $t$ par le jeu de paramètres $
 
 Après avoir émis la proposition $\tilde{y}_t$, l'apprenant reçoit un gain $g_t$ égal à 1 si la catégorie proposée est correcte et 0 sinon, soit $g_t = \mathbf{1}_{\tilde{y}_t=y_t}$. 
 
-La perte instantanée est ici définie comme :
-$$l_t = [1 + (1 - 2 g_t) \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$$
-autrement dit~:
-\begin{itemize}
-	\item[] $l_t = [1 - \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$ si $g_t=1$;
-	\item[] $l_t = [1 + \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$ sinon
-\end{itemize}
-Dans le premier cas (le choix est correct), la perte décroît avec $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ jusqu'à 0. Au contraire, dans le second cas (choix incorrect), la perte augmente avec le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$.
-Minimiser la perte revient donc à faire croître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ dans le premier cas, et à faire décroître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$  dans le second cas.
+
 
 \emph{NB : the same objective is assigned in the ``one-vs-all'' scheme in the multi-class classification scheme. It is a non-conservative (normative) objective function. In case the dataset is separable, $\exists U$ such that $\forall t, l_t = 0$  }
 
