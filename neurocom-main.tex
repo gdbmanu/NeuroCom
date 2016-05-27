@@ -127,7 +127,7 @@ Mot1 \sep Mot2
 \label{sec:lentete}
 
 
-Categorical online learning is a well-documented class of learning problems in which ($i$) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and ($ii$) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$. The multiclass learning task typically addresses object recognition such as OCR, face recognition, speech recognition etc. In contrast with the offline approach, online learning takes the form of an iterative process, relying on a time-ordered sequence of observations, queries and feedbacks.   
+Categorical online learning is a well-documented class of learning problems in which ($i$) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and ($ii$) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$. The multiclass learning task typically addresses object recognition (such as OCR, face recognition, speech recognition etc.) and recommender systems. In contrast with the offline approach, online learning takes the form of an iterative process, relying on a time-ordered sequence of observations, queries and feedbacks.   
 Two well-known setups obey to this class, i.e. the contextual bandit setup (see  \cite{lai1985asymptotically} and \cite{auer2002finite}) and supervised online learning setup (see  \cite{rosenblatt1958perceptron}, \cite{duda1973pattern} and \cite{freund1999large}), the two setups mainly differing by the nature of the feedback. Whether abundant or scarce, deterministic or stochastic, stationary or adversarial, the feedback characteristics critically shape the design of the learning algorithms.  
 
 The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback (see \cite{kakade2008efficient}). This case lies at the crossroad of the supervised online learning setup and the bandit setup.  A one-bit feedback reflects a ``hit-or-miss'' learning situations, in which a single bit indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, the problem is specific to the online approach and was only recently identified and analyzed by the community (see \cite{kakade2008efficient}, \cite{gentile2012multilabel}, etc.). 
@@ -239,17 +239,16 @@ The normative setup is clearly overconstrained regarding the classification task
 
 \section{Our approach}
 
-
 The one-bit feedback provides an asymmetrical situation in which prediction miss provide a poor classification information (eliminates one response out of $K$ possibilities) while prediction hit provide a rich classification information (eliminates $K-1$ responses out of $K$ possibilities). 
-In the initial situation where little information is provided, a learner is suggested to try labels at random until a label hit is obtained. This is not necessary the case in the subsequent steps where enough information has been gathered, providing better classification accuracy. 
-This intuition needs to be carefully considered, for the effective information (or innovation) gathered is the difference between prediction and actual response. Mistakes (predicting a hit and obtaining a miss, or vice-versa) are  more informative than actual classification achievements (this point is e.g. exemplified  in the perceptron algorithm where only mistakes provide classifier update). The choice of an exploration strategy thus depends on the focus put either on gathering information or optimizing rewards. 
+In the starting phase of a learning process, little information is expected on average, and a learner is suggested to try labels at random until a label hit is obtained. This may not seem necessary in the subsequent steps where enough information may have been gathered to provide effective classification accuracy. 
+This intuition should however be considered with care, for information gathering needs to rely on sensing a differences between a prediction and an actual response. {\color{blue} In short, mistakes (predicting a hit and obtaining a miss, or vice-versa) are  more informative than actual classification achievements (this point being exemplified by the perceptron taking only misclassification events for its update). There is thus a set point at which a greedy choice becomes suboptimal from an information gathering perspective (see \cite{kakade2008efficient}).} The choice of an exploration strategy thus depends on the focus put either on gathering information or optimizing rewards. 
 
-Model-based setups (see \cite{lai1985asymptotically}, \cite{auer2003nonstochastic}, \cite{crammer2013multiclass}) generally use model information (number of visits, hits variance, etc.) to optimize rewards. 
-Discriminant-based setups (see \cite{kakade2008efficient}, \cite{zhong2015esann}) put a greater focus on classification information gathering through  
+Model-based setups (see \cite{lai1985asymptotically}, \cite{auer2003nonstochastic}, \cite{crammer2013multiclass}) generally use model information (number of visits, hits variance, etc.) to optimize rewards, so that exploration steps become rapidly scarce. 
+Discriminant-based setups (see \cite{kakade2008efficient}, \cite{zhong2015esann}) keep a focus on classification information gathering through  
 %$\varepsilon$-greedy policies giving a constant budget ($1-\varepsilon + \frac{\varepsilon}{K}$) to the actual prediction and $\frac{\varepsilon}{K}$ to the other choices 
-a constant exploration rate $\varepsilon$ that balances hits and misses prediction against actual hits and misses
+a constant exploration rate $\varepsilon$, low enough to allow for effective classification rates while allowing continuing information gathering 
 (see eq. (\ref{eq:kaka-policy})).
-Unpredicted hits play a particular role for they are given a higher weight in the update, reflecting a "prediction surprise" (see for instance eq. (\ref{eq:kaka-update})). This information-weigted update is however done at the risk of an increased variance of the update sequence and of course of a linear regret.
+Unpredicted hit examples play a particular role for they are given a higher coefficient in the update, reflecting a "prediction surprise" (see for instance eq. (\ref{eq:kaka-update})). This information-weighted update is however done at the risk of an increased variance of the update sequence and of course of a linear regret.
 %, where pure exploration ($\varepsilon = 1$ i.e. uniform prediction) and pure greediness ($\varepsilon = 0$, i.e. hit prediction only) are special cases.
 
 
@@ -262,11 +261,11 @@ Unpredicted hits play a particular role for they are given a higher weight in th
 
 %A one-bit feedback approach mainly differs from the supervised case by considering with more care exploration requirements.  
 
-Moreover, the computational efficiency of the perceptron (\cite{rosenblatt1958perceptron}, as well as the SVM \cite{vapnik1998statistical},  critically relies on their sparsity, i.e. their capability to separate the example  set between relevant and irrelevant observation vectors, given the classification task. Fewer vectors in a classifier provide better generalization capabilities and participate in regularization.
+Moreover, the computational efficiency of the perceptron (\cite{rosenblatt1958perceptron}, as well as the SVM (\cite{vapnik1998statistical}),  critically relies on their sparsity, i.e. their capability to separate the example  set between relevant and irrelevant observation vectors, given a classification task. Fewer vectors in a classifier provide better generalization capabilities and participate in regularization.
 On contrary to their supervised counterpart, information-weighted updates such as Banditron (\cite{kakade2008efficient}) and PAB (\cite{zhong2015esann}) show a dense classifier update, loosing the Kernel-extension capability (at reasonable computational cost). 
 
 The ability to choose example vectors is however  a critical property of the discriminant approach that needs to be conserved in the partially supervised setup considered here. 
-Taking inspiration from \cite{crammer2006online}, we consider a specific one-bit feedback loss function, under one-vs-all multiclass classification framework (see eq. (\ref{eq:BPA-loss})). A rapid inspection shows that label misses provide enough information to update one class separatrix, while label hits give the capability to update $K$ separatrices. For sparsity reasons however, and following the "ultraconservative" approach proposed by \cite{crammer2003ultraconservative}, only the error-set is considered for the classifier update, i.e. only a single separatrix may be updated under non-zero loss condition.
+Taking inspiration from \cite{crammer2006online}, we consider a specific one-bit feedback loss function, under the one-vs-all multiclass classification framework (see eq. (\ref{eq:BPA-loss})). A rapid inspection shows that label misses provide enough information to update one class separatrix, while label hits give the capability to update $K$ separatrices. For sparsity reasons however, and following the "ultraconservative" approach proposed by \cite{crammer2003ultraconservative}, only the currently inspected label is considered for the update, i.e. at most one single separatrix may be updated at each step under a non-zero loss condition.
 
 {\color{blue}
 La perte instantanée est ici définie comme :
@@ -279,7 +278,7 @@ autrement dit~:
 Dans le premier cas (le choix est correct), la perte décroît avec $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ jusqu'à 0. Au contraire, dans le second cas (choix incorrect), la perte augmente avec le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$.
 Minimiser la perte revient donc à faire croître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ dans le premier cas, et à faire décroître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$  dans le second cas.}
 
-Contrarily to the information-based approach, the weight attributed to each relevant example vector relies on a quadratic update minimization objective under a class-accuracy linear constraint
+Contrarily to the previous case, the weight coefficients attributed to each relevant example vector rely on a quadratic update minimization objective under a class-accuracy linear constraint
 $ l_t $.
 The weight update is the solution of ~:
 $$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
