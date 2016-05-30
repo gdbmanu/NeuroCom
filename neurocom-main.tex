@@ -87,7 +87,7 @@
 %% \address{Address\fnref{label3}}
 %% \fntext[label3]{}
 
-\title{Binary feedback-based online multiclass learning}
+\title{Sparse online multi-class learning under one-bit feedback}
 
 %% use optional labels to link authors explicitly to addresses:
 %% \author[label1,label2]{}
@@ -144,7 +144,7 @@ The sequential organization of learning is present in the most traditional setup
 
 \paragraph{Linear models}
 Multiclass classification requires  finding an appropriate class $y \in \{1,... K\}$ for every observation vector $x \in \mathbb{R}^d$.
-The \textit{decision function} (or politics) $\tilde{y}_t \sim h(x_t)$ embodies both prior information about the regularity of the universe and experience-based information. A reasonable assumption  is to consider that  close-by contexts should provide close-by rewards distributions. 
+The \textit{decision function} (or policy) $\tilde{y}_t \sim h(x_t)$ embodies both prior information about the regularity of the universe and experience-based information. A reasonable assumption  is to consider that  close-by contexts should provide close-by rewards distributions. 
 The linear approach to classification means to separate the input space in regions, where the different regions are defined by a set of linear mappings. We consider in that case a  classifier $W = (w^1,..,w^k) \in \mathbb{R}^{K \times d}$ so that, for every categorical response $k$, a \emph{similarity score} $\langle w^k, x_t\rangle$ is carried out. 
 %defined as a set of $K$ linear mappings. 
 The linear assumption allows ($i$) to 
@@ -161,15 +161,12 @@ In the second case, the quadratic optimization approach (see \cite{anlauf1989ada
 \paragraph{One-bit feedback}
 The one-bit feedback is a specific online learning setup that implements, in a principled way, the scarce labelling information problem. After reading $\tilde{y}_t$, instead of providing a label, the universe provides a single bit of information called the \textit{label hit}, i.e. $f_t = 1$ if  $\tilde{y}_t=y_t$ and $f_t = 0$ elsewhere. The objective, just as in the supervised case, is to avoid label misses and maximise labels hits. A specific update function needs to be defined to allow label hit improvement over time. 
 
-
-
-
 This problem was coined the ``bandit feedback classification problem'' by \cite{kakade2008efficient}. Taking inspiration from the multiclass perceptron (\cite{duda1973pattern}), a time-effective algorithm, called the ``Banditron'', is established:
-$K$ linear mappings $w^1, ..., w^K$ are defined and class-decision relies on a best-match politics, i.e.
+$K$ linear mappings $w^1, ..., w^K$ are defined and class-decision relies on a best-match policy, i.e.
  $$\hat{y} = \arg \max_{k \in\{1,..,K\}}  \langle w^k, x \rangle$$
-Contrarily to the supervised case, an \textit{exploration} politics needs to be defined to efficiently sample the decision space. The Banditron adopts a simple  $\varepsilon-greedy$ search allowing the non-maximal responses to be occasionally chosen in a uniform way:
+Contrarily to the supervised case, an \textit{exploration} policy needs to be defined to efficiently sample the decision space. The Banditron adopts a simple  $\varepsilon-greedy$ search allowing the non-maximal responses to be occasionally chosen in a uniform way:
  $$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ with $\varepsilon \in [0,1]$.
-Given an initial set of $K$ null-vector hyperplanes $W_0 = (w^{1}_0$, ..., $w^{K}_0)$, the update at time $t$ is ~:
+Given an initial set of $K$ null-vector hyperplanes $W_0 = (w^{1}_0$, ..., $w^{K}_0)$. Given the actual output $\tilde{y}_t$, the update at time $t$ is ~:
 $$ W_t = W_{t-1} + \frac{\delta(\tilde{y}_t ,y_t) X_t^{\tilde{y}_t}}{P(\tilde{Y}=\tilde{y}_t)} - X_t^{\hat{y}_t}$$   
 with the convention $X_t^k = (0, ..., 0,  x_t, 0, .., 0)$ a sequence of null vectors, except at position $k$ where the observation vector $x_t$ is found, so that $\langle W, X^k\rangle = \langle w^k, x\rangle$. The expectation of the update is shown to be that of the multiclass perceptron, and a convergence to the correponding perceptron classifier is obtained, with a finite bound on the cumulative error in linearly separable cases. 
 
@@ -206,7 +203,7 @@ and a corresponding normative multiclass \emph{hinge loss} is:
 $$ l(x,W,y) = \sum_{k=1}^K \left[1 + (1 - 2 \delta(y,k)) \langle w^k,x \rangle\right]_+
 $$
 with $\delta(i,j) =1$ if $i = j$ and 0 elsewhere, and $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
-Under  a \emph{relative} margin setup (see \cite{crammer2003ultraconservative}), compliant with a ``Winner-Takes-All'' approach (WTA), there is no absolute reference value but instead a distance reference, so that the linear score of the class-compliant separatrix $\langle w^y, x\rangle$ is expected to overtake  the other linear scores by at least $a$, i.e. (taking $a=1$)
+Under  a \emph{relative} margin setup (see \cite{crammer2003ultraconservative}), compliant with the Kessler's construction (\cite{duda1973pattern}), there is no absolute reference value but instead a distance reference, so that the linear score of the class-compliant separatrix $\langle w^y, x\rangle$ is expected to overtake  the other linear scores by at least $a$, i.e. (taking $a=1$)
 $$ \langle w^y, x \rangle \geq 1 + \max_{k \neq y} \langle w^k, x \rangle  $$
 and a corresponding relative multiclass \emph{hinge loss} is:
 $$ l (x,W,y) =  \left[ 1 +  \langle w^y, x \rangle - \max_{k \neq y} \langle w^k, x\rangle\right]_+$$
@@ -239,18 +236,7 @@ The normative setup is clearly overconstrained regarding the classification task
 
 \section{Our approach}
 
-The one-bit feedback provides an asymmetrical situation in which prediction miss provide a poor classification information (eliminates one response out of $K$ possibilities) while prediction hit provide a rich classification information (eliminates $K-1$ responses out of $K$ possibilities). 
-In the starting phase of a learning process, little information is expected on average, and a learner is suggested to try labels at random until a label hit is obtained. This may not seem necessary in the subsequent steps where enough information may have been gathered to provide effective classification accuracy. 
-This intuition should however be considered with care, for information gathering needs to rely on sensing a differences between a prediction and an actual response. {\color{blue} In short, mistakes (predicting a hit and obtaining a miss, or vice-versa) are  more informative than actual classification achievements (this point being exemplified by the perceptron taking only misclassification events for its update). There is thus a set point at which a greedy choice becomes suboptimal from an information gathering perspective (see \cite{kakade2008efficient}).} The choice of an exploration strategy thus depends on the focus put either on gathering information or optimizing rewards. 
-
-Model-based setups (see \cite{lai1985asymptotically}, \cite{auer2003nonstochastic}, \cite{crammer2013multiclass}) generally use model information (number of visits, hits variance, etc.) to optimize rewards, so that exploration steps become rapidly scarce. 
-Discriminant-based setups (see \cite{kakade2008efficient}, \cite{zhong2015esann}) keep a focus on classification information gathering through  
-%$\varepsilon$-greedy policies giving a constant budget ($1-\varepsilon + \frac{\varepsilon}{K}$) to the actual prediction and $\frac{\varepsilon}{K}$ to the other choices 
-a constant exploration rate $\varepsilon$, low enough to allow for effective classification rates while allowing continuing information gathering 
-(see eq. (\ref{eq:kaka-policy})).
-Unpredicted hit examples play a particular role for they are given a higher coefficient in the update, reflecting a "prediction surprise" (see for instance eq. (\ref{eq:kaka-update})). This information-weighted update is however done at the risk of an increased variance of the update sequence and of course of a linear regret.
-%, where pure exploration ($\varepsilon = 1$ i.e. uniform prediction) and pure greediness ($\varepsilon = 0$, i.e. hit prediction only) are special cases.
-
+\subsection{Sparse online multiclass discrimination}
 
 %address the asymmetry problem
 %The unpredicted hits obtained in the second case 
@@ -261,23 +247,78 @@ Unpredicted hit examples play a particular role for they are given a higher coef
 
 %A one-bit feedback approach mainly differs from the supervised case by considering with more care exploration requirements.  
 
-Moreover, the computational efficiency of the perceptron (\cite{rosenblatt1958perceptron}, as well as the SVM (\cite{vapnik1998statistical}),  critically relies on their sparsity, i.e. their capability to separate the example  set between relevant and irrelevant observation vectors, given a classification task. Fewer vectors in a classifier provide better generalization capabilities and participate in regularization.
-On contrary to their supervised counterpart, information-weighted updates such as Banditron (\cite{kakade2008efficient}) and PAB (\cite{zhong2015esann}) show a dense classifier update, loosing the Kernel-extension capability (at reasonable computational cost). 
+The computational efficiency of the perceptron (\cite{rosenblatt1958perceptron}, as well as the SVM (\cite{vapnik1998statistical}),  critically relies on their sparsity, i.e. their capability to separate the example  set between relevant and irrelevant observation vectors, given a classification task. Fewer vectors in a classifier provide better generalization capabilities and participate in regularization.
+On contrary to their supervised counterpart, class-separatrices updates in the Banditron (\cite{kakade2008efficient}) and PAB (\cite{zhong2015esann}) are dense over time, loosing the Kernel-extension capability (at reasonable computational cost). 
 
-The ability to choose example vectors is however  a critical property of the discriminant approach that needs to be conserved in the partially supervised setup considered here. 
-Taking inspiration from \cite{crammer2006online}, we consider a specific one-bit feedback loss function, under the one-vs-all multiclass classification framework (see eq. (\ref{eq:BPA-loss})). A rapid inspection shows that label misses provide enough information to update one class separatrix, while label hits give the capability to update $K$ separatrices. For sparsity reasons however, and following the "ultraconservative" approach proposed by \cite{crammer2003ultraconservative}, only the currently inspected label is considered for the update, i.e. at most one single separatrix may be updated at each step under a non-zero loss condition.
+The ability to choose class-effective example vectors is however  a critical property of the discriminant approach that needs to be conserved in the partially supervised setup considered here. 
+Taking inspiration from \cite{crammer2006online}, we thus consider a specific one-bit feedback loss function, under the one-vs-all multiclass classification framework (see eq. (\ref{eq:BPA-loss})). A rapid inspection shows that label misses provide enough information to update one class separatrix, while label hits give the capability to update $K$ separatrices (see \cite{chen2009beyond}). For sparsity reasons however, and following the "ultraconservative" approach proposed by \cite{crammer2003ultraconservative}, only the currently inspected label is considered for the update, i.e. at most one single separatrix may be updated at each step under a non-zero loss condition.
 
-{\color{blue}
-La perte instantanée est ici définie comme :
-$$l_t = [1 + (1 - 2 g_t) \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$$
-autrement dit~:
+%{\color{blue}
+The instantaneous loss is now defined as:
+\begin{equation}\label{eq:loss}
+l_t = [1 + (1 - 2 \delta(y_t,\tilde{y}_t)) \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+
+\end{equation}
+i.e.~:
 \begin{itemize}
-	\item[] $l_t = [1 - \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$ si $g_t=1$;
-	\item[] $l_t = [1 + \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$ sinon
+	\item[] $l_t = [1 - \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$ if $y_t=\tilde{y}_t$;
+	\item[] $l_t = [1 + \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+$ elsewhere.
 \end{itemize}
-Dans le premier cas (le choix est correct), la perte décroît avec $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ jusqu'à 0. Au contraire, dans le second cas (choix incorrect), la perte augmente avec le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$.
-Minimiser la perte revient donc à faire croître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ dans le premier cas, et à faire décroître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$  dans le second cas.}
+%Dans le premier cas (le choix est correct), la perte décroît avec $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ jusqu'à 0. Au contraire, dans le second cas (choix incorrect), la perte augmente avec le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$.
+%Minimiser la perte revient donc à faire croître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ dans le premier cas, et à faire décroître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$  dans le second cas.}
+This "agnostic" approach to non-explicitely disclosed labels %avoids weight coefficients asymmetry in the label hit case and 
+renders the method (i) independent to the labels set cardinality, (ii) independent to the actual classification achievement (avoiding unnecessary weight updates at high classification rates) (iii) independent to the actual exploration/exploitation rate and (iv) more resilient to label noise. 
 
+\subsection{Exploration policy}
+
+ The one-bit feedback provides an asymmetrical situation in which prediction misses provide a poor classification information (eliminates one response out of $K$ possibilities) while prediction hits provide a rich classification information (eliminates $K-1$ responses out of $K$ possibilities). 
+ In the starting phase of a learning process, little information is expected on average, and a learner is suggested to try labels at random until a label hit is obtained. This may not seem necessary in the subsequent steps where enough information may have been gathered to provide effective classification accuracy. 
+ This intuition should however be considered with care, for information gathering needs to rely on sensing a differences between a prediction and an actual response. {\color{blue} In short, mistakes (predicting a hit and obtaining a miss, or vice-versa) are  more informative than actual classification achievements (this point being exemplified by the perceptron taking only misclassification events for its update). There is thus a set point at which a greedy choice becomes suboptimal from an information gathering perspective (see \cite{kakade2008efficient}).} The choice of an exploration strategy thus depends on the focus put either on gathering information or optimizing rewards. 
+ 
+ Model-based setups (see \cite{lai1985asymptotically}, \cite{auer2003nonstochastic}, \cite{crammer2013multiclass}) generally use model information (number of visits, hits variance, etc.) to optimize rewards, so that exploration steps become rapidly scarce through UCB-based policies. 
+ Discriminant-based setups (see \cite{kakade2008efficient}, \cite{zhong2015esann}) keep a focus on classification information gathering through  
+ %$\varepsilon$-greedy policies giving a constant budget ($1-\varepsilon + \frac{\varepsilon}{K}$) to the actual prediction and $\frac{\varepsilon}{K}$ to the other choices 
+ a constant exploration rate $\varepsilon$, low enough to allow for effective classification rates while allowing continuing information gathering.
+ %Unpredicted hit examples play a particular role for they are given a higher coefficient in the update, reflecting a "prediction surprise" (see for instance eq. (\ref{eq:kaka-update})). This information-weighted update is however done at the risk of an increased variance of the update sequence and of course of a linear regret.
+ Though expecting a weak dependence on decision policy, we consistently adopt an $\varepsilon$-greedy approach in simulations, using the \cite{kakade2008efficient} formula, i.e.:
+ $$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ with a (fixed) exploration parameter $\varepsilon \in [0,1]$.
+ %, where pure exploration ($\varepsilon = 1$ i.e. uniform prediction) and pure greediness ($\varepsilon = 0$, i.e. hit prediction only) are special cases.
+
+
+\subsection{Gradient-descent approach}
+
+The gradient-based approach to sparse online discriminative classification, as proposed by \cite{kivinen2004online}, relies on minimizing the regularized risk:
+$$R(W) = \mathbb{E}\left[ l + \frac{\lambda}{2}\|W\|^2\right]$$
+with $\lambda$ a regularization parameter.
+
+Taking $l_t$ as in eq.(\ref{eq:loss}), the regularized risk gradient estimator at each step $t$ is shown to be:
+$$g_t = \left\{
+\begin{array}{ll}
+\lambda W_{t-1} + (1 - 2 \delta(y_t,\tilde{y}_t)) X_t^{\tilde{y}_t} &\text{ if } l_t > 0\\
+\lambda W_{t-1} &\text{ elsewhere}
+\end{array}
+\right.$$
+and a stochastic gradient descent approach with learning parameter $\eta$ provides the following update:
+$$W_t =  \left\{
+\begin{array}{ll}
+(1-\eta\lambda) W_{t-1} - \eta (1 - 2 \delta(y_t,\tilde{y}_t)) X_t^{\tilde{y}_t} &\text{ if } l_t > 0\\
+(1-\eta\lambda) W_{t-1} &\text{ elsewhere}
+\end{array}
+\right.$$
+The classifier output remaining unchanged when $l_t = 0$, and following a conservative approach, we omit the update in that case. 
+
+Then, the classifier can be made explicit in the form of a sum over observation vectors~:
+$$W_t = \sum_{t^\prime=1}^t \alpha_{t^\prime} X_t^{\tilde{y}_{t^\prime}}$$
+with:
+$$\alpha_{t^\prime} = \mathbf{1}_{l_{t^\prime} > 0}(1 - \eta \lambda)^{\sigma_t - \sigma_{t^\prime}-1}  \eta (2\delta(y_{t^\prime},\tilde{y}_{t^\prime})-1)$$
+where $\sigma_t$ is the number of updates at time $t$, i.e.
+$$\sigma_t = \sum_{t^\prime=1}^t \mathbf{1}_{l_{t^\prime} > 0}$$  
+
+Then, following \cite{kivinen2004online}, a strict control on the number of support example vectors may be imposed, though "old" coefficients exponentially vanish while new updates take place. A truncation principle may for instance be adopted, with an "horizon" $H$ such that every $\alpha_{t^\prime}$ such that $\sigma_{t^\prime} > H$ is set to 0. The truncation error can then be shown to  exponentially decrease with $H$ (see \cite{kivinen2004online}). This approach is of course well-adapted to the non-stationary case, where context-related categories change over time.
+
+
+
+\subsection{Quadratic optimization}
+ 
 Contrarily to the previous case, the weight coefficients attributed to each relevant example vector rely on a quadratic update minimization objective under a class-accuracy linear constraint
 $ l_t $.
 The weight update is the solution of ~:
@@ -457,27 +498,6 @@ Autrement dit chaque séparatrice $f^{(k)}$ est définie par un ensemble de vect
 
 Le nombre de vecteurs supports augmente de 1 chaque fois que la perte est non nulle. De par le théorème 1, nous savons que ce nombre est borné dès lors que les données sont séparables dans l'espace de redescription. 
 
-Afin de contrôler plus strictement le nombre de vecteurs supports, nous considérons une approche alternative basée sur la minimisation du risque régularisé par descente de gradient comme proposé dans \cite{kivinen2004online}~:
-$$R(\mathcal{F}) = \mathbb{E}\left[ l_t + \frac{\lambda}{2}\|\mathcal{F}\|^2_\mathcal{H}\right]$$
-On obtient dans ce cas la règle de mise à jour~:
-$$f_t^{(k)}=\left\{
-\begin{array}{l}
-(1-\eta\lambda) f_{t-1}^{(k)} + \eta (2g_t-1) \mathcal{K}(x_t,.) \text{ si } k=\tilde{y}_t\\
-f_{t-1}^{(k)} \text{ sinon}
-\end{array}
-\right.
-$$
-avec $\eta$ paramètre d'apprentissage et $\lambda$ paramètre de régularisation. En notant 
-$$\sigma_t^{(k)} = \sum_{t^\prime=1}^t
-\mathbf{1}_{\tilde{y}_{t^\prime}=k}$$
-on obtient dans ce cas:
-$$\forall k, f^{(k)}_t = \sum_{t^\prime = 1} ^t \alpha_{t^\prime}^{(k)} \mathcal{K}(x_{t^\prime},.)$$
-et
-$$\alpha_{t^\prime}^{(k)} = \mathbf{1}_{\tilde{y}_{t^\prime}=k}(1 - \eta \lambda)^{\sigma_t^{(k)} - \sigma_{t^\prime}^{(k)}-1}  \eta (2g_{t^\prime}-1)$$
-
-Comme proposé par Kivinen, il suffit alors de tronquer la séquence de vecteurs supports servant à définir la séparatrice en éliminant les termes les plus faibles, typiquement les exemplaires $t^\prime$ tels que $\sigma_{t^\prime}^{(k)} > H$, avec $H$ horizon définissant le nombre maximal de vecteurs supports conservés par séparatrice. Cet artifice borne naturellement le nombre de vecteurs supports du classifieur, en ne considérant que les exemplaires les plus récemment observés (les exemplaires les plus anciens sont ``oubliés'').  Kivinen montre que l'erreur de troncature décroît exponentiellement avec la taille de l'horizon choisi. 
-
-
 
 
 %Et évidemment, vous ajoutez ensuite les paquets que vous voulez
@@ -549,7 +569,6 @@ Figure~\ref{pic:BPARCV} %, ~\ref{pic:BPALR10} and~\ref{pic:BPALR26}
 presents the result on the real dataset. With this dataset, the supervised algorithms, despite their competitive advantage with respect to the ones with bandit feedback, do not significantly depart from BPA and Confidit, with classification results that clearly outperform Banditron. While having a lower computational complexity, BPA approach is even found to outperform Confidit in the most challenging situation, i.e. the high-dimensional case with a large number of classes (RCV1-v2 data set).
 
 The $\epsilon$ parameter represents the exploration rate in Banditron and BPA algorithms. We compare on Figure 3 the average error rates obtained on the two algorithms for different values of $\epsilon$ on the different data sets. In contrast with Banditron, BPA shows that $\epsilon$ has a very little influence on the final error rate, indicating a capability to deal with small exploration rates.
-
 
 
 \begin{figure}[h!]
