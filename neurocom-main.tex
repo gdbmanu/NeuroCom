@@ -236,6 +236,22 @@ The normative setup is clearly overconstrained regarding the classification task
 
 \section{Our approach}
 
+\subsection{Exploration policy}
+
+The one-bit feedback provides an asymmetrical situation in which prediction misses provide a poor classification information (eliminates one response out of $K$ possibilities) while prediction hits provide a rich classification information (eliminates $K-1$ responses out of $K$ possibilities). 
+In the starting phase of a learning process, little information is expected on average, and a learner is suggested to try labels at random until a label hit is obtained. This may not seem necessary in the subsequent steps where enough information may have been gathered to provide effective classification accuracy. 
+This intuition should however be considered with care, for information gathering needs to rely on sensing a differences between a prediction and an actual response. {\color{blue} In short, mistakes (predicting a hit and obtaining a miss, or vice-versa) are  more informative than actual classification achievements (this point being exemplified by the perceptron taking only misclassification events for its update). There is thus a set point at which a greedy choice becomes suboptimal from an information gathering perspective (see \cite{kakade2008efficient}).} The choice of an exploration strategy thus depends on the focus put either on gathering information or optimizing rewards. 
+
+Model-based setups (see \cite{lai1985asymptotically}, \cite{auer2003nonstochastic}, \cite{crammer2013multiclass}) generally use model information (number of visits, hits variance, etc.) to optimize rewards, so that exploration steps become rapidly scarce through UCB-based policies. 
+Discriminant-based setups (see \cite{kakade2008efficient}, \cite{zhong2015esann}) keep a focus on classification information gathering through  
+%$\varepsilon$-greedy policies giving a constant budget ($1-\varepsilon + \frac{\varepsilon}{K}$) to the actual prediction and $\frac{\varepsilon}{K}$ to the other choices 
+a constant exploration rate $\varepsilon$, low enough to allow for effective classification rates while allowing continuing information gathering.
+%Unpredicted hit examples play a particular role for they are given a higher coefficient in the update, reflecting a "prediction surprise" (see for instance eq. (\ref{eq:kaka-update})). This information-weighted update is however done at the risk of an increased variance of the update sequence and of course of a linear regret.
+Though expecting a weak dependence on decision policy, we consistently adopt an $\varepsilon$-greedy approach in simulations, using the \cite{kakade2008efficient} formula, i.e.:
+$$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ with a (fixed) exploration parameter $\varepsilon \in [0,1]$.
+%, where pure exploration ($\varepsilon = 1$ i.e. uniform prediction) and pure greediness ($\varepsilon = 0$, i.e. hit prediction only) are special cases.
+
+
 \subsection{Sparse online multiclass discrimination}
 
 %address the asymmetry problem
@@ -247,14 +263,14 @@ The normative setup is clearly overconstrained regarding the classification task
 
 %A one-bit feedback approach mainly differs from the supervised case by considering with more care exploration requirements.  
 
-The computational efficiency of the perceptron (\cite{rosenblatt1958perceptron}, as well as the SVM (\cite{vapnik1998statistical}),  critically relies on their sparsity, i.e. their capability to separate the example  set between relevant and irrelevant observation vectors, given a classification task. Fewer vectors in a classifier provide better generalization capabilities and participate in regularization.
+The computational efficiency of the perceptron (\cite{rosenblatt1958perceptron}), as well as the SVM (\cite{vapnik1998statistical}),  critically relies on their sparsity, i.e. their capability to separate the example  set between relevant and irrelevant observation vectors, given a classification task. Fewer vectors in a classifier provide better generalization capabilities and participate in regularization.
 On contrary to their supervised counterpart, class-separatrices updates in the Banditron (\cite{kakade2008efficient}) and PAB (\cite{zhong2015esann}) are dense over time, loosing the Kernel-extension capability (at reasonable computational cost). 
 
-The ability to choose class-effective example vectors is however  a critical property of the discriminant approach that needs to be conserved in the partially supervised setup considered here. 
+The ability to choose class-effective example vectors is however  a critical property of the discriminant approach, that needs to be conserved in the partially supervised setup considered here. 
 Taking inspiration from \cite{crammer2006online}, we thus consider a specific one-bit feedback loss function, under the one-vs-all multiclass classification framework (see eq. (\ref{eq:BPA-loss})). A rapid inspection shows that label misses provide enough information to update one class separatrix, while label hits give the capability to update $K$ separatrices (see \cite{chen2009beyond}). For sparsity reasons however, and following the "ultraconservative" approach proposed by \cite{crammer2003ultraconservative}, only the currently inspected label is considered for the update, i.e. at most one single separatrix may be updated at each step under a non-zero loss condition.
 
 %{\color{blue}
-The instantaneous loss is now defined as:
+The instantaneous loss is defined as:
 \begin{equation}\label{eq:loss}
 l_t = [1 + (1 - 2 \delta(y_t,\tilde{y}_t)) \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+
 \end{equation}
@@ -268,21 +284,6 @@ i.e.~:
 This "agnostic" approach to non-explicitely disclosed labels %avoids weight coefficients asymmetry in the label hit case and 
 renders the method (i) independent to the labels set cardinality, (ii) independent to the actual classification achievement (avoiding unnecessary weight updates at high classification rates) (iii) independent to the actual exploration/exploitation rate and (iv) more resilient to label noise. 
 
-\subsection{Exploration policy}
-
- The one-bit feedback provides an asymmetrical situation in which prediction misses provide a poor classification information (eliminates one response out of $K$ possibilities) while prediction hits provide a rich classification information (eliminates $K-1$ responses out of $K$ possibilities). 
- In the starting phase of a learning process, little information is expected on average, and a learner is suggested to try labels at random until a label hit is obtained. This may not seem necessary in the subsequent steps where enough information may have been gathered to provide effective classification accuracy. 
- This intuition should however be considered with care, for information gathering needs to rely on sensing a differences between a prediction and an actual response. {\color{blue} In short, mistakes (predicting a hit and obtaining a miss, or vice-versa) are  more informative than actual classification achievements (this point being exemplified by the perceptron taking only misclassification events for its update). There is thus a set point at which a greedy choice becomes suboptimal from an information gathering perspective (see \cite{kakade2008efficient}).} The choice of an exploration strategy thus depends on the focus put either on gathering information or optimizing rewards. 
- 
- Model-based setups (see \cite{lai1985asymptotically}, \cite{auer2003nonstochastic}, \cite{crammer2013multiclass}) generally use model information (number of visits, hits variance, etc.) to optimize rewards, so that exploration steps become rapidly scarce through UCB-based policies. 
- Discriminant-based setups (see \cite{kakade2008efficient}, \cite{zhong2015esann}) keep a focus on classification information gathering through  
- %$\varepsilon$-greedy policies giving a constant budget ($1-\varepsilon + \frac{\varepsilon}{K}$) to the actual prediction and $\frac{\varepsilon}{K}$ to the other choices 
- a constant exploration rate $\varepsilon$, low enough to allow for effective classification rates while allowing continuing information gathering.
- %Unpredicted hit examples play a particular role for they are given a higher coefficient in the update, reflecting a "prediction surprise" (see for instance eq. (\ref{eq:kaka-update})). This information-weighted update is however done at the risk of an increased variance of the update sequence and of course of a linear regret.
- Though expecting a weak dependence on decision policy, we consistently adopt an $\varepsilon$-greedy approach in simulations, using the \cite{kakade2008efficient} formula, i.e.:
- $$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ with a (fixed) exploration parameter $\varepsilon \in [0,1]$.
- %, where pure exploration ($\varepsilon = 1$ i.e. uniform prediction) and pure greediness ($\varepsilon = 0$, i.e. hit prediction only) are special cases.
-
 
 \subsection{Gradient-descent approach}
 
@@ -290,21 +291,21 @@ The gradient-based approach to sparse online discriminative classification, as p
 $$R(W) = \mathbb{E}\left[ l + \frac{\lambda}{2}\|W\|^2\right]$$
 with $\lambda$ a regularization parameter.
 
-Taking $l_t$ as in eq.(\ref{eq:loss}), the regularized risk gradient estimator at each step $t$ is shown to be:
+Taking $l_t$ as in eq.(\ref{eq:loss}), the regularized risk gradient estimator at each step $t$ can be shown to be:
 $$g_t = \left\{
 \begin{array}{ll}
 \lambda W_{t-1} + (1 - 2 \delta(y_t,\tilde{y}_t)) X_t^{\tilde{y}_t} &\text{ if } l_t > 0\\
-\lambda W_{t-1} &\text{ elsewhere}
+\lambda W_{t-1} &\text{ elsewhere }(l_t=0)
 \end{array}
 \right.$$
 and a stochastic gradient descent approach with learning parameter $\eta$ provides the following update:
 $$W_t =  \left\{
 \begin{array}{ll}
 (1-\eta\lambda) W_{t-1} - \eta (1 - 2 \delta(y_t,\tilde{y}_t)) X_t^{\tilde{y}_t} &\text{ if } l_t > 0\\
-(1-\eta\lambda) W_{t-1} &\text{ elsewhere}
+(1-\eta\lambda) W_{t-1} &\text{ elsewhere }(l_t = 0)
 \end{array}
 \right.$$
-The classifier output remaining unchanged when $l_t = 0$, and following a conservative approach, we omit the update in that case. 
+In practice, the classifier output remaining unchanged when $l_t = 0$, and following a conservative approach, we omit the update in that case. 
 
 Then, the classifier can be made explicit in the form of a sum over observation vectors~:
 $$W_t = \sum_{t^\prime=1}^t \alpha_{t^\prime} X_t^{\tilde{y}_{t^\prime}}$$
@@ -312,59 +313,49 @@ with:
 $$\alpha_{t^\prime} = \mathbf{1}_{l_{t^\prime} > 0}(1 - \eta \lambda)^{\sigma_t - \sigma_{t^\prime}-1}  \eta (2\delta(y_{t^\prime},\tilde{y}_{t^\prime})-1)$$
 where $\sigma_t$ is the number of updates at time $t$, i.e.
 $$\sigma_t = \sum_{t^\prime=1}^t \mathbf{1}_{l_{t^\prime} > 0}$$  
+and the cardinality of the non-zero coefficients correspond to the number of observation vectors effectively stored in memory.
 
-Then, following \cite{kivinen2004online}, a strict control on the number of support example vectors may be imposed, though "old" coefficients exponentially vanish while new updates take place. A truncation principle may for instance be adopted, with an "horizon" $H$ such that every $\alpha_{t^\prime}$ such that $\sigma_{t^\prime} > H$ is set to 0. The truncation error can then be shown to  exponentially decrease with $H$ (see \cite{kivinen2004online}). This approach is of course well-adapted to the non-stationary case, where context-related categories change over time.
+Then, following \cite{kivinen2004online}, a strict control on the number of support  vectors may be imposed, though "old" coefficients exponentially vanish while new updates take place. A $H$-"horizon" truncation principle may be adopted, with every $\alpha_{t^\prime}$ such that $\sigma_t - \sigma_{t^\prime} > H$ set to 0. The truncation error can then be shown to  exponentially decrease with $H$ (see \cite{kivinen2004online}). This approach is of course well-adapted to the non-stationary case, where context-related categories change over time.
 
+%\paragraph{}
+\begin{algorithm}
+\caption{Gradient descent}
+\begin{algorithmic}
 
-
+	\STATE Parameters:  $\varepsilon$, $\eta$, $\lambda$
+	\STATE Set $W_0 = 0$ (null vector)
+	\FOR {each round $t$ = 1,\dots, $T$}
+	\STATE Observe $x_t$.
+	\STATE Set $\hat{y}_t = \underset{i = 1,\dots,K}{\text{argmax}}\left\langle W_{t-1} ,X_t^i\right\rangle$
+	\FORALL {$i \in [1,...,K]$}
+	\STATE $p_{i,t}= (1-\varepsilon)\delta(i,\hat{y}_t) + \frac{\varepsilon}{K}$
+	\ENDFOR
+	\STATE Draw $\tilde{y}_t$ randomly from $p_t = \left(p_{1,t},\dots ,p_{K,t}\right)$.
+	\STATE Observe $\delta_t = \delta(y_t,\tilde{y}_t)$.
+	\STATE Set $l_t = \left[ 1+(1-2\delta_t)\langle W_{t-1},X_t^{\tilde{y}_t}\rangle\right]_{+}$ 
+	\STATE Set $$W_t =  \left\{
+	\begin{array}{ll}
+	(1-\eta\lambda) W_{t-1} + \eta (2 \delta_t-1) X_t^{\tilde{y}_t} &\text{ if } l_t > 0\\
+	W_{t-1} &\text{ elsewhere }(l_t = 0)
+	\end{array}
+	\right.$$
+	\ENDFOR
+\end{algorithmic}
+\end{algorithm}
 \subsection{Quadratic optimization}
  
-Contrarily to the previous case, the weight coefficients attributed to each relevant example vector rely on a quadratic update minimization objective under a class-accuracy linear constraint
-$ l_t $.
+Aside the horizon-based first-order gradient descent presented above, \cite{crammer2006online} consider a quadratic update minimization objective under a class-accuracy linear constraint
+$ l_t $.  
 The weight update is the solution of ~:
 $$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
-where $C$ is an optional misclassification stiffness parameter.
+where $C$ is an optional misclassification stiffness parameter. It provides the following update~:
+$$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2\delta(y_t,\tilde{y}_t) - 1) X_t^{\tilde{y}_t}$$
+
+This setup is called "passive-aggressive" for it combines a conservative approach (ignore $x_t$ if $l_t=0$) with a tight update (optimize the classifier according to $x_t$ if $l_t>0$).
 
 
-%The use of a relative multiclass hinge loss {\color{red}(see eq. XXX)} provides the following update~:
-%$$W_{t} =  W_{t-1} + \frac{l_t}{2\|x_t\|^2 + \frac{1}{2C}} (X_t^{y_t} - X_t^{s_t})$$
-%where $s_t = \arg\max_{s \neq y_t} \langle W_{t-1}, X_t^s \rangle$.
-%Combined with a variance reduction technique, this update term was used as a baseline in \cite{zhong2015esann} to address the one-bit feedback, showing effective convergence rates in large-scale real-world problems. {\color{red} However, like the Banditron and like most model-based setups, this initial approach suffers from a lack of parsimony, i.e. implements a }
-
-
-In line with \cite{kakade2008efficient},  we adapted the multiclass passive-agressive update to the one-bit feedback case  and show in practice faster convergence rates than the Banditron . 
-The two setups however 
-
-Dans le cas linéairement séparable, l'apprentissage en ligne d'un perceptron multi-classes peut être significativement accéléré en utilisant les principes de l'optimisation quadratique tels que proposés par Vapnik \cite{vapnik1998statistical}. Dans un article récent, Crammer et al \cite{crammer2006online} proposent une méthode d'apprentissage en ligne supervisée reposant sur l'optimisation locale de la fonction de perte ``hinge loss'' définie dans le cadre multi-classe comme : 
-
-où $[.]_+$ retourne l'identité pour les valeurs positives et 0 pour les valeurs négatives. 
-
-La résolution du problème :
-
-où $C$ correspond au paramètre de raideur, conduit à la mise à jour~:
-. Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est  borné en $O(\sqrt{(T)})$ dans le cas non séparable.
-
-  
-
-
-\subsection{Principe}
-L'approche adoptée dans le cadre de cet article est une généralisation assez directe des principes d'optimisation quadratique en ligne proposés par Crammer au cas des bandits contextuels. Cette extension nécessite de définir une fonction de perte spécifique. 
-
-Soit un classifieur linéaire défini à l'essai $t$ par le jeu de paramètres $W_{t-1}$. Après avoir observé l'exemplaire $x_t$, le choix $\tilde{y}_t$ repose sur un tirage selon la distribution: $$P(\tilde{Y}=k) = (1 - \varepsilon) \mathbf{1}_{k = \hat{y}} + \frac{\varepsilon}{K} $$ avec $\varepsilon \in [0,1]$ le paramètre d'exploration, et $\hat{y}$ la catégorie correspondant au meilleure score des produits salaires entre entre l'exemplaire et les différentes séparatrices.  
-
-Après avoir émis la proposition $\tilde{y}_t$, l'apprenant reçoit un gain $g_t$ égal à 1 si la catégorie proposée est correcte et 0 sinon, soit $g_t = \mathbf{1}_{\tilde{y}_t=y_t}$. 
-
-
-
-\emph{NB : the same objective is assigned in the ``one-vs-all'' scheme in the multi-class classification scheme. It is a non-conservative (normative) objective function. In case the dataset is separable, $\exists U$ such that $\forall t, l_t = 0$  }
-
-La résolution du problème d'optimisation suivant~:
-$$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
-où $C$ correspond au paramètre de raideur, conduit à la mise à jour~:
-$$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2g_t - 1) X_t^{\tilde{y}_t}$$
-
-\paragraph{Bandit Passive-Aggressive (BPA)}
-%\caption{BPA}
+\begin{algorithm}
+\caption{Quadratic optimization}
 \begin{algorithmic}
 	\STATE $\ \ $
 	\STATE Parameters:  $\varepsilon$, $C$.
@@ -373,17 +364,20 @@ $$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2g_t - 1) X_t^{\tilde
 	\STATE Observe $x_t$.
 	\STATE Set $\hat{y}_t = \underset{i = 1,\dots,K}{\text{argmax}}\left\langle W_{t-1} ,X_t^i\right\rangle$
 	\FORALL {$i \in [1,...,K]$}
-	\STATE $p_{i,t}= (1-\varepsilon)\mathbf{1}_{i = \hat{y}_t} + \frac{\varepsilon}{K}$
+	\STATE $p_{i,t}= (1-\varepsilon)\delta(i,\hat{y}_t) + \frac{\varepsilon}{K}$
 	\ENDFOR
 	\STATE Draw $\tilde{y}_t$ randomly from $p_t = \left(p_{1,t},\dots ,p_{K,t}\right)$.
-	\STATE Observe $g_t = \mathbf{1}_{(\tilde{y}_t=y_t)}$.
-	\STATE Set $l_t = \left[ 1+(1-2g_t)\langle W_{t-1},X_t^{\tilde{y}_t}\rangle\right]_{+}$ 
-	\STATE $W_t = W_{t-1} + (2g_t-1)\frac{l_t}{\parallel X_t^{\tilde{y}_t}\parallel^2 + \frac{1}{2C}}\cdot X_t^{\tilde{y}_t}$
+	\STATE Observe $\delta_t = \delta(y_t,\tilde{y}_t)$.
+	\STATE Set $l_t = \left[ 1+(1-2\delta_t)\langle W_{t-1},X_t^{\tilde{y}_t}\rangle\right]_{+}$ 
+	\STATE Set $$W_t = W_{t-1} + \frac{l_t}{\parallel x_t\parallel^2 + \frac{1}{2C}} (2\delta_t-1) X_t^{\tilde{y}_t}$$
 	\ENDFOR
 \end{algorithmic}
-
+\end{algorithm}
 
 \subsection{Analyse}
+
+{\color{blue} Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est borné en $O(\sqrt{T})$ dans le cas non séparable.}
+
 Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_t^{\ast}$ la perte obtenue par ce classifieur à l'instant $t$ lorsque la réponse $\tilde{y}_t$ est produite. On démontre les deux théorèmes suivants (en négligeant la constante de raideur $C$ pour simplifier) :
 
 \begin{theorem}
@@ -504,6 +498,7 @@ Le nombre de vecteurs supports augmente de 1 chaque fois que la perte est non nu
 %utiliser, les macros les définitions de théorèmes etc... Nous
 %recommandons le paquet \texttt{hyperref} puisque les documents
 %\texttt{PDF} seront en ligne si vous avez donné
+
 
 \section{Experiments}
 
