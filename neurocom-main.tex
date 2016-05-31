@@ -127,7 +127,7 @@ Mot1 \sep Mot2
 \label{sec:lentete}
 
 
-Categorical online learning is a well-documented class of learning problems in which ($i$) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and ($ii$) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$. The multiclass learning task typically addresses object recognition (such as OCR, face recognition, speech recognition etc.) and recommender systems. In contrast with the offline approach, online learning takes the form of an iterative process, relying on a time-ordered sequence of observations, queries and feedbacks.   
+Categorical online learning is a well-documented class of learning problems in which ($i$) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and ($ii$) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$. The multiclass learning task typically addresses object recognition (such as OCR, face recognition, speech recognition etc.) and recommender systems. In contrast with the offline approach, online learning takes the form of an iterative process, relying on a time-ordered sequence of observations, actions and feedbacks (where the feedback is the observable "result" of the action).   
 Two well-known setups obey to this class, i.e. the contextual bandit setup (see  \cite{lai1985asymptotically} and \cite{auer2002finite}) and supervised online learning setup (see  \cite{rosenblatt1958perceptron}, \cite{duda1973pattern} and \cite{freund1999large}), the two setups mainly differing by the nature of the feedback. Whether abundant or scarce, deterministic or stochastic, stationary or adversarial, the feedback characteristics critically shape the design of the learning algorithms.  
 
 The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback (see \cite{kakade2008efficient}). This case lies at the crossroad of the supervised online learning setup and the bandit setup.  A one-bit feedback reflects a ``hit-or-miss'' learning situations, in which a single bit indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, the problem is specific to the online approach and was only recently identified and analyzed by the community (see \cite{kakade2008efficient}, \cite{gentile2012multilabel}, etc.). 
@@ -192,16 +192,17 @@ The classifier is updated through local measures of a loss function $l_t = l(x_t
 %The loss thus relies on a combiation of \emph{internal} information (current classifier's parameters, current choice) and \emph{external} information (input vector, feedback). On contrary to the offline setting, the classifier's current value $W_t$ plays a significant role in defining the future direction. 
 
 Different loss function and margin constraints can be defined depending on task and feedback characteristics. 
-Under the multiclass setting, two principal margin constraint schemes can be set up, namely the \emph{normative} margin and the \emph{relative} margin. In the \emph{normative} margin case, the classifier is expected to provide a response that overtakes in norm a reference value $a$. A typical normative margin setup is the one-vs-all (OVA) setup, having  $a = 1$ for reference,  i.e. $$\forall k \left\{
+Under the multiclass setting, two principal margin constraint schemes can be set up, namely the \emph{normative} margin and the \emph{relative} margin. In the \emph{normative} margin case, the classifier is expected to provide a response that overtakes in norm a reference value $a$. A typical normative margin setup is the one-vs-all (OVA) setup, having  $a = 1$ for reference,  i.e. \begin{equation}\label{eq:OVA}
+\forall k \left\{
 \begin{array}{l}
 \langle w^k, x \rangle \geq 1 \text{ if } y = k \\
 \langle w^k, x \rangle \leq -1 \text{ if }y \neq k.
 \end{array}
 \right. 
-$$
+\end{equation}
 and a corresponding normative multiclass \emph{hinge loss} is:  
-$$ l(x,W,y) = \sum_{k=1}^K \left[1 + (1 - 2 \delta(y,k)) \langle w^k,x \rangle\right]_+
-$$
+\begin{equation}\label{eq:OVA-loss} l(x,W,y) = \sum_{k=1}^K \left[1 + (1 - 2 \delta(y,k)) \langle w^k,x \rangle\right]_+
+\end{equation}
 with $\delta(i,j) =1$ if $i = j$ and 0 elsewhere, and $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
 Under  a \emph{relative} margin setup (see \cite{crammer2003ultraconservative}), compliant with the Kessler's construction (\cite{duda1973pattern}), there is no absolute reference value but instead a distance reference, so that the linear score of the class-compliant separatrix $\langle w^y, x\rangle$ is expected to overtake  the other linear scores by at least $a$, i.e. (taking $a=1$)
 $$ \langle w^y, x \rangle \geq 1 + \max_{k \neq y} \langle w^k, x \rangle  $$
@@ -252,7 +253,7 @@ $$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ w
 %, where pure exploration ($\varepsilon = 1$ i.e. uniform prediction) and pure greediness ($\varepsilon = 0$, i.e. hit prediction only) are special cases.
 
 
-\subsection{Sparse online multiclass discrimination}
+\subsection{Sparse online multiclass discrimination}\label{sec:sparse-online-multiclass-discrimination}
 
 %address the asymmetry problem
 %The unpredicted hits obtained in the second case 
@@ -284,10 +285,90 @@ i.e.~:
 This "agnostic" approach to non-explicitely disclosed labels %avoids weight coefficients asymmetry in the label hit case and 
 renders the method (i) independent to the labels set cardinality, (ii) independent to the actual classification achievement (avoiding unnecessary weight updates at high classification rates) (iii) independent to the actual exploration/exploitation rate and (iv) more resilient to label noise. 
 
+\subsection{Quadratic optimization}
+ 
+In \cite{crammer2006online}, a quadratic update minimization objective under a class-accuracy linear constraint $ l_t $ is considered.  
+The weight update is the solution of ~:
+$$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
+where $C$ is an optional misclassification stiffness parameter. It provides the following update~:
+$$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2\delta(y_t,\tilde{y}_t) - 1) X_t^{\tilde{y}_t}$$
+which leads to algorithm \ref{algo:quad}.
+
+\begin{algorithm}[t!]
+	\caption{Online quadratic optimization}\label{algo:quad}
+	\begin{algorithmic}
+		\STATE Parameters:  $\varepsilon$, $C$
+		\STATE Set $W \leftarrow \vec{0}$
+		\FOR {$t \in [1,\dots, T]$}
+		\STATE Read $x_t$
+		\STATE $\hat{y}_t \leftarrow \underset{k = 1,\dots,K}{\text{argmax}}\left\langle W ,X_t^k\right\rangle$
+		\FOR {$k \in [1,...,K]$}
+		\STATE $p_{k}\leftarrow (1-\varepsilon)\delta(k,\hat{y}_t) + \frac{\varepsilon}{K}$
+		\ENDFOR
+		\STATE Draw $\tilde{y}_t$ randomly from $\left(p_{1},\dots ,p_{K}\right)$
+		\STATE Read $f_t = \delta(y_t,\tilde{y}_t)$
+		\STATE $l_t \leftarrow \left[ 1+(1-2f_t)\langle W,X_t^{\tilde{y}_t}\rangle\right]_{+}$ 
+		\STATE Set $$W \leftarrow W + \frac{l_t}{\parallel x_t\parallel^2 + \frac{1}{2C}} (2f_t-1) X_t^{\tilde{y}_t}$$
+		\ENDFOR
+	\end{algorithmic}
+\end{algorithm}
+
+This setup is called "passive-aggressive" for it combines a conservative approach (ignore $x_t$ if $l_t=0$) with a tight update (optimize the classifier according to $x_t$ if $l_t>0$).
+In its original formulation ($C = \infty$), this learning setup implements a "one-shot" update, i.e. carries out a zero-loss  after update. The stiffness parameter $C$ allows for a more progressive update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
+
+In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good the current choice is, without telling how good or bad other choices would be. Solving the system carries out a single update on the  $\tilde{y}^\text{th}$ separatrix only. 
+
+Under this focused examination, it is worth considering an alternate classifier $U$ in parallel with $W_{t-1}$. The same examination of $\tilde{y}_t$ at time $t$ provides an alternate feedback $l^*_t = l(U,x_t,y_t,\tilde{y}_t)$. By construction, if the data are separable under OVA constraints (see eq. (\ref{eq:OVA})), there exist at least one classifier $U$ such that $\forall t, l^*_t = 0$. In that case, the following theorem can be established:
+
+
+
+
+%\subsubsection{Analyse}
+
+
+%Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_t^{\ast}$ la perte obtenue par ce classifieur à l'instant $t$ lorsque la réponse $\tilde{y}_t$ est produite. On démontre les deux théorèmes suivants (en négligeant la constante de raideur $C$ pour simplifier) :
+
+\begin{theorem}
+	\label{theo:BPAT1}
+	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of separable examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, and $U \in \mathbb{R}^{K\times d}$ such that $ \forall t, l^*_t=0$. Then, the cumulative squared loss of this algorithm is bounded by,
+	\begin{equation}
+	\sum_{t=1}^{T} l_t^2 \leqslant R^2\cdot \parallel{U}\parallel^2
+	\end{equation}
+\end{theorem}
+(proof in \ref{app:thm1})
+
+The result obtained in that case is formally similar to that of  \cite{crammer2006online}. It is here shown valid for \emph{any sequence} $\tilde{y}_1$, ..., $\tilde{y}_T$, including constant sequences and pure random sequences, i.e. shows \emph{policy independence}.
+% and optimal (zero-error) sequence. 
+Whatever the series of actions, only $T$ configurations out of $KT$ possible configurations are checked, forming a particular path of actions. This sequence probes the environment without exhausting it. Pathological series (such as constant series) still provide a bound on the \emph{observed} cumulative loss, ignoring every unobserved losses. An appropriate uniform exploration policy is thus needed in order {\color{red} to provide effective classification improvement.}
+
+
+the observed loss such as checked on  will not exceed the given bound, but does not provide a zero-loss garantee on the  unobserved configurations.   
+
+
+does not provide a regret  
+
+If we turn now to an arbitrary classifier $U$, without separability assumption, 
+
+\begin{theorem}
+	\label{theo:BPAT2}
+	Let $(x_1,y_1),...,(x_T,y_T) $ be a sequence of examples where  $x_t\in \mathbb{R}^d$, $y_t \in \{1,...,K\}$ and $\parallel{x_t}\parallel \leqslant R$ for all t. Then for any  $U \in \mathbb{R}^{K\times d}$, the cumulative squared loss of this algorithm is bounded by:
+	\[\sum_{t=1}^{T}l_t^2 \leqslant \left(R\parallel{U}\parallel+2 \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}\right)^2 \]
+\end{theorem}
+
+(proof in \ref{app:thm2})
+
+{\color{blue} Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est borné en $O(\sqrt{T})$ dans le cas non séparable.}
+
+%Pour les affiliations, vous pouvez utiliser
+%\href{http://ctan.org/pkg/authblk}{le paquet \texttt{authblk}}.
+
+Les bornes obtenues ici sont comparables  à celles obtenues par Crammer dans le cadre de la classification supervisée  \cite{crammer2006online}. En particulier, comme dans le cas de l'algorithme ``passif-agressif'' de Crammer, on peut s'attendre à un regret de l'ordre de $O(\sqrt{T})$ dans le cas non-linéairement séparable. Il est donc remarquable de constater que les garanties de convergences de notre algorithme sont les mêmes que dans le cas supervisé, étant donnée la moindre information utilisée et le caractère stochastique de la fonction de décision. On notera néanmoins le caractère plus ``faible'' de la fonction de perte utilisée, de sorte que nos résultats ne garantissent pas que la bonne réponse sera atteinte, mais seulement que la mauvaise réponse ne sera pas atteinte.
+
+The fact we obain the same bounds as \cite{crammer2006online} indicates that additional degrees of freedom not to be considered.   
 
 \subsection{Gradient-descent approach}
 
-The gradient-based approach to sparse online discriminative classification, as proposed by \cite{kivinen2004online}, relies on minimizing the regularized risk:
+Aside the XXX presented above, the gradient-based approach to sparse online discriminative classification, as proposed by \cite{kivinen2004online}, relies on minimizing the regularized risk:
 $$R(W) = \mathbb{E}\left[ l + \frac{\lambda}{2}\|W\|^2\right]$$
 with $\lambda$ a regularization parameter.
 
@@ -318,157 +399,44 @@ and the cardinality of the non-zero coefficients correspond to the number of obs
 Then, following \cite{kivinen2004online}, a strict control on the number of support  vectors may be imposed, though "old" coefficients exponentially vanish while new updates take place. A $H$-"horizon" truncation principle may be adopted, with every $\alpha_{t^\prime}$ such that $\sigma_t - \sigma_{t^\prime} > H$ set to 0. The truncation error can then be shown to  exponentially decrease with $H$ (see \cite{kivinen2004online}). This approach is of course well-adapted to the non-stationary case, where context-related categories change over time.
 
 %\paragraph{}
-\begin{algorithm}
-\caption{Gradient descent}
-\begin{algorithmic}
-
-	\STATE Parameters:  $\varepsilon$, $\eta$, $\lambda$
-	\STATE Set $W_0 = 0$ (null vector)
-	\FOR {each round $t$ = 1,\dots, $T$}
-	\STATE Observe $x_t$.
-	\STATE Set $\hat{y}_t = \underset{i = 1,\dots,K}{\text{argmax}}\left\langle W_{t-1} ,X_t^i\right\rangle$
-	\FORALL {$i \in [1,...,K]$}
-	\STATE $p_{i,t}= (1-\varepsilon)\delta(i,\hat{y}_t) + \frac{\varepsilon}{K}$
-	\ENDFOR
-	\STATE Draw $\tilde{y}_t$ randomly from $p_t = \left(p_{1,t},\dots ,p_{K,t}\right)$.
-	\STATE Observe $\delta_t = \delta(y_t,\tilde{y}_t)$.
-	\STATE Set $l_t = \left[ 1+(1-2\delta_t)\langle W_{t-1},X_t^{\tilde{y}_t}\rangle\right]_{+}$ 
-	\STATE Set $$W_t =  \left\{
-	\begin{array}{ll}
-	(1-\eta\lambda) W_{t-1} + \eta (2 \delta_t-1) X_t^{\tilde{y}_t} &\text{ if } l_t > 0\\
-	W_{t-1} &\text{ elsewhere }(l_t = 0)
-	\end{array}
-	\right.$$
-	\ENDFOR
-\end{algorithmic}
-\end{algorithm}
-\subsection{Quadratic optimization}
- 
-Aside the horizon-based first-order gradient descent presented above, \cite{crammer2006online} consider a quadratic update minimization objective under a class-accuracy linear constraint
-$ l_t $.  
-The weight update is the solution of ~:
-$$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
-where $C$ is an optional misclassification stiffness parameter. It provides the following update~:
-$$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2\delta(y_t,\tilde{y}_t) - 1) X_t^{\tilde{y}_t}$$
-
-This setup is called "passive-aggressive" for it combines a conservative approach (ignore $x_t$ if $l_t=0$) with a tight update (optimize the classifier according to $x_t$ if $l_t>0$).
-
-
-\begin{algorithm}
-\caption{Quadratic optimization}
-\begin{algorithmic}
-	\STATE $\ \ $
-	\STATE Parameters:  $\varepsilon$, $C$.
-	\STATE Set $W_0 = 0$ (null vector)
-	\FOR {each round $t$ = 1,\dots, $T$}
-	\STATE Observe $x_t$.
-	\STATE Set $\hat{y}_t = \underset{i = 1,\dots,K}{\text{argmax}}\left\langle W_{t-1} ,X_t^i\right\rangle$
-	\FORALL {$i \in [1,...,K]$}
-	\STATE $p_{i,t}= (1-\varepsilon)\delta(i,\hat{y}_t) + \frac{\varepsilon}{K}$
-	\ENDFOR
-	\STATE Draw $\tilde{y}_t$ randomly from $p_t = \left(p_{1,t},\dots ,p_{K,t}\right)$.
-	\STATE Observe $\delta_t = \delta(y_t,\tilde{y}_t)$.
-	\STATE Set $l_t = \left[ 1+(1-2\delta_t)\langle W_{t-1},X_t^{\tilde{y}_t}\rangle\right]_{+}$ 
-	\STATE Set $$W_t = W_{t-1} + \frac{l_t}{\parallel x_t\parallel^2 + \frac{1}{2C}} (2\delta_t-1) X_t^{\tilde{y}_t}$$
-	\ENDFOR
-\end{algorithmic}
+\begin{algorithm}[t!]
+	\caption{H-horizon gradient descent}
+	\begin{algorithmic}
+		
+		\STATE Parameters:  $\varepsilon$, $\eta$, $\lambda$, $H$
+		\STATE Set $W \leftarrow \vec{0}$, $n \leftarrow 0$, $b_\text{inf}\leftarrow 1$
+		\FOR {$t \in [1,\dots, T]$}
+		\STATE Read $x_t$
+		\STATE $\hat{y}_t \leftarrow \underset{k = 1,\dots,K}{\text{argmax}}\left\langle W ,X_t^k\right\rangle$
+		\FOR {$k \in [1,...,K]$}
+		\STATE $p_{k}\leftarrow (1-\varepsilon)\delta(k,\hat{y}_t) + \frac{\varepsilon}{K}$
+		\ENDFOR
+		\STATE Draw $\tilde{y}_t$ randomly from $\left(p_{1},\dots ,p_{K}\right)$
+		\STATE Read $f_t = \delta(y_t,\tilde{y}_t)$
+		\STATE $l_t \leftarrow \left[ 1+(1-2f_t)\langle W,X_t^{\tilde{y}_t}\rangle\right]_{+}$ 
+		\IF {$l_t > 0$}
+		\STATE $n \leftarrow n + 1$
+		\STATE $\alpha_{n} \leftarrow \eta (2 f_t-1)$
+		\STATE Store $X_{n} = X_t^{\tilde{y}_t}$
+		\IF{$n > H$}
+		\STATE $b_\text{inf} \leftarrow n - H + 1$
+		\STATE Erase $X_{n - H }$ from memory
+		\ENDIF 
+		\FOR {$ i \in [b_\text{inf}, ..., n -1]$}
+		\STATE $\alpha_i \leftarrow (1 - \eta\lambda) \alpha_i$
+		\ENDFOR			
+		\STATE Set $W \leftarrow \sum_{i=b_\text{inf}}^n \alpha_i X_{i}$
+		%\left\{
+		%\begin{array}{ll}
+		%(1-\eta\lambda) W_{t-1} + \eta (2 f_t-1) X_t^{\tilde{y}_t} &\text{ if } l_t > 0\\
+		%W_{t-1} &\text{ elsewhere }(l_t = 0)
+		%\end{array}
+		%\right.$$
+		\ENDIF
+		\ENDFOR
+	\end{algorithmic}
 \end{algorithm}
 
-\subsection{Analyse}
-
-{\color{blue} Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est borné en $O(\sqrt{T})$ dans le cas non séparable.}
-
-Soit $U$ est un classifieur quelconque de l'espace des classifieurs, on note $l_t^{\ast}$ la perte obtenue par ce classifieur à l'instant $t$ lorsque la réponse $\tilde{y}_t$ est produite. On démontre les deux théorèmes suivants (en négligeant la constante de raideur $C$ pour simplifier) :
-
-\begin{theorem}
-	\label{theo:BPAT1}
-	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of separable examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, and $U \in \mathbb{R}^{K\times d}$ such that $ \forall t, l^*_t=0$. Then, the cumulative squared loss of this algorithm is bounded by,
-	\begin{equation}
-	\sum_{t=1}^{T} l_t^2 \leqslant R^2\cdot \parallel{U}\parallel^2
-	\end{equation}
-\end{theorem}
-
-\begin{proof}
-	Define $\Delta_t$ to be:
-	\[\Delta_t = \parallel{W_{t-1}-U}\parallel^2-\parallel{W_t-U}\parallel^2\]
-	By summing $\Delta_t$ over all $t$ from 1 to $T$,  $\sum_t \Delta_t$ is shown to be a telescopic sum which collapses to
-	\begin{align}
-	\sum_{t=1}^{T}\Delta_t &= \sum_{t=1}^{T} \left( \parallel{W_{t-1} - U}\parallel^2-\parallel{W_t - U}\parallel^2 \right)\nonumber\\ 
-	&= \parallel{W_0 - U}\parallel^2-\parallel{W_t-U}\parallel^2\nonumber
-	\end{align}	
-	By the initialization of $W_0 = \vec{0}$, 
-	\begin{equation}
-	\label{equa:delta}
-	\sum_{t=1}^{T}\Delta_t = \parallel{U}\parallel^2 - \parallel{W_t-U}\parallel^2 \leqslant \parallel{U}\parallel^2 
-	\end{equation}
-	
-	Using the definition of update : %in Eq.\ref{eq:,
-	\begin{align}
-	\Delta_t = -2\left\langle (W_{t-1} - U), (2g_t-1)\frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\rangle 
-	- \left\| \frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\|^2
-	\nonumber
-	\end{align}
-	%With    and   ,
-	So, taking~:
-	\begin{itemize}
-		\item[] $l_t = [1+(1-2g_t)\cdot\langle W_{t-1},X_t^{\tilde{y}_t}\rangle]_+$
-		\item[] $l_t^{\ast} = [1+(1-2g_t)\cdot\langle U,X_t^{\tilde{y}_t}\rangle]_+$
-		\item[] $\parallel{X_t^{\tilde{y}_t}}\parallel = \parallel x_t\parallel$
-	\end{itemize}
-	it comes:
-	\begin{align}
-	\Delta_t =& 2l_t\frac{(1-2g_t)\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle - (1-2g_t)\langle U, X_t^{\tilde{y}_t}\rangle}{\|x_t\|^2}
-	-\frac{l_t^2}{\parallel{x_t}\parallel^2}\nonumber
-	\end{align}
-	Noting that $\Delta_t = 0$ when $l_t = 0$, and $l^*_t \geq  1+(1-2g_t)\cdot\langle U,X_t^{\tilde{y}_t}\rangle$, it comes : 
-	\begin{align}
-	\Delta_t\geqslant& 2l_t\frac{l_t - l_t^{\ast}}{\parallel{x_t}\parallel^2}-\frac{l_t^2}{\parallel{x_t}\parallel^2}\nonumber\\
-	=& \frac{l_t^2-2l_t l_t^{\ast}}{\parallel x_t\parallel^2}\nonumber
-	\end{align}
-	If all examples are separable, $\exists U$ such that $\forall t \in [1,...,T]$ , $l_t^{\ast} = 0$ ,
-	%, following the Eq.~\ref{sumDelta},
-	
-	\[\Rightarrow \parallel{U}\parallel^2 \geqslant \sum_{t=1}^{T}\Delta_t \geqslant \sum_{t=1}^{T}  \frac{l_t^2}{\parallel{x_t}\parallel^2}
-	\geqslant 
-	\sum_{t=1}^{T}  \frac{l_t^2}{R^2}
-	\]
-	\[\Rightarrow\sum_{t=1}^{T} l_t^2 \leqslant R^2 \cdot \parallel{U}\parallel^2\]
-\end{proof}
-\begin{theorem}
-	\label{theo:BPAT2}
-	Let $(x_1,y_1),...,(x_T,y_T) $ be a sequence of examples where  $x_t\in \mathbb{R}^d$, $y_t \in \{1,...,K\}$ and $\parallel{x_t}\parallel \leqslant R$ for all t. Then for any  $U \in \mathbb{R}^{K\times d}$, the cumulative squared loss of this algorithm is bounded by:
-	\[\sum_{t=1}^{T}l_t^2 \leqslant \left(R\parallel{U}\parallel+2 \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}\right)^2 \]
-\end{theorem}
-\begin{proof}
-	By the proof of Theorem \ref{theo:BPAT1}, 
-	\[\sum_{t=1}^{T}l_t^2 \leqslant R^2\cdot \parallel{U}\parallel^2 + 2\sum_{t=1}^{T}l_t l_t^{\ast}\]
-	To upper bound the right side of the above inequality, we denote $a_t = \sqrt{\sum_{t=1}^{T}l_t^2}$ and $b_t = \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}$, 
-	\begin{align}
-	2(a_tb_t)^2-2(\sum_{t=1}^{T}l_tl_t^{\ast})^2 =& \sum_{i=1}^{T}\sum_{j=1}^{T}l_i^2(l_j^{\ast})^2+\sum_{i=1}^{T}\sum_{j=1}^{T}l_j^2(l_i^{\ast})^2 \nonumber\\
-	&- 2\sum_{i=1}^{T}\sum_{j=1}^{T}l_il_jl_i^{\ast}l_j^{\ast}\nonumber\\
-	=& \sum_{i=1}^{T}\sum_{j=1}^{T}(l_il_j^{\ast}-l_jl_i^{\ast})^2 \geqslant 0 \nonumber
-	\end{align}
-	
-	\begin{align}
-	\sum_{t=1}^{T}l_t^2 \leqslant R^2 \cdot \parallel{U}\parallel^2+2\sum_{t=1}^{T}l_tl_t^{\ast}\leqslant R^2 \cdot \parallel{U}\parallel^2+2a_tb_t\nonumber
-	\end{align}
-	then considering:
-	\[a_t^2 -2 a_tb_t+b_t^2\leqslant R^2\parallel{U}\parallel^2+b_t^2\]
-	%the largest possible $a_t$ respecting the inequality is $b_t+\sqrt{R^2\parallel{U}\parallel^2+b_t^2}$
-	we obtain :
-	\[a_t \leqslant b_t+\sqrt{R^2\parallel{U}\parallel^2+b_t^2}\]
-	and using the fact that $\sqrt{a+b}\leqslant \sqrt{a}+\sqrt{b}$,
-	\[a_t \leqslant R\parallel{U}\parallel+2 b_t\]
-	so that :
-	\[\sum_{t=1}^{T}l_t^2 \leqslant \left(R\parallel{U}\parallel+2 \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}\right)^2 \]
-\end{proof}
-
-%Pour les affiliations, vous pouvez utiliser
-%\href{http://ctan.org/pkg/authblk}{le paquet \texttt{authblk}}.
-
-Les bornes obtenues ici sont comparables  à celles obtenues par Crammer dans le cadre de la classification supervisée  \cite{crammer2006online}. En particulier, comme dans le cas de l'algorithme ``passif-agressif'' de Crammer, on peut s'attendre à un regret de l'ordre de $O(\sqrt{T})$ dans le cas non-linéairement séparable. Il est donc remarquable de constater que les garanties de convergences de notre algorithme sont les mêmes que dans le cas supervisé, étant donnée la moindre information utilisée et le caractère stochastique de la fonction de décision. On notera néanmoins le caractère plus ``faible'' de la fonction de perte utilisée, de sorte que nos résultats ne garantissent pas que la bonne réponse sera atteinte, mais seulement que la mauvaise réponse ne sera pas atteinte.
-
-The fact we obain the same bounds as \cite{crammer2006online} indicates that additional degrees of freedom not to be considered.   
 
 \subsection{Extensions}
 Le plongement des données d'entrée dans des espaces de Hilbert à noyaux reproduisants (RKHS) permet d'étendre notre approche aux jeux de données non linéairement séparables. 
@@ -770,6 +738,82 @@ Moreover, experimental evaluation shows that BPA performs better than other algo
 %% \bibitem[ ()]{}
 
 % %\end{thebibliography}
+
+\appendix
+\section{Proof of Theorem \ref{theo:BPAT1}}\label{app:thm1}
+
+\begin{proof}
+	Define $\Delta_t$ to be:
+	\[\Delta_t = \parallel{W_{t-1}-U}\parallel^2-\parallel{W_t-U}\parallel^2\]
+	By summing $\Delta_t$ over all $t$ from 1 to $T$,  $\sum_t \Delta_t$ is shown to be a telescopic sum which collapses to
+	\begin{align}
+	\sum_{t=1}^{T}\Delta_t &= \sum_{t=1}^{T} \left( \parallel{W_{t-1} - U}\parallel^2-\parallel{W_t - U}\parallel^2 \right)\nonumber\\ 
+	&= \parallel{W_0 - U}\parallel^2-\parallel{W_t-U}\parallel^2\nonumber
+	\end{align}	
+	By the initialization of $W_0 = \vec{0}$, 
+	\begin{equation}
+	\label{equa:delta}
+	\sum_{t=1}^{T}\Delta_t = \parallel{U}\parallel^2 - \parallel{W_t-U}\parallel^2 \leqslant \parallel{U}\parallel^2 
+	\end{equation}
+	
+	Using the definition of update : %in Eq.\ref{eq:,
+	\begin{align}
+	\Delta_t = -2\left\langle (W_{t-1} - U), (2f_t-1)\frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\rangle 
+	- \left\| \frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\|^2
+	\nonumber
+	\end{align}
+	%With    and   ,
+	So, taking~:
+	\begin{itemize}
+		\item[] $l_t = [1+(1-2f_t)\cdot\langle W_{t-1},X_t^{\tilde{y}_t}\rangle]_+$
+		\item[] $l_t^{\ast} = [1+(1-2f_t)\cdot\langle U,X_t^{\tilde{y}_t}\rangle]_+$
+		\item[] $\parallel{X_t^{\tilde{y}_t}}\parallel = \parallel x_t\parallel$
+	\end{itemize}
+	it comes:
+	\begin{align}
+	\Delta_t =& 2l_t\frac{(1-2f_t)\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle - (1-2f_t)\langle U, X_t^{\tilde{y}_t}\rangle}{\|x_t\|^2}
+	-\frac{l_t^2}{\parallel{x_t}\parallel^2}\nonumber
+	\end{align}
+	Noting that $\Delta_t = 0$ when $l_t = 0$, and $l^*_t \geq  1+(1-2f_t)\cdot\langle U,X_t^{\tilde{y}_t}\rangle$, it comes : 
+	\begin{align}
+	\Delta_t\geqslant& 2l_t\frac{l_t - l_t^{\ast}}{\parallel{x_t}\parallel^2}-\frac{l_t^2}{\parallel{x_t}\parallel^2}\nonumber\\
+	=& \frac{l_t^2-2l_t l_t^{\ast}}{\parallel x_t\parallel^2}\nonumber
+	\end{align}
+	If all examples are separable, $\exists U$ such that $\forall t \in [1,...,T]$ , $l_t^{\ast} = 0$ ,
+	%, following the Eq.~\ref{sumDelta},
+	
+	\[\Rightarrow \parallel{U}\parallel^2 \geqslant \sum_{t=1}^{T}\Delta_t \geqslant \sum_{t=1}^{T}  \frac{l_t^2}{\parallel{x_t}\parallel^2}
+	\geqslant 
+	\sum_{t=1}^{T}  \frac{l_t^2}{R^2}
+	\]
+	\[\Rightarrow\sum_{t=1}^{T} l_t^2 \leqslant R^2 \cdot \parallel{U}\parallel^2\]
+\end{proof}
+
+\section{Proof of Theorem \ref{theo:BPAT2}}\label{app:thm2}
+\begin{proof}
+	By the proof of Theorem \ref{theo:BPAT1}, 
+	\[\sum_{t=1}^{T}l_t^2 \leqslant R^2\cdot \parallel{U}\parallel^2 + 2\sum_{t=1}^{T}l_t l_t^{\ast}\]
+	To upper bound the right side of the above inequality, we denote $a_t = \sqrt{\sum_{t=1}^{T}l_t^2}$ and $b_t = \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}$, 
+	\begin{align}
+	2(a_tb_t)^2-2(\sum_{t=1}^{T}l_tl_t^{\ast})^2 =& \sum_{i=1}^{T}\sum_{j=1}^{T}l_i^2(l_j^{\ast})^2+\sum_{i=1}^{T}\sum_{j=1}^{T}l_j^2(l_i^{\ast})^2 \nonumber\\
+	&- 2\sum_{i=1}^{T}\sum_{j=1}^{T}l_il_jl_i^{\ast}l_j^{\ast}\nonumber\\
+	=& \sum_{i=1}^{T}\sum_{j=1}^{T}(l_il_j^{\ast}-l_jl_i^{\ast})^2 \geqslant 0 \nonumber
+	\end{align}
+	
+	\begin{align}
+	\sum_{t=1}^{T}l_t^2 \leqslant R^2 \cdot \parallel{U}\parallel^2+2\sum_{t=1}^{T}l_tl_t^{\ast}\leqslant R^2 \cdot \parallel{U}\parallel^2+2a_tb_t\nonumber
+	\end{align}
+	then considering:
+	\[a_t^2 -2 a_tb_t+b_t^2\leqslant R^2\parallel{U}\parallel^2+b_t^2\]
+	%the largest possible $a_t$ respecting the inequality is $b_t+\sqrt{R^2\parallel{U}\parallel^2+b_t^2}$
+	we obtain :
+	\[a_t \leqslant b_t+\sqrt{R^2\parallel{U}\parallel^2+b_t^2}\]
+	and using the fact that $\sqrt{a+b}\leqslant \sqrt{a}+\sqrt{b}$,
+	\[a_t \leqslant R\parallel{U}\parallel+2 b_t\]
+	so that :
+	\[\sum_{t=1}^{T}l_t^2 \leqslant \left(R\parallel{U}\parallel+2 \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}\right)^2 \]
+\end{proof}
+
 
 \end{document}
 
