@@ -299,16 +299,17 @@ which leads to algorithm \ref{algo:quad}.
 	\begin{algorithmic}
 		\STATE Parameters:  $\varepsilon$, $C$
 		\STATE Set $W \leftarrow \vec{0}$
-		\FOR {$t \in [1,\dots, T]$}
+		\FOR {$t$ in $[1,\dots, T]$}
 		\STATE Read $x_t$
-		\STATE $\hat{y}_t \leftarrow \underset{k = 1,\dots,K}{\text{argmax}}\left\langle W ,X_t^k\right\rangle$
-		\FOR {$k \in [1,...,K]$}
-		\STATE $p_{k}\leftarrow (1-\varepsilon)\delta(k,\hat{y}_t) + \frac{\varepsilon}{K}$
-		\ENDFOR
-		\STATE Draw $\tilde{y}_t$ randomly from $\left(p_{1},\dots ,p_{K}\right)$
+		%\STATE $\hat{y}_t \leftarrow \underset{k = 1,\dots,K}{\text{argmax}}\left\langle W ,X_t^k\right\rangle$
+		%\FOR {$k \in [1,...,K]$}
+		%\STATE $p_{k}\leftarrow (1-\varepsilon)\delta(k,\hat{y}_t) + \frac{\varepsilon}{K}$
+		%\ENDFOR
+		%\STATE Draw $\tilde{y}_t$ randomly from $\left(p_{1},\dots ,p_{K}\right)$
+		\STATE Choose $\tilde{y}_t$
 		\STATE Read $f_t = \delta(y_t,\tilde{y}_t)$
 		\STATE $l_t \leftarrow \left[ 1+(1-2f_t)\langle W,X_t^{\tilde{y}_t}\rangle\right]_{+}$ 
-		\STATE Set $$W \leftarrow W + \frac{l_t}{\parallel x_t\parallel^2 + \frac{1}{2C}} (2f_t-1) X_t^{\tilde{y}_t}$$
+		\STATE $W \leftarrow W + \frac{l_t}{\parallel x_t\parallel^2 + \frac{1}{2C}} (2f_t-1) X_t^{\tilde{y}_t}$
 		\ENDFOR
 	\end{algorithmic}
 \end{algorithm}
@@ -316,12 +317,9 @@ which leads to algorithm \ref{algo:quad}.
 This setup is called "passive-aggressive" for it combines a conservative approach (ignore $x_t$ if $l_t=0$) with a tight update (optimize the classifier according to $x_t$ if $l_t>0$).
 In its original formulation ($C = \infty$), this learning setup implements a "one-shot" update, i.e. carries out a zero-loss  after update. The stiffness parameter $C$ allows for a more progressive update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
 
-In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good the current choice is, without telling how good or bad other choices would be. Solving the system carries out a single update on the  $\tilde{y}^\text{th}$ separatrix only. 
+In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good the current choice is, without telling how good or bad other choices would be. Solving the system carries out a single update on the  $\tilde{y}^\text{th}$ separatrix. 
 
 Under this focused examination, it is worth considering an alternate classifier $U$ in parallel with $W_{t-1}$. The same examination of $\tilde{y}_t$ at time $t$ provides an alternate feedback $l^*_t = l(U,x_t,y_t,\tilde{y}_t)$. By construction, if the data are separable under OVA constraints (see eq. (\ref{eq:OVA})), there exist at least one classifier $U$ such that $\forall t, l^*_t = 0$. In that case, the following theorem can be established:
-
-
-
 
 %\subsubsection{Analyse}
 
@@ -330,17 +328,34 @@ Under this focused examination, it is worth considering an alternate classifier 
 
 \begin{theorem}
 	\label{theo:BPAT1}
-	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of separable examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, and $U \in \mathbb{R}^{K\times d}$ such that $ \forall t, l^*_t=0$. Then, the cumulative squared loss of this algorithm is bounded by,
+	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of separable examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, $\tilde{y}_1,...,\tilde{y}_T$ a sequence of responses, with $\tilde{y}_t\in \{1,...,K\}$, 
+	and $U \in \mathbb{R}^{K\times d}$ such that $ \forall t, l^*_t=0$. Then, the cumulative squared loss of algorithm \ref{algo:quad} is bounded by,
 	\begin{equation}
 	\sum_{t=1}^{T} l_t^2 \leqslant R^2\cdot \parallel{U}\parallel^2
 	\end{equation}
 \end{theorem}
 (proof in \ref{app:thm1})
 
-The result obtained in that case is formally similar to that of  \cite{crammer2006online}. It is here shown valid for \emph{any sequence} $\tilde{y}_1$, ..., $\tilde{y}_T$, including constant sequences and pure random sequences, i.e. shows \emph{policy independence}.
-% and optimal (zero-error) sequence. 
-Whatever the series of actions, only $T$ configurations out of $KT$ possible configurations are checked, forming a particular path of actions. This sequence probes the environment without exhausting it. Pathological series (such as constant series) still provide a bound on the \emph{observed} cumulative loss, ignoring every unobserved losses. An appropriate uniform exploration policy is thus needed in order {\color{red} to provide effective classification improvement.}
+The result obtained in that case is formally similar to that of  \cite{crammer2006online}. There are however many caveats.
 
+First, the classifier $U$ is composed of $K$ different separatrices, so that its norm is exected to grow linearly with $K$.
+
+Second, the result is  valid for \emph{any sequence} $\tilde{y}_1$, ..., $\tilde{y}_T$, including constant sequences, greedy sequence and pure random sequences. In other words, it is independent from the choice policy.
+% and optimal (zero-error) sequence. 
+Indeed, whatever the series of responses, only $T$ feedbacks out of $KT$ possible feedbacks are actually read.
+%, forming a particular path of actions. 
+This sequence probes the environment without exhausting it. The theorem provides a bound on the \emph{observed} cumulative loss, ignoring every unobserved losses. 
+%An appropriate uniform exploration policy is thus needed in order {\color{red} to provide effective classification improvement.}
+Two important cases need here to be examined:
+\begin{itemize}
+	\item In case $\tilde{y}_1, ...,\tilde{y}_T$ obey to a uniform random choice (independent from $W$), every separatrix $w^k$ is probed on average the same number of times, providing a non-biased series of class information for large $T$.
+	\item In case $\tilde{y}_1, ...,\tilde{y}_T$ obey to a greedy choice, the choice is now dependent on $W_t$. The theorem still garantees  a zero loss after a fixed number of updates. Let us note  $W^*$ this final classifier. Then at least one of the two constraints of \eqref{eq:OVA} is satisfied. Errors occur if $\exists (x,y)$ such that $\langle W^*,X^y\rangle < 1$ and $l_t = 0$. Then, $y$ is not chosen i.e. $\hat{y} \neq y$ and $\langle W^*,X^{\hat{y}}\rangle \leq -1$, i.e. $\forall k, \langle W^*,X^k\rangle \leq -1$.  
+	Regarding the second constraint, if $\exists k \neq y$ such that $\langle W^*,X^k\rangle > -1$ and $l_t = 0$, then $k$ is not chosen i.e. $\hat{y} \neq k $ and $\langle W^*,X^{\hat{y}}\rangle > \langle W^*,X^k\rangle > -1$. Then, the only possibility for $l_t = 0$ is  $\langle W^*,X^{\hat{y}}\rangle \geq 1$ and $\hat{y} = y$. There is no possibility for the two constraints being unsatisfied together.
+	Then, if the class examples belong to a closed set, then either exists $(x',y)$ such that $\langle w_y^*,x'\rangle > 1$ and then $\exists \rho \in [0,1]$ such that
+	$-1 < \langle w_y^*,\rho x + (1-\rho) x'\rangle < 1 $ and $l_t \neq 0$, either 
+	 Moreover, if all class examples belong to a closed set, there is no 
+\end{itemize}
+Finally, an $\varepsilon$-greedy choice, that alternates between uniform sampling and class-effective choice, provides 
 
 the observed loss such as checked on  will not exceed the given bound, but does not provide a zero-loss garantee on the  unobserved configurations.   
 
@@ -405,14 +420,14 @@ Then, following \cite{kivinen2004online}, a strict control on the number of supp
 		
 		\STATE Parameters:  $\varepsilon$, $\eta$, $\lambda$, $H$
 		\STATE Set $W \leftarrow \vec{0}$, $n \leftarrow 0$, $b_\text{inf}\leftarrow 1$
-		\FOR {$t \in [1,\dots, T]$}
+		\FOR {$t$ in $[1,\dots, T]$}
 		\STATE Read $x_t$
-		\STATE $\hat{y}_t \leftarrow \underset{k = 1,\dots,K}{\text{argmax}}\left\langle W ,X_t^k\right\rangle$
-		\FOR {$k \in [1,...,K]$}
-		\STATE $p_{k}\leftarrow (1-\varepsilon)\delta(k,\hat{y}_t) + \frac{\varepsilon}{K}$
-		\ENDFOR
-		\STATE Draw $\tilde{y}_t$ randomly from $\left(p_{1},\dots ,p_{K}\right)$
-		\STATE Read $f_t = \delta(y_t,\tilde{y}_t)$
+		%\STATE $\hat{y}_t \leftarrow \underset{k = 1,\dots,K}{\text{argmax}}\left\langle W ,X_t^k\right\rangle$
+		%\FOR {$k \in [1,...,K]$}
+		%\STATE $p_{k}\leftarrow (1-\varepsilon)\delta(k,\hat{y}_t) + \frac{\varepsilon}{K}$
+		%\ENDFOR
+		%\STATE Draw $\tilde{y}_t$ randomly from $\left(p_{1},\dots ,p_{K}\right)$
+		\STATE Choose $\tilde{y}_t$		\STATE Read $f_t = \delta(y_t,\tilde{y}_t)$
 		\STATE $l_t \leftarrow \left[ 1+(1-2f_t)\langle W,X_t^{\tilde{y}_t}\rangle\right]_{+}$ 
 		\IF {$l_t > 0$}
 		\STATE $n \leftarrow n + 1$
@@ -422,10 +437,10 @@ Then, following \cite{kivinen2004online}, a strict control on the number of supp
 		\STATE $b_\text{inf} \leftarrow n - H + 1$
 		\STATE Erase $X_{n - H }$ from memory
 		\ENDIF 
-		\FOR {$ i \in [b_\text{inf}, ..., n -1]$}
+		\FOR {$ i $ in $[b_\text{inf}, ..., n -1]$}
 		\STATE $\alpha_i \leftarrow (1 - \eta\lambda) \alpha_i$
 		\ENDFOR			
-		\STATE Set $W \leftarrow \sum_{i=b_\text{inf}}^n \alpha_i X_{i}$
+		\STATE $W \leftarrow \sum_{i=b_\text{inf}}^n \alpha_i X_{i}$
 		%\left\{
 		%\begin{array}{ll}
 		%(1-\eta\lambda) W_{t-1} + \eta (2 f_t-1) X_t^{\tilde{y}_t} &\text{ if } l_t > 0\\
