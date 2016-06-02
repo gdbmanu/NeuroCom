@@ -349,11 +349,26 @@ This sequence probes the environment without exhausting it. The theorem provides
 Two important cases need here to be examined:
 \begin{itemize}
 	\item In case $\tilde{y}_1, ...,\tilde{y}_T$ obey to a uniform random choice (independent from $W$), every separatrix $w^k$ is probed on average the same number of times, providing a non-biased series of class information for large $T$.
-	\item In case $\tilde{y}_1, ...,\tilde{y}_T$ obey to a greedy choice, the choice is now dependent on $W_t$. The theorem still garantees  a zero loss after a fixed number of updates. Let us note  $W^*$ this final classifier. Then at least one of the two constraints of \eqref{eq:OVA} is satisfied. Errors occur if $\exists (x,y)$ such that $\langle W^*,X^y\rangle < 1$ and $l_t = 0$. Then, $y$ is not chosen i.e. $\hat{y} \neq y$ and $\langle W^*,X^{\hat{y}}\rangle \leq -1$, i.e. $\forall k, \langle W^*,X^k\rangle \leq -1$.  
-	Regarding the second constraint, if $\exists k \neq y$ such that $\langle W^*,X^k\rangle > -1$ and $l_t = 0$, then $k$ is not chosen i.e. $\hat{y} \neq k $ and $\langle W^*,X^{\hat{y}}\rangle > \langle W^*,X^k\rangle > -1$. Then, the only possibility for $l_t = 0$ is  $\langle W^*,X^{\hat{y}}\rangle \geq 1$ and $\hat{y} = y$. There is no possibility for the two constraints being unsatisfied together.
-	Then, if the class examples belong to a closed set, then either exists $(x',y)$ such that $\langle w_y^*,x'\rangle > 1$ and then $\exists \rho \in [0,1]$ such that
-	$-1 < \langle w_y^*,\rho x + (1-\rho) x'\rangle < 1 $ and $l_t \neq 0$, either 
-	 Moreover, if all class examples belong to a closed set, there is no 
+	\item In case $\tilde{y}_1, ...,\tilde{y}_T$ obey to a greedy choice, the choice is now dependent on $W_t$. The theorem still guarantees a zero loss after a fixed number of updates. Let us note  $W^*$ this final classifier. Then at least one of the two constraints of \eqref{eq:OVA} is satisfied. 
+	\begin{itemize}
+		\item If $\exists (x,y)$ such that $\langle W^*,X^y\rangle < 1$, then, due to the zero-loss constraint,  $y$ is not chosen i.e. $\hat{y} \neq y$ and $\langle W^*,X^{\hat{y}}\rangle \leq -1$, i.e. $\forall k, \langle W^*,X^k\rangle \leq -1$.  
+		\item If $\exists k \neq y$ such that $\langle W^*,X^k\rangle > -1$ and $l_t = 0$, then, due to the zero-loss constraint, $k$ is not chosen i.e. $\hat{y} \neq k $ and $\langle W^*,X^{\hat{y}}\rangle > \langle W^*,X^k\rangle > -1$. Then, the only possibility for zero-loss is  $\langle W^*,X^{\hat{y}}\rangle \geq 1$ and $\hat{y} = y$.
+	\end{itemize}
+	 So $\forall (x,y)$, at least one of the two constraints  is satisfied.
+	Only the first violation carries out a classification error.  
+	Let us consider this case (i.e. $\exists (x,y)$ such that $\langle w_y^*,x\rangle \leq -1$). If $\exists (x',y)$ such that $\langle w_y^*,x'\rangle > 1$. All class examples belong (by construction) to a convex set (defined by $U$), so that $\exists \rho \in [0,1]$ such that
+	$-1 < \langle w_y^*,\rho x + (1-\rho) x'\rangle < 1 $ which brings out a non-zero loss, in contradiction with the theorem.
+	In conclusion, either all members of class $y$ are correctly classified, either none of them are (!), so that
+	$\langle w_y^*,x\rangle \leq -1$.
+	%In that case, %given class $y$ and $\forall x$ member of class $y$, and due to the zero-loss constraint,
+	% $\forall k$ : $\langle w_k^*,x\rangle \leq -1$ so that .
+	%: There is no \{(x,y),(x',y)\} such that  
+	\begin{itemize}
+		\item  
+		\item 
+		Either  $\exists y : \forall (x,y)$ : $\langle w_y^*,x\rangle < 1$. Then, due to the zero-loss constraint, $\forall (x, y): $ Then, $\forall (x,y^\prime)$ with $y^\prime \neq y$,  $\langle w_{y^\prime}^*,x\rangle \leq -1$, i.e. $\forall x, \langle w_y^*,x\rangle \leq -1$, i.e. 
+		$\langle w_y^*,x^\prime \rangle \leq -1$ and $\langle w_y^*,-x^\prime \rangle \leq -1$ which is also contradictory.
+	\end{itemize}
 \end{itemize}
 Finally, an $\varepsilon$-greedy choice, that alternates between uniform sampling and class-effective choice, provides 
 
