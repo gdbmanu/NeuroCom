@@ -145,7 +145,7 @@ The sequential organization of learning is present in the most traditional setup
 \paragraph{Linear models}
 Multiclass classification requires  finding an appropriate class $y \in \{1,... K\}$ for every observation vector $x \in \mathbb{R}^d$.
 The \textit{decision function} (or policy) $\tilde{y}_t \sim h(x_t)$ embodies both prior information about the regularity of the universe and experience-based information. A reasonable assumption  is to consider that  close-by contexts should provide close-by rewards distributions. 
-The linear approach to classification means to separate the input space in regions, where the different regions are defined by a set of linear mappings. We consider in that case a  classifier $W = (w^1,..,w^k) \in \mathbb{R}^{K \times d}$ so that, for every categorical response $k$, a \emph{similarity score} $\langle w^k, x_t\rangle$ is carried out. 
+The linear approach to classification means to separate the input space in regions, where the different regions are defined by a set of linear mappings. We consider in that case a  classifier $W = (w_1,..,w_k) \in \mathbb{R}^{K \times d}$ so that, for every categorical response $k$, a \emph{similarity score} $\langle w_k, x_t\rangle$ is carried out. 
 %defined as a set of $K$ linear mappings. 
 The linear assumption allows ($i$) to 
 settle choice (or action) over class similarity prediction and ($ii$) to update models over prediction accuracy.
@@ -162,13 +162,21 @@ In the second case, the quadratic optimization approach (see \cite{anlauf1989ada
 The one-bit feedback is a specific online learning setup that implements, in a principled way, the scarce labelling information problem. After reading $\tilde{y}_t$, instead of providing a label, the universe provides a single bit of information called the \textit{label hit}, i.e. $f_t = 1$ if  $\tilde{y}_t=y_t$ and $f_t = 0$ elsewhere. The objective, just as in the supervised case, is to avoid label misses and maximise labels hits. A specific update function needs to be defined to allow label hit improvement over time. 
 
 This problem was coined the ``bandit feedback classification problem'' by \cite{kakade2008efficient}. Taking inspiration from the multiclass perceptron (\cite{duda1973pattern}), a time-effective algorithm, called the ``Banditron'', is established:
-$K$ linear mappings $w^1, ..., w^K$ are defined and class-decision relies on a best-match policy, i.e.
- $$\hat{y} = \arg \max_{k \in\{1,..,K\}}  \langle w^k, x \rangle$$
+$K$ linear mappings $w_1, ..., w_K$ are defined and class-decision relies on a best-match policy, i.e.
+\begin{equation}\label{eq:argmax}
+\hat{y} = \underset{k \in\{1,..,K\}}{\text{argmax}}  \langle w_k, x \rangle
+\end{equation}
 Contrarily to the supervised case, an \textit{exploration} policy needs to be defined to efficiently sample the decision space. The Banditron adopts a simple  $\varepsilon-greedy$ search allowing the non-maximal responses to be occasionally chosen in a uniform way:
- $$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ with $\varepsilon \in [0,1]$.
-Given an initial set of $K$ null-vector hyperplanes $W_0 = (w^{1}_0$, ..., $w^{K}_0)$. Given the actual output $\tilde{y}_t$, the update at time $t$ is ~:
-$$ W_t = W_{t-1} + \frac{\delta(\tilde{y}_t ,y_t) X_t^{\tilde{y}_t}}{P(\tilde{Y}=\tilde{y}_t)} - X_t^{\hat{y}_t}$$   
-with the convention $X_t^k = (0, ..., 0,  x_t, 0, .., 0)$ a sequence of null vectors, except at position $k$ where the observation vector $x_t$ is found, so that $\langle W, X^k\rangle = \langle w^k, x\rangle$. The expectation of the update is shown to be that of the multiclass perceptron, and a convergence to the correponding perceptron classifier is obtained, with a finite bound on the cumulative error in linearly separable cases. 
+\begin{equation}\label{eq:eps-greedy}
+P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}
+\end{equation}
+ with $\varepsilon \in [0,1]$.
+Given an initial set of $K$ null-vector hyperplanes $W_0 = (\vec{0}, ..., \vec{0})$ and an actual output $\tilde{y}_t$, the update at time $t$ is ~:
+\begin{equation} \label{eq:banditron-update}
+W_t = W_{t-1} + \frac{\delta(\tilde{y}_t ,y_t) X_t^{\tilde{y}_t}}{P(\tilde{Y}=\tilde{y}_t)} - X_t^{\hat{y}_t}
+\end{equation}   
+with the convention $X_t^k = (\vec{0}, ..., x_t, ..., \vec{0})$ a sequence of null vectors, except at position $k$ where the observation vector $x_t$ is found, so that $$\langle W, X^k\rangle = \langle w_k, x\rangle$$ 
+The expectation of the update is shown to be that of the multiclass perceptron, and a convergence to the correponding perceptron classifier is obtained, with a finite bound on the cumulative error in linearly separable cases. 
 
 {\color{blue}
 Toujours dans le cadre des classifieurs linéaires, plusieurs algorithmes d'apprentissage de bandits contextuels ont été proposés dans la littérature. Dans nos expérimentations numériques, nous considérerons également ici l'algorithme ``Confidit'' proposé par Crammer et Gentile \cite{crammer2013multiclass}, reposant sur le perceptron d'ordre 2 et l'exploration non stochastique basée sur le principe UCB \cite{lai1985asymptotically}, et présentant des profils de convergence plus favorables que le Banditron. }
@@ -192,22 +200,23 @@ The classifier is updated through local measures of a loss function $l_t = l(x_t
 %The loss thus relies on a combiation of \emph{internal} information (current classifier's parameters, current choice) and \emph{external} information (input vector, feedback). On contrary to the offline setting, the classifier's current value $W_t$ plays a significant role in defining the future direction. 
 
 Different loss function and margin constraints can be defined depending on task and feedback characteristics. 
-Under the multiclass setting, two principal margin constraint schemes can be set up, namely the \emph{normative} margin and the \emph{relative} margin. In the \emph{normative} margin case, the classifier is expected to provide a response that overtakes in norm a reference value $a$. A typical normative margin setup is the one-vs-all (OVA) setup, having  $a = 1$ for reference,  i.e. \begin{equation}\label{eq:OVA}
-\forall k \left\{
-\begin{array}{l}
-\langle w^k, x \rangle \geq 1 \text{ if } y = k \\
-\langle w^k, x \rangle \leq -1 \text{ if }y \neq k.
-\end{array}
-\right. 
-\end{equation}
-and a corresponding normative multiclass \emph{hinge loss} is:  
-\begin{equation}\label{eq:OVA-loss} l(x,W,y) = \sum_{k=1}^K \left[1 + (1 - 2 \delta(y,k)) \langle w^k,x \rangle\right]_+
-\end{equation}
-with $\delta(i,j) =1$ if $i = j$ and 0 elsewhere, and $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
-Under  a \emph{relative} margin setup (see \cite{crammer2003ultraconservative}), compliant with the Kessler's construction (\cite{duda1973pattern}), there is no absolute reference value but instead a distance reference, so that the linear score of the class-compliant separatrix $\langle w^y, x\rangle$ is expected to overtake  the other linear scores by at least $a$, i.e. (taking $a=1$)
-$$ \langle w^y, x \rangle \geq 1 + \max_{k \neq y} \langle w^k, x \rangle  $$
-and a corresponding relative multiclass \emph{hinge loss} is:
-$$ l (x,W,y) =  \left[ 1 +  \langle w^y, x \rangle - \max_{k \neq y} \langle w^k, x\rangle\right]_+$$
+Under the multiclass setting, two principal margin constraint schemes can be set up, namely the \emph{normative} margin and the \emph{relative} margin. 
+
+\begin{itemize}
+	\item In the \emph{normative} margin case, the classifier is expected to provide a response that overtakes in norm a reference value $a$. A typical normative margin setup is the one-vs-all (OVA) setup, having  $a = 1$ for reference,  i.e. $\forall k$: \begin{align}%\label{eq:OVA}
+	&\langle w_k, x \rangle \geq 1 &\text{ if } y = k \label{eq:OVA-A}\\
+	&\langle w_k, x \rangle \leq -1 &\text{ if }y \neq k \label{eq:OVA-B}
+	\end{align}
+	and a corresponding normative multiclass \emph{hinge loss} is:  
+	\begin{equation}\label{eq:OVA-loss} l(x,W,y) = \sum_{k=1}^K \left[1 + (1 - 2 \delta(y,k)) \langle w_k,x \rangle\right]_+
+	\end{equation}
+	with $\delta(i,j) =1$ if $i = j$ and 0 elsewhere, and $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
+	\item Under  a \emph{relative} margin setup (see \cite{crammer2003ultraconservative}), compliant with the Kessler's construction (\cite{duda1973pattern}), there is no absolute reference value but instead a distance reference, so that the linear score of the class-compliant separatrix $\langle w_y, x\rangle$ is expected to overtake  the other linear scores by at least $a$, i.e. (taking $a=1$)
+	$$ \langle w_y, x \rangle \geq 1 + \max_{k \neq y} \langle w_k, x \rangle  $$
+	and a corresponding relative multiclass \emph{hinge loss} is:
+	$$ l (x,W,y) =  \left[ 1 +  \langle w^y, x \rangle - \max_{k \neq y} \langle w_k, x\rangle\right]_+$$
+\end{itemize}
+
 
 The normative setup is clearly overconstrained regarding the classification task (see \cite{crammer2003ultraconservative}), but in counterpart provides mapping-independence among the different classes.
 
@@ -315,11 +324,11 @@ which leads to algorithm \ref{algo:quad}.
 \end{algorithm}
 
 This setup is called "passive-aggressive" for it combines a conservative approach (ignore $x_t$ if $l_t=0$) with a tight update (optimize the classifier according to $x_t$ if $l_t>0$).
-In its original formulation ($C = \infty$), this learning setup implements a "one-shot" update, i.e. carries out a zero-loss  after update. The stiffness parameter $C$ allows for a more progressive update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
+In its original formulation ($C = \infty$), this learning setup implements a "one-shot" update, i.e. carries out a zero-loss  after update. A finite stiffness parameter $C$ allows for a more progressive update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
 
 In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good the current choice is, without telling how good or bad other choices would be. Solving the system carries out a single update on the  $\tilde{y}^\text{th}$ separatrix. 
 
-Under this focused examination, it is worth considering an alternate classifier $U$ in parallel with $W_{t-1}$. The same examination of $\tilde{y}_t$ at time $t$ provides an alternate feedback $l^*_t = l(U,x_t,y_t,\tilde{y}_t)$. By construction, if the data are separable under OVA constraints (see eq. (\ref{eq:OVA})), there exist at least one classifier $U$ such that $\forall t, l^*_t = 0$. In that case, the following theorem can be established:
+Under this focused examination, it is worth considering an alternate classifier $U$ in parallel with $W_{t-1}$. The same examination of $\tilde{y}_t$ at time $t$ provides an alternate feedback $l^*_t = l(U,x_t,y_t,\tilde{y}_t)$. By construction, if the data are separable under OVA constraints (see eq. (\ref{eq:OVA-A}-\ref{eq:OVA-B})), there exist at least one classifier $U$ such that $\forall t, l^*_t = 0$. In that case, the following theorem can be established:
 
 %\subsubsection{Analyse}
 
@@ -336,48 +345,56 @@ Under this focused examination, it is worth considering an alternate classifier 
 \end{theorem}
 (proof in \ref{app:thm1})
 
-The result obtained in that case is formally similar to that of  \cite{crammer2006online}. There are however many caveats.
+The result obtained in that case is formally similar to that of  \cite{crammer2006online}. It states, in short, that a finite number of updates are needed to fit the classification constraints expressed by the observed series of loss functions. Whatever the series $\tilde{y}_1, ...,\tilde{y}_t$, there is a point at which all subsequent observed losses are equal to zero. This result guarantees a certain sparsity of the final classifier.
 
-First, the classifier $U$ is composed of $K$ different separatrices, so that its norm is exected to grow linearly with $K$.
-
-Second, the result is  valid for \emph{any sequence} $\tilde{y}_1$, ..., $\tilde{y}_T$, including constant sequences, greedy sequence and pure random sequences. In other words, it is independent from the choice policy.
+There is however an important caveat to be mentioned. 
+%The possible sequences $\tilde{y}_1$, ..., $\tilde{y}_T$ include constant sequences, greedy sequence and pure random sequences. In other words, it is independent from the policy.
 % and optimal (zero-error) sequence. 
-Indeed, whatever the series of responses, only $T$ feedbacks out of $KT$ possible feedbacks are actually read.
+Indeed, whatever the sequences $\tilde{\mathcal{Y}}_T = (\tilde{y}_1$, ..., $\tilde{y}_T)$, only $T$ feedbacks signals out of $KT$ possible feedbacks are actually read,
+%Only a $1/K$ portion of all feedback signals necessary to reach 
+%perfect classification are actually observed, 
+and each separatrix $w_k$ relies on a series of observations : $\mathcal{T}_k = \{t: \tilde{y}_t = k\}$.
 %, forming a particular path of actions. 
-This sequence probes the environment without exhausting it. The theorem provides a bound on the \emph{observed} cumulative loss, ignoring every unobserved losses. 
+This sequence probes the environment without necessarily uncovering all of it. The theorem provides a bound on the \emph{observed} cumulative loss, ignoring every unobserved losses. 
 %An appropriate uniform exploration policy is thus needed in order {\color{red} to provide effective classification improvement.}
-Two important cases need here to be examined:
+Consequently, the loss (or squared loss) \emph{is not an upper bound of the classification mistake.} The theorem thus does not guarantees that every example will be correctly classified in the end. This would depends on (i) the particular policy followed in the course of learning and (ii)  additional assumptions on sample regularity.   
+
+The theorem guarantees a zero loss after a fixed number of updates. Let us note  $W^*$ this zero-loss final classifier. Then $\forall k \in 1,...,K$, 
+%First, the classifier $U$ is composed of $K$ different separatrices, so that its norm is expected to grow linearly with $K$.
+
+%if a single policy $h$ is followed in the course of learning, 
+
+%The way $\tilde{\mathcal{Y}}_T$ is generated depends on a particular \emph{policy} that is followed . Different policies provide different guaranties on the final classification rate. 
+
+%Two important cases need here to be examined:
 \begin{itemize}
-	\item In case $\tilde{y}_1, ...,\tilde{y}_T$ obey to a uniform random choice (independent from $W$), every separatrix $w^k$ is probed on average the same number of times, providing a non-biased series of class information for large $T$.
-	\item In case $\tilde{y}_1, ...,\tilde{y}_T$ obey to a greedy choice, the choice is now dependent on $W_t$. The theorem still guarantees a zero loss after a fixed number of updates. Let us note  $W^*$ this final classifier. Then at least one of the two constraints of \eqref{eq:OVA} is satisfied. 
-	\begin{itemize}
-		\item If $\exists (x,y)$ such that $\langle W^*,X^y\rangle < 1$, then, due to the zero-loss constraint,  $y$ is not chosen i.e. $\hat{y} \neq y$ and $\langle W^*,X^{\hat{y}}\rangle \leq -1$, i.e. $\forall k, \langle W^*,X^k\rangle \leq -1$.  
-		\item If $\exists k \neq y$ such that $\langle W^*,X^k\rangle > -1$ and $l_t = 0$, then, due to the zero-loss constraint, $k$ is not chosen i.e. $\hat{y} \neq k $ and $\langle W^*,X^{\hat{y}}\rangle > \langle W^*,X^k\rangle > -1$. Then, the only possibility for zero-loss is  $\langle W^*,X^{\hat{y}}\rangle \geq 1$ and $\hat{y} = y$.
-	\end{itemize}
-	 So $\forall (x,y)$, at least one of the two constraints  is satisfied.
-	Only the first violation carries out a classification error.  
-	Let us consider this case (i.e. $\exists (x,y)$ such that $\langle w_y^*,x\rangle \leq -1$). If $\exists (x',y)$ such that $\langle w_y^*,x'\rangle > 1$. All class examples belong (by construction) to a convex set (defined by $U$), so that $\exists \rho \in [0,1]$ such that
-	$-1 < \langle w_y^*,\rho x + (1-\rho) x'\rangle < 1 $ which brings out a non-zero loss, in contradiction with the theorem.
-	In conclusion, either all members of class $y$ are correctly classified, either none of them are (!), so that
-	$\langle w_y^*,x\rangle \leq -1$.
-	%In that case, %given class $y$ and $\forall x$ member of class $y$, and due to the zero-loss constraint,
-	% $\forall k$ : $\langle w_k^*,x\rangle \leq -1$ so that .
-	%: There is no \{(x,y),(x',y)\} such that  
-	\begin{itemize}
-		\item  
-		\item 
-		Either  $\exists y : \forall (x,y)$ : $\langle w_y^*,x\rangle < 1$. Then, due to the zero-loss constraint, $\forall (x, y): $ Then, $\forall (x,y^\prime)$ with $y^\prime \neq y$,  $\langle w_{y^\prime}^*,x\rangle \leq -1$, i.e. $\forall x, \langle w_y^*,x\rangle \leq -1$, i.e. 
-		$\langle w_y^*,x^\prime \rangle \leq -1$ and $\langle w_y^*,-x^\prime \rangle \leq -1$ which is also contradictory.
-	\end{itemize}
+	\item if $\tilde{y}_1, ...,\tilde{y}_T$ obey to a greedy deterministic choice $h$, and if $\exists t$ such that $\tilde{y}_t = y_t = k$, then, as $l_t$ is satisfied by $W^*$, $\langle w_k^*, x_t\rangle \geq 1$. Let us now assume that \emph{every sample $x$ from class $k$ lives in a convex set $\mathcal{C}_k$}. Then, if $\exists x \in \mathcal{C}_k$ with $h(x) \neq k$ and zero loss, then $\langle w_k^*, x\rangle < \langle w_{h(x)}^*, x\rangle \leq -1$. Then $\exists \rho \in [0,1]$ such that $x_\rho = \rho x + (1-\rho) x_t \in \mathcal{C}_k$ and 
+	$-1 < \langle w_k^*,x_\rho \rangle < 1 $, which breaks out the zero loss condition. So, $\nexists x \in \mathcal{C}_k$ with $h(x) \neq k$, i.e. every sample from $\mathcal{C}_k$ is correctly classified.
+	\item if $\tilde{y}_1, ...,\tilde{y}_T$ obey to a uniform random choice (independent from $W$), the separatrix $w_k$ is probed on average $T/K$ times. By a simple combinatorial argument, the chance not finding $t$ such that $\tilde{y}_t = y_t = k$ exponentially decreases with $t$.
+	\item Finally, an $\varepsilon$-greedy choice, that alternates between uniform sampling and greedy choice, guarantees a correct classification in the end.  
 \end{itemize}
-Finally, an $\varepsilon$-greedy choice, that alternates between uniform sampling and class-effective choice, provides 
+%	at least one of the two constraints of (\ref{eq:OVA-A}-\ref{eq:OVA-B}) is satisfied. 
+%	\begin{itemize}
+%		\item If $\exists (x,y)$ such that $\langle W^*,X^y\rangle < 1$, then, due to the zero-loss constraint,  $y$ is not chosen i.e. $\hat{y} \neq y$ and $\langle W^*,X^{\hat{y}}\rangle \leq -1$, i.e. $\forall k, \langle W^*,X^k\rangle \leq -1$.  
+%		\item If $\exists k \neq y$ such that $\langle W^*,X^k\rangle > -1$ and $l_t = 0$, then, due to the zero-loss constraint, $k$ is not chosen i.e. $\hat{y} \neq k $ and $\langle W^*,X^{\hat{y}}\rangle > \langle W^*,X^k\rangle > -1$. Then, the only possibility for zero-loss is  $\langle W^*,X^{\hat{y}}\rangle \geq 1$ and $\hat{y} = y$.
+%	\end{itemize}
+%	 So $\forall (x,y)$, at least one of the two constraints  is satisfied.
+%	Only the first violation carries out a classification error.  
+%	Let us consider this case (i.e. $\exists (x,y)$ such that $\langle w_y^*,x\rangle \leq -1$). If $\exists (x',y)$ such that $\langle w_y^*,x'\rangle > 1$. All class examples belong (by construction) to a convex set (defined by $U$), so that  in contradiction with the theorem.
+%	In conclusion, either all members of class $y$ are correctly classified, either none of them are (!), so that
+%	$\langle w_y^*,x\rangle \leq -1$.
+%	%In that case, %given class $y$ and $\forall x$ member of class $y$, and due to the zero-loss constraint,
+%	% $\forall k$ : $\langle w_k^*,x\rangle \leq -1$ so that .
+%	%: There is no \{(x,y),(x',y)\} such that  
+%	\begin{itemize}
+%		\item  
+%		\item 
+%		Either  $\exists y : \forall (x,y)$ : $\langle w_y^*,x\rangle < 1$. Then, due to the zero-loss constraint, $\forall (x, y): $ Then, $\forall (x,y^\prime)$ with $y^\prime \neq y$,  $\langle w_{y^\prime}^*,x\rangle \leq -1$, i.e. $\forall x, \langle w_y^*,x\rangle \leq -1$, i.e. 
+%		$\langle w_y^*,x^\prime \rangle \leq -1$ and $\langle w_y^*,-x^\prime \rangle \leq -1$ which is also contradictory.
+%	\end{itemize}
 
-the observed loss such as checked on  will not exceed the given bound, but does not provide a zero-loss garantee on the  unobserved configurations.   
 
-
-does not provide a regret  
-
-If we turn now to an arbitrary classifier $U$, without separability assumption, 
+If we turn now to an arbitrary classifier $U$, without separability assumption, the following theorem comes~:
 
 \begin{theorem}
 	\label{theo:BPAT2}
