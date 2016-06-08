@@ -210,7 +210,7 @@ Following   \cite{kivinen2004online} and \cite{crammer2006online}, we consider a
 %A feedback is a \emph{local} measure of  learning achievement (or failure), 
 The classifier is updated through local measures of a loss function $$l_t = l(x_t,W_{t-1},y_t)$$
  %
- Contrarily to a mere reward (or penalty), a loss function comes with an implicit set point, namely $l_t=0$, that grants response correctness under a margin constraint. In \cite{kivinen2004online}, a loss-minimizer gradient descent update is combined with a norm-minimizer on the decision function, while \cite{crammer2006online} adopt a quadratic norm-minimal condition $\min_W ||W - W_{t-1}||^2$ on each update. In both cases local changes are shown to provide global improvement, e.g. {\color{red} \cite{kivinen2004online} show ...} and \cite{crammer2006online} show the total number of updates to be bounded in the linearly-separable case.
+ Contrarily to a mere reward (or penalty), a loss function comes with an implicit set point, namely $l_t=0$, that grants response correctness under a margin constraint. In \cite{kivinen2004online}, a loss-minimizer gradient descent update is combined with a norm-minimizer on the decision function, while \cite{crammer2006online} adopt a quadratic norm-minimal condition $\min_W ||W - W_{t-1}||^2$ on each update. In both cases local changes are shown to provide global improvement, e.g. \cite{kivinen2004online} show the stochastic gradient to converge to a global minimum and \cite{crammer2006online} show the total number of updates to be bounded in the linearly-separable case.
 
 %,  The loss function combines the feedback signal $f_t$ with the actual response $\tilde{y}_t$ and the current classifier's parameters $W_t$ to provide additional information about the direction to be followed for future classification improvement (i.e. risk minimization). 
 %The loss thus relies on a combiation of \emph{internal} information (current classifier's parameters, current choice) and \emph{external} information (input vector, feedback). On contrary to the offline setting, the classifier's current value $W_t$ plays a significant role in defining the future direction. 
@@ -227,7 +227,7 @@ Under the multiclass setting, two principal margin constraint schemes can be set
 	\begin{equation}\label{eq:OVA-loss} l(x,W,y) = \sum_{k=1}^K \left[1 + (1 - 2 \delta(y,k)) \langle w_k,x \rangle\right]_+
 	\end{equation}
 	with $\delta(i,j) =1$ if $i = j$ and 0 elsewhere, and $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
-	\item Under  a \emph{relative} margin setup (see \cite{crammer2003ultraconservative}), compliant with the Kessler's construction (\cite{duda1973pattern}), there is no absolute reference value but instead a distance reference, so that the linear score of the class-compliant separatrix $\langle w_y, x\rangle$ is expected to overtake  the other linear scores by at least $a$, i.e. (taking $a=1$)
+	\item Under  a \emph{relative} margin setup (see \cite{crammer2003ultraconservative}) \--- compliant with the Kessler's construction (see \cite{duda1973pattern}) \--- there is no absolute reference value but instead a distance reference, so that the linear score of the class-compliant separatrix $\langle w_y, x\rangle$ is expected to overtake  the other linear scores by at least $a$, i.e. (taking $a=1$)
 	\begin{equation}
  \label{eq:rel} \langle w_y, x \rangle \geq 1 + \max_{k \neq y} \langle w_k, x \rangle  	
  \end{equation}
@@ -367,7 +367,7 @@ Under this focused examination, it is worth considering an alternate classifier 
 \begin{theorem}
 	\label{theo:BPAT1}
 	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of separable examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, let $\tilde{y}_1,...,\tilde{y}_T$ be a sequence of responses, with $\tilde{y}_t\in \{1,...,K\}$, 
-	and let $U \in \mathbb{R}^{K\times d}$ be such that $ \forall t, l^*_t=0$. Then, the cumulative squared loss of algorithm \ref{algo:quad} is bounded by,
+	and let $U \in \mathbb{R}^{K\times d}$ be such that $ \forall t, l^*_t=0$. Then, assuming $C \rightarrow \infty$, the cumulative squared loss of algorithm \ref{algo:quad} is bounded by,
 	\begin{equation}
 	\sum_{t=1}^{T} l_t^2 \leqslant R^2 \parallel{U}\parallel^2
 	\end{equation}
@@ -427,22 +427,32 @@ If we turn now to an arbitrary classifier $U$, without separability assumption, 
 
 \begin{theorem}
 	\label{theo:BPAT2}
-	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, let $\tilde{y}_1,...,\tilde{y}_T$ be a sequence of responses, with $\tilde{y}_t\in \{1,...,K\}$. Then for any  $U \in \mathbb{R}^{K\times d}$, the cumulative squared loss of algorithm \ref{algo:quad} is bounded by:
+	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, let $\tilde{y}_1,...,\tilde{y}_T$ be a sequence of responses, with $\tilde{y}_t\in \{1,...,K\}$. Then for any  $U \in \mathbb{R}^{K\times d}$, and assuming $C \rightarrow \infty$, the cumulative squared loss of algorithm \ref{algo:quad} is bounded by:
 	\[\sum_{t=1}^{T}l_t^2 \leqslant \left(R\parallel{U}\parallel+2 \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}\right)^2 \]
 \end{theorem}
 
 (proof in \ref{app:thm2})
 
-This bound is once again identical to the one obtained by Crammer in supervised case (see \cite{crammer2006online}).
+This bound is once again identical to that obtained by 
+\cite{crammer2006online} in the supervised case. 
+It tells in short that, for large $T$, the average squared 
+loss will be at most four time that of any linear 
+classifier $U$ (including any loss-minimizer classifier $U^*$). 
 
-{\color{blue} Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est borné en $O(\sqrt{T})$ dans le cas non séparable.}
+
+Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA loss is considered in one run. For the classification error to be bounded, stationarity of samples generation as well as policy uniformity need to be assumed for the exhaustion of constraints be statistically granted.  
+
+Moreover, additional regularization needs to be considered to attain $O(\sqrt{T})$ regret (see \cite{crammer2006online}), that 
+we do not develop here for brevity. 
+
+%{\color{blue} Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est borné en $O(\sqrt{T})$ dans le cas non séparable.}
 
 %Pour les affiliations, vous pouvez utiliser
 %\href{http://ctan.org/pkg/authblk}{le paquet \texttt{authblk}}.
 
-Les bornes obtenues ici sont comparables  à celles obtenues par Crammer dans le cadre de la classification supervisée  \cite{crammer2006online}. En particulier, comme dans le cas de l'algorithme ``passif-agressif'' de Crammer, on peut s'attendre à un regret de l'ordre de $O(\sqrt{T})$ dans le cas non-linéairement séparable. Il est donc remarquable de constater que les garanties de convergences de notre algorithme sont les mêmes que dans le cas supervisé, étant donnée la moindre information utilisée et le caractère stochastique de la fonction de décision. On notera néanmoins le caractère plus ``faible'' de la fonction de perte utilisée, de sorte que nos résultats ne garantissent pas que la bonne réponse sera atteinte, mais seulement que la mauvaise réponse ne sera pas atteinte.
+%Les bornes obtenues ici sont comparables  à celles obtenues par Crammer dans le cadre de la classification supervisée  \cite{crammer2006online}. En particulier, comme dans le cas de l'algorithme ``passif-agressif'' de Crammer, on peut s'attendre à un regret de l'ordre de $O(\sqrt{T})$ dans le cas non-linéairement séparable. Il est donc remarquable de constater que les garanties de convergences de notre algorithme sont les mêmes que dans le cas supervisé, étant donnée la moindre information utilisée et le caractère stochastique de la fonction de décision. On notera néanmoins le caractère plus ``faible'' de la fonction de perte utilisée, de sorte que nos résultats ne garantissent pas que la bonne réponse sera atteinte, mais seulement que la mauvaise réponse ne sera pas atteinte.
 
-The fact we obain the same bounds as \cite{crammer2006online} indicates that additional degrees of freedom not to be considered.   
+%The fact we obain the same bounds as \cite{crammer2006online} indicates that additional degrees of freedom not to be considered.   
 
 \subsection{Gradient-descent approach}
 
@@ -948,8 +958,6 @@ Moreover, experimental evaluation shows that BPA performs better than other algo
 %% If you have bibdatabase file and want bibtex to generate the
 %% bibitems, please use
 %%
-\bibliographystyle{elsarticle-harv} 
-\bibliography{main}
 
 %% else use the following coding to input the bibitems directly in the
 %% TeX file.
@@ -982,23 +990,23 @@ Moreover, experimental evaluation shows that BPA performs better than other algo
 	
 	Using the definition of update : %in Eq.\ref{eq:,
 	\begin{align}
-	\Delta_t = -2\left\langle (W_{t-1} - U), (2f_t-1)\frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\rangle 
+	\Delta_t = -2\left\langle W_{t-1} - U, (2f_t-1)\frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\rangle 
 	- \left\| \frac{l_t}{\parallel{x_t}\parallel^2}X_t^{\tilde{y}_t}\right\|^2
 	\nonumber
 	\end{align}
 	%With    and   ,
-	So, taking~:
-	\begin{itemize}
-		\item[] $l_t = [1+(1-2f_t)\cdot\langle W_{t-1},X_t^{\tilde{y}_t}\rangle]_+$
-		\item[] $l_t^{\ast} = [1+(1-2f_t)\cdot\langle U,X_t^{\tilde{y}_t}\rangle]_+$
-		\item[] $\parallel{X_t^{\tilde{y}_t}}\parallel = \parallel x_t\parallel$
-	\end{itemize}
-	it comes:
+	So, taking $\parallel{X_t^{\tilde{y}_t}}\parallel = \parallel x_t\parallel$, it comes:
+
 	\begin{align}
 	\Delta_t =& 2l_t\frac{(1-2f_t)\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle - (1-2f_t)\langle U, X_t^{\tilde{y}_t}\rangle}{\|x_t\|^2}
 	-\frac{l_t^2}{\parallel{x_t}\parallel^2}\nonumber
 	\end{align}
-	Noting that $\Delta_t = 0$ when $l_t = 0$, and $l^*_t \geq  1+(1-2f_t)\cdot\langle U,X_t^{\tilde{y}_t}\rangle$, it comes : 
+	Then, noting that:
+		\begin{itemize}
+			\item[] $l_t = [1+(1-2f_t)\cdot\langle W_{t-1},X_t^{\tilde{y}_t}\rangle]_+$
+			\item[] $l_t^{\ast} = [1+(1-2f_t)\cdot\langle U,X_t^{\tilde{y}_t}\rangle]_+$
+		\end{itemize}
+		that $\Delta_t = 0$ when $l_t = 0$, and that $l^*_t \geq  1+(1-2f_t)\cdot\langle U,X_t^{\tilde{y}_t}\rangle$, it comes : 
 	\begin{align}
 	\Delta_t\geqslant& 2l_t\frac{l_t - l_t^{\ast}}{\parallel{x_t}\parallel^2}-\frac{l_t^2}{\parallel{x_t}\parallel^2}\nonumber\\
 	=& \frac{l_t^2-2l_t l_t^{\ast}}{\parallel x_t\parallel^2}\nonumber
@@ -1037,6 +1045,9 @@ Moreover, experimental evaluation shows that BPA performs better than other algo
 	so that :
 	\[\sum_{t=1}^{T}l_t^2 \leqslant \left(R\parallel{U}\parallel+2 \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}\right)^2 \]
 \end{proof}
+
+\bibliographystyle{elsarticle-harv} 
+\bibliography{main}
 
 
 \end{document}
