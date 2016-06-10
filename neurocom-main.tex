@@ -535,7 +535,7 @@ Then, following \cite{kivinen2004online}, a strict control on the number of supp
 The extension of the linear discriminant setup to reproducible kernel Hilbert spaces (RKHS) allows deal with non-linearly separable learning sets at the cost of additional free parameters (specific kernel features). 
 
 Let $\mathcal{K}(.,.)$ a mapping from $ \mathbb{R}^d \times \mathbb{R}^d$ to $ \mathbb{R}^+$ having the Mercer property (see \cite{scholkopf2002learning}). Let $\mathcal{K}(x,.)$ be the projection of example $x$ in $\mathcal{H}$. Then, by construction, a scalar product $\langle.,.\rangle_\mathcal{H}$ in $\mathcal{H}$ is such that: 
- $$\forall w \in \mathcal{H}, \langle w,\mathcal{K}(x,.)\rangle_\mathcal{H} = f(x) $$
+ $$\forall w \in \mathcal{H}, \langle w,\mathcal{K}(x,.)\rangle_\mathcal{H} = w(x) $$
 Given previous notations, each classifier $W = (w_1,...,w_k)$ is now defined in $\mathcal{H}^K$ and:
  \begin{align}\label{eq:X-kernel}
  X^k \triangleq (0(.), ..., & \mathcal{K}(x,.), ..., 0(.)) \in \mathcal{H}^{K}\\
@@ -544,7 +544,7 @@ Given previous notations, each classifier $W = (w_1,...,w_k)$ is now defined in 
  \end{align}
 with $0(.)$ a null function. Then, taking:
 $$\langle W,X^k\rangle \triangleq \langle w_k,\mathcal{K}(x,.)\rangle_\mathcal{H} = w_k(x)$$
-all previous definitions an results apply.
+all previous definitions an results apply in the redescription space.
 
 %Le classifieur est dans ce cadre défini comme un ensemble de fonctions : $\mathcal{F} = \{f^{(1)}, ..., f^{(K)}\}$ avec :
 %$$\hat{y} = \arg \max_k f^{(k)}(x)$$
@@ -554,19 +554,21 @@ all previous definitions an results apply.
 %$$\forall k, f^{(k)}_t = \sum_{t^\prime = 1} ^t  \frac {\mathbf{1}_{k=\tilde{y}_{t^\prime}}l_{t^\prime}}{\mathcal{K}(x_{t^\prime},x_{t^\prime})+\frac{1}{2C}} (2g_{t^\prime} - 1)\mathcal{K}(x_{t^\prime},.)$$
 %$$ l_t = [1 + (1-2g_t) f_{t-1}^{(\tilde{y}_t)}(x_t)]_+$$
 
-In particular, when considering algorithm \ref{algo:quad} and noting $\alpha_t = \frac {l_{t}}{\mathcal{K}(x_{t},x_{t})+\frac{1}{2C}} (2f_{t} - 1)$, we have:
+In particular, considering algorithm \ref{algo:quad} and noting $\alpha_t = \frac {l_{t}}{\mathcal{K}(x_{t},x_{t})+\frac{1}{2C}} (2f_{t} - 1)$, we have:
 $$W_t = \sum_{t^\prime = 1} ^t \alpha_{t^\prime} X_{t^\prime}^{\tilde{y}_{t^\prime}} 
 %= \sum_{k=1}^K \sum_{t^\prime: \tilde{y}_{t^\prime} = k} \alpha_{t^\prime} X^k_{t^\prime}
 $$
 % \mathcal{K}(x_{t^\prime},.)$$
-so that, taking definition (\ref{eq:X-kernel}), and setting $\mathcal{T}_{k,t} = \{{t^{\prime}} \leq t: \tilde{y}_{t^{\prime}} = k \text{ and } l_{t^{\prime}} > 0\}$, each 
-separatrix $w_{k,t}$ is now defined by a support vectors set 
+so that, taking definition (\ref{eq:X-kernel}), and setting $\forall k, \mathcal{T}_{k,t} = \{{t^{\prime}} \leq t: \tilde{y}_{t^{\prime}} = k \text{ and } l_{t^{\prime}} > 0\}$, each 
+separatrix $w_{k,t}$ is now defined by a set of reference vectors 
 $\{x_{t^{\prime}}\}_{{t^{\prime}}\in \mathcal{T}_{k,t}}$ 
 so that 
 	$$w_{k,t} = \sum_{t^{\prime}\in \mathcal{T}_{k,t}} \alpha_{t^{\prime}} \mathcal{K}(x_{t^{\prime}},.)$$
 
+The total number of reference vectors is incremented each time a non-zero loss is carried out. From theorem \ref{theo:BPAT1}, we know this number is bounded since any dataset is separable in the redescription space. 
 
-Le nombre de vecteurs supports augmente de 1 chaque fois que la perte est non nulle. De par le théorème 1, nous savons que ce nombre est borné dès lors que les données sont séparables dans l'espace de redescription. 
+  
+%Le nombre de vecteurs supports augmente de 1 chaque fois que la perte est non nulle. De par le théorème 1, nous savons que ce nombre est borné dès lors que les données sont séparables dans l'espace de redescription. 
 
 
 
