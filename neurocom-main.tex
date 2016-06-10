@@ -167,11 +167,11 @@ In the second case, the quadratic optimization approach (see \cite{anlauf1989ada
 The one-bit feedback is a specific online learning setup that implements, in a principled way, the scarce labelling information problem. After reading $\tilde{y}_t$, instead of providing a label, the universe provides a single bit of information called the \textit{label hit}, i.e. $f_t = 1$ if  $\tilde{y}_t=y_t$ and $f_t = 0$ elsewhere. The objective, just as in the supervised case, is to avoid label misses and maximise labels hits. A specific update function needs to be defined to allow label hit improvement over time. 
 
 This problem was coined the ``bandit feedback classification problem'' by \cite{kakade2008efficient}. Taking inspiration from the multiclass perceptron (\cite{duda1973pattern}), a time-effective algorithm, called the ``Banditron'', is established:
-$K$ linear mappings $w_1, ..., w_K$ are defined and class-decision relies on a best-match policy, i.e.
+$K$ linear mappings $w_1, ..., w_K$ are defined and the candidate response winner $\hat{y}$ relies on a best-match policy, i.e.
 \begin{equation}\label{eq:argmax}
 \hat{y} = \underset{k \in\{1,..,K\}}{\text{argmax}}  \langle w_k, x \rangle
 \end{equation}
-Contrarily to the supervised case, an \textit{exploration} policy needs to be defined to efficiently sample the decision space. The Banditron adopts a simple  $\varepsilon-greedy$ search allowing the non-maximal responses to be occasionally chosen in a uniform way:
+Contrarily to the supervised case, an \textit{exploration} policy needs to be defined to efficiently sample the decision space. The Banditron adopts a simple  $\varepsilon-greedy$ search allowing  non-matching responses to be occasionally chosen in a uniform way:
 \begin{equation}\label{eq:eps-greedy}
 P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}
 \end{equation}
@@ -276,7 +276,7 @@ Discriminant-based setups (see \cite{kakade2008efficient}, \cite{zhong2015esann}
 %$\varepsilon$-greedy policies giving a constant budget ($1-\varepsilon + \frac{\varepsilon}{K}$) to the actual prediction and $\frac{\varepsilon}{K}$ to the other choices 
 a constant exploration rate $\varepsilon$, low enough to allow for effective classification rates while allowing continuing information gathering.
 %Unpredicted hit examples play a particular role for they are given a higher coefficient in the update, reflecting a "prediction surprise" (see for instance eq. (\ref{eq:kaka-update})). This information-weighted update is however done at the risk of an increased variance of the update sequence and of course of a linear regret.
-Though expecting a weak dependence on decision policy, we consistently adopt an $\varepsilon$-greedy approach in simulations, using the \cite{kakade2008efficient} formula, i.e.:
+{\color{red} Though expecting a weak dependence on decision policy WHY??}, we consistently adopt an $\varepsilon$-greedy approach in simulations, using the \cite{kakade2008efficient} formula, i.e.:
 $$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ with a (fixed) exploration parameter $\varepsilon \in [0,1]$.
 %, where pure exploration ($\varepsilon = 1$ i.e. uniform prediction) and pure greediness ($\varepsilon = 0$, i.e. hit prediction only) are special cases.
 
@@ -295,14 +295,18 @@ $$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ w
 The computational efficiency of the perceptron (\cite{rosenblatt1958perceptron}), as well as the SVM (\cite{vapnik1998statistical}),  critically relies on their sparsity, i.e. their capability to separate the example  set between relevant and irrelevant observation vectors, given a classification task. Fewer vectors in a classifier provide better generalization capabilities and participate in regularization.
 On contrary to their supervised counterpart, class-separatrices updates in the Banditron (\cite{kakade2008efficient}) and PAB (\cite{zhong2015esann}) are dense over time, loosing the Kernel-extension capability (at reasonable computational cost). 
 
-The ability to choose class-effective example vectors is however  a critical property of the discriminant approach, that needs to be conserved in the partially supervised setup considered here. 
-Taking inspiration from \cite{crammer2006online}, we need a specific loss function:
+{\color{green} Previous generalizations of the relative margin constraint (see eq. (\ref{eq:rel})) were shown dense over time (see \cite{kakade2008efficient} and \cite{zhong2015esann}).} 
+
+The ability to choose class-relevant example vectors is however a critical property of the discriminant approach, that needs to be conserved in the partially supervised setup considered here. 
+We consider here a specific loss function:
 $$l_t = l(x_t,W_{t-1},\tilde{y}_t,f_t)$$
-with, in the one-bit feedback  case, $f_t = \delta(y_t,\tilde{y}_t)$. Previous generalizations of the relative margin constraint (eq. (\ref{eq:rel})) were shown dense over time (see \cite{kakade2008efficient} and \cite{zhong2015esann}). We adopt here the one-vs-all normative margin constraint (presented in eqs.(\ref{eq:OVA-A}-\ref{eq:OVA-B})), %allowing an absolute (non difference-based) update that 
-and show in contrast a conservation of the update sparsity.
+with $f_t = \delta(y_t,\tilde{y}_t)$,
+that adapts the one-vs-all normative margin constraint (presented in eqs.(\ref{eq:OVA-A}-\ref{eq:OVA-B})) to the one-bit feedback case. 
+%, %allowing an absolute (non difference-based) update that 
+%and show in contrast a conservation of the update sparsity.
 % (see theorem \ref{theo:BPAT1}). %(or conservativeness). 
 
-The full information set $\{\delta(y,1), ... \delta(y,K)\}$ is reduced to $\delta(y,\tilde{y})$ only in our case. 
+On contrary to the supervised case, where a full information set $\{\delta(y,1), ..., \delta(y,K)\}$ is disposable, a single bit $\delta(y,\tilde{y})$ is disclosed in our case, the other bits being unset. 
 A rapid inspection shows that the full set could be deduced in the label hit case ($y = \tilde{y}$), allowing for $K$ separatrices updates (see \cite{chen2009beyond}). Following the sparsity argument however,
 %, we follow the "ultraconservative" view proposed by \cite{crammer2003ultraconservative}, 
 only the  currently inspected label $\tilde{y}$ is  considered  for the update, for one separatrix at most may be updated at each round. 
@@ -325,7 +329,7 @@ renders the method (i) independent to the labels set cardinality, (ii) independe
 
 \subsection{Quadratic optimization}
  
-In \cite{crammer2006online}, a quadratic update minimization objective under a class-accuracy linear constraint $ l_t $ is considered.  
+In \cite{crammer2006online}, a quadratic update norm minimization objective under a class-accuracy linear constraint $ l_t $ is considered.  
 The weight update is the solution of ~:
 $$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
 where $C$ is an optional misclassification stiffness parameter. It provides the following update~:
@@ -353,11 +357,11 @@ which leads to algorithm \ref{algo:quad}.
 \end{algorithm}
 
 This setup is called "passive-aggressive" for it combines a conservative approach (ignore $x_t$ if $l_t=0$) with a tight update (optimize the classifier according to $x_t$ if $l_t>0$).
-In its original formulation ($C \rightarrow \infty$), this learning setup implements a "one-shot" update, i.e. carries out a zero-loss  after update. A finite stiffness parameter $C$ provides a more progressive update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
+In its original formulation ($C \rightarrow \infty$), this learning setup implements a "one-shot" update, i.e. carries out a zero-loss  after update. A finite stiffness parameter $C$ provides a more progressive (less "aggressive") update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
 
 In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good the current choice is, without telling how good or bad other choices would be. Solving the system carries out a single update on the  $\tilde{y}^\text{th}$ separatrix. 
 
-Under this focused examination, it is worth considering an alternate classifier $U$ in parallel with $W_{t-1}$. The same examination of $\tilde{y}_t$ at time $t$ provides an alternate feedback $l^*_t = l(x_t,U,\tilde{y}_t,f_t)$. By construction, if the data are separable under OVA constraints (see eq. (\ref{eq:OVA-A}-\ref{eq:OVA-B})), there exist at least one classifier $U$ such that $\forall t, l^*_t = 0$. In that case, the following theorem can be established:
+Under this focused examination, it is worth considering an alternate classifier $U$ in parallel with $W_{t-1}$. The same examination of $\tilde{y}_t$ at time $t$ provides an alternate feedback $l^*_t = l(x_t,U,\tilde{y}_t,f_t)$. By construction, if the data are separable under OVA constraints (see eq. (\ref{eq:OVA-A}-\ref{eq:OVA-B})), there exist at least one classifier $U$ such that $\forall (t, \tilde{y}_t), l^*_t = 0$. In that case, the following theorem holds:
 
 %\subsubsection{Analyse}
 
@@ -374,21 +378,22 @@ Under this focused examination, it is worth considering an alternate classifier 
 \end{theorem}
 (proof in \ref{app:thm1})
 
-The result obtained in that case is formally similar to that of  \cite{crammer2006online}. It states, in short, that a finite number of updates are needed to fit the classification constraints expressed by the observed series of loss functions. Whatever the series $\tilde{y}_1, ...,\tilde{y}_T$, there is a point at which all subsequent observed losses are equal to zero. This result guarantees a certain sparsity of the final classifier.
+The result obtained in that case is formally similar to that of  \cite{crammer2006online}. It states, in short, that a finite number of updates are needed to fit the classification constraints expressed by the observed series of losses. Whatever the series $\tilde{y}_1, ...,\tilde{y}_T$, there is a point at which all subsequent observed losses are equal to zero. This result grants final classifier sparsity in the separable case.
 
 There is however an important caveat to be mentioned. 
 %The possible sequences $\tilde{y}_1$, ..., $\tilde{y}_T$ include constant sequences, greedy sequence and pure random sequences. In other words, it is independent from the policy.
 % and optimal (zero-error) sequence. 
-Indeed, whatever the sequences $\tilde{\mathcal{Y}}_T = (\tilde{y}_1$, ..., $\tilde{y}_T)$, only $T$ feedbacks signals out of $KT$ possible feedbacks are actually read,
+Indeed, whatever the  $ (\tilde{y}_1$, ..., $\tilde{y}_T)$ sequence, only $T$ feedbacks signals out of $KT$ potential feedbacks are actually read,
 %Only a $1/K$ portion of all feedback signals necessary to reach 
 %perfect classification are actually observed, 
-and each separatrix $w_k$ relies on a series of observations : $\{t: \tilde{y}_t = k\}$.
+and each separatrix $w_k$ relies on a sub-series of observations : $\{t: \tilde{y}_t = k\}$.
 %, forming a particular path of actions. 
-This sequence probes the environment without necessarily uncovering all of it. The theorem provides a bound on the \emph{observed} cumulative loss, ignoring every unobserved losses. 
+The sequence probes the environment without necessarily uncovering all of it. The theorem provides a bound on the \emph{observed} cumulative loss, ignoring every unobserved losses. 
 %An appropriate uniform exploration policy is thus needed in order {\color{red} to provide effective classification improvement.}
 Consequently, the loss (or squared loss) \emph{is not an upper bound of the classification mistake.} The theorem thus does not guarantees that every example will be correctly classified in the end. This would depends on (i) the particular policy followed in the course of learning and (ii)  additional assumptions on sample regularity.   
 
-The theorem guarantees a zero loss after a fixed number of updates. Let us note  $W^*$ this zero-loss final classifier. Then $\forall k \in 1,...,K$, 
+Let us consider now that a fixed policy is applied throughout the session. Depending on the particular policy applied, additional guarantees can be obtained.  
+Considering the theorem guarantees a zero loss after a fixed number of updates, let us note  $W^*$ this zero-loss final classifier. Then $\forall k \in 1,...,K$, 
 %First, the classifier $U$ is composed of $K$ different separatrices, so that its norm is expected to grow linearly with $K$.
 
 %if a single policy $h$ is followed in the course of learning, 
@@ -396,12 +401,12 @@ The theorem guarantees a zero loss after a fixed number of updates. Let us note 
 %The way $\tilde{\mathcal{Y}}_T$ is generated depends on a particular \emph{policy} that is followed . Different policies provide different guaranties on the final classification rate. 
 
 %Two important cases need here to be examined:
-\begin{itemize}
-	\item if $\tilde{y}_1, ...,\tilde{y}_T$ obey to a greedy deterministic choice $h$, and if $\exists t$ such that $\tilde{y}_t = y_t = k$, then, as $l_t$ is satisfied by $W^*$, $\langle w_k^*, x_t\rangle \geq 1$. Let us now assume that \emph{every sample $x$ from class $k$ lives in a convex set $\mathcal{C}_k$}. Then, if $\exists x \in \mathcal{C}_k$ with $h(x) \neq k$ and zero loss, then $\langle w_k^*, x\rangle < \langle w_{h(x)}^*, x\rangle \leq -1$. Then $\exists \rho \in [0,1]$ such that $x_\rho = \rho x + (1-\rho) x_t \in \mathcal{C}_k$ and 
+
+	\paragraph{Greedy deterministic policy} If $\tilde{y}_1, ...,\tilde{y}_T$ obey to a greedy deterministic choice $h$, and if $\exists t$ such that $\tilde{y}_t = y_t = k$, then, as $l_t$ is satisfied by $W^*$, $\langle w_k^*, x_t\rangle \geq 1$. Let us now assume that \emph{every sample $x$ from class $k$ lives in a convex set $\mathcal{C}_k$}. Then, if $\exists x \in \mathcal{C}_k$ with $h(x) \neq k$ and zero loss, then $\langle w_k^*, x\rangle < \langle w_{h(x)}^*, x\rangle \leq -1$. Then $\exists \rho \in [0,1]$ such that $x_\rho = \rho x + (1-\rho) x_t \in \mathcal{C}_k$ and 
 	$-1 < \langle w_k^*,x_\rho \rangle < 1 $, which breaks out the zero loss condition. So, $\nexists x \in \mathcal{C}_k$ with $h(x) \neq k$, i.e. every sample from $\mathcal{C}_k$ is correctly classified.
-	\item if $\tilde{y}_1, ...,\tilde{y}_T$ obey to a uniform random choice (independent from $W$), the separatrix $w_k$ is probed on average $T/K$ times. By a simple combinatorial argument, the chance not finding $t$ such that $\tilde{y}_t = y_t = k$ exponentially decreases with $t$.
-	\item Finally, an $\varepsilon$-greedy choice, that alternates between uniform sampling and greedy choice, guarantees a correct classification in the end.  
-\end{itemize}
+	\paragraph{Uniform random policy} If $\tilde{y}_1, ...,\tilde{y}_T$ obey to a uniform random choice (independent from $W$), the separatrix $w_k$ is probed on average $T/K$ times. By a simple combinatorial argument, the chance not finding $t$ such that $\tilde{y}_t = y_t = k$ exponentially decreases with $t$.
+	\paragraph{$\varepsilon$-greedy policy} Finally, an $\varepsilon$-greedy choice, that alternates between uniform sampling and greedy choice, guarantees a correct classification in the end.  
+
 %	at least one of the two constraints of (\ref{eq:OVA-A}-\ref{eq:OVA-B}) is satisfied. 
 %	\begin{itemize}
 %		\item If $\exists (x,y)$ such that $\langle W^*,X^y\rangle < 1$, then, due to the zero-loss constraint,  $y$ is not chosen i.e. $\hat{y} \neq y$ and $\langle W^*,X^{\hat{y}}\rangle \leq -1$, i.e. $\forall k, \langle W^*,X^k\rangle \leq -1$.  
@@ -423,7 +428,7 @@ The theorem guarantees a zero loss after a fixed number of updates. Let us note 
 %	\end{itemize}
 
 
-If we turn now to an arbitrary classifier $U$, without separability assumption, the following theorem comes~:
+\paragraph{} If we turn now to an arbitrary classifier $U$, without separability assumption, the following theorem holds~:
 
 \begin{theorem}
 	\label{theo:BPAT2}
@@ -440,9 +445,9 @@ loss will be at most four time that of any linear
 classifier $U$ (including that of a loss-minimizer classifier $U^*$). 
 
 
-Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA loss is visited in one run. For the classification error to be bounded, stationarity of samples generation as well as policy uniformity need to be assumed for the exhaustion of constraints be statistically granted.  
+Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA losses is visited in one run. For the classification error to be bounded, stationarity of samples generation as well as policy uniformity need to be assumed for the exhaustion of constraints be statistically granted.  
 
-Moreover, additional regularization needs to be considered to attain $O(\sqrt{T})$ regret (see \cite{crammer2006online}), that 
+This bound is moreover less tight than that of \cite{freund1997decision}, and  additional regularization needs to be set up to attain $O(\sqrt{T})$ regret (see \cite{crammer2006online}),  
 we do not develop here for brevity. 
 
 %{\color{blue} Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est borné en $O(\sqrt{T})$ dans le cas non séparable.}
@@ -527,23 +532,38 @@ Then, following \cite{kivinen2004online}, a strict control on the number of supp
 
 
 \subsection{Kernel Extension}
-Le plongement des données d'entrée dans des espaces de Hilbert à noyaux reproduisants (RKHS) permet d'étendre notre approche aux jeux de données non linéairement séparables. 
+The extension of the linear discriminant setup to reproducible kernel Hilbert spaces (RKHS) allows deal with non-linearly separable learning sets at the cost of additional free parameters (specific kernel features). 
 
-Soit $\mathcal{H}$ un espace de Hilbert à noyaux reproduisants dont le produit scalaire est défini à l'aide de la fonction noyau $\mathcal{K}$. On note $\mathcal{K}(x,.)$ la projection de l'exemplaire $x$ dans $\mathcal{H}$, avec $\forall f \in \mathcal{H}, \langle f,\mathcal{K}(x,.)\rangle_\mathcal{H} = f(x) $.
+Let $\mathcal{K}(.,.)$ a mapping from $ \mathbb{R}^d \times \mathbb{R}^d$ to $ \mathbb{R}^+$ having the Mercer property (see \cite{scholkopf2002learning}). Let $\mathcal{K}(x,.)$ be the projection of example $x$ in $\mathcal{H}$. Then, by construction, a scalar product $\langle.,.\rangle_\mathcal{H}$ in $\mathcal{H}$ is such that: 
+ $$\forall w \in \mathcal{H}, \langle w,\mathcal{K}(x,.)\rangle_\mathcal{H} = f(x) $$
+Given previous notations, each classifier $W = (w_1,...,w_k)$ is now defined in $\mathcal{H}^K$ and:
+ \begin{align}\label{eq:X-kernel}
+ X^k \triangleq (0(.), ..., & \mathcal{K}(x,.), ..., 0(.)) \in \mathcal{H}^{K}\\
+ &\mid\nonumber\\
+ &k\nonumber
+ \end{align}
+with $0(.)$ a null function. Then, taking:
+$$\langle W,X^k\rangle \triangleq \langle w_k,\mathcal{K}(x,.)\rangle_\mathcal{H} = w_k(x)$$
+all previous definitions an results apply.
 
+%Le classifieur est dans ce cadre défini comme un ensemble de fonctions : $\mathcal{F} = \{f^{(1)}, ..., f^{(K)}\}$ avec :
+%$$\hat{y} = \arg \max_k f^{(k)}(x)$$
 
-Le classifieur est dans ce cadre défini comme un ensemble de fonctions : $\mathcal{F} = \{f^{(1)}, ..., f^{(K)}\}$ avec :
-$$\hat{y} = \arg \max_k f^{(k)}(x)$$
+%Soit $\mathcal{F}_0=\{0, ..., 0\}$ le classifieur initial. A chaque essai, il est mis à jour selon la règle définie précédemment, soit à l'instant $t$~:
+%$$\mathcal{F}_t = \{f^{(1)}_t, ..., f^{(K)}_t\}$$
+%$$\forall k, f^{(k)}_t = \sum_{t^\prime = 1} ^t  \frac {\mathbf{1}_{k=\tilde{y}_{t^\prime}}l_{t^\prime}}{\mathcal{K}(x_{t^\prime},x_{t^\prime})+\frac{1}{2C}} (2g_{t^\prime} - 1)\mathcal{K}(x_{t^\prime},.)$$
+%$$ l_t = [1 + (1-2g_t) f_{t-1}^{(\tilde{y}_t)}(x_t)]_+$$
 
-Soit $\mathcal{F}_0=\{0, ..., 0\}$ le classifieur initial. A chaque essai, il est mis à jour selon la règle définie précédemment, soit à l'instant $t$~:
-$$\mathcal{F}_t = \{f^{(1)}_t, ..., f^{(K)}_t\}$$
-$$\forall k, f^{(k)}_t = \sum_{t^\prime = 1} ^t  \frac {\mathbf{1}_{k=\tilde{y}_{t^\prime}}l_{t^\prime}}{\mathcal{K}(x_{t^\prime},x_{t^\prime})+\frac{1}{2C}} (2g_{t^\prime} - 1)\mathcal{K}(x_{t^\prime},.)$$
-$$ l_t = [1 + (1-2g_t) f_{t-1}^{(\tilde{y}_t)}(x_t)]_+$$
-
-En notant $\alpha_t^{(k)} = \frac {\mathbf{1}_{k=\tilde{y}_{t}}l_{t}}{\mathcal{K}(x_{t},x_{t})+\frac{1}{2C}} (2g_{t} - 1)$, il vient :
-$$\forall k, f^{(k)}_t = \sum_{t^\prime = 1} ^t \alpha_{t^\prime}^{(k)} \mathcal{K}(x_{t^\prime},.)$$
-
-Autrement dit chaque séparatrice $f^{(k)}$ est définie par un ensemble de vecteurs supports ($x_{t_1^{(k)}}$, ..., $x_{t_i^{(k)}}$, ...  ) tels que $\forall i, \alpha_{t_i^{(k)}}^{(k)} \neq 0$.
+In particular, when considering algorithm \ref{algo:quad} and noting $\alpha_t = \frac {l_{t}}{\mathcal{K}(x_{t},x_{t})+\frac{1}{2C}} (2f_{t} - 1)$, we have:
+$$W_t = \sum_{t^\prime = 1} ^t \alpha_{t^\prime} X_{t^\prime}^{\tilde{y}_{t^\prime}} 
+%= \sum_{k=1}^K \sum_{t^\prime: \tilde{y}_{t^\prime} = k} \alpha_{t^\prime} X^k_{t^\prime}
+$$
+% \mathcal{K}(x_{t^\prime},.)$$
+so that, taking definition (\ref{eq:X-kernel}), and setting $\mathcal{T}_{k,t} = \{{t^{\prime}} \leq t: \tilde{y}_{t^{\prime}} = k \text{ and } l_{t^{\prime}} > 0\}$, each 
+separatrix $w_{k,t}$ is now defined by a support vectors set 
+$\{x_{t^{\prime}}\}_{{t^{\prime}}\in \mathcal{T}_{k,t}}$ 
+so that 
+	$$w_{k,t} = \sum_{t^{\prime}\in \mathcal{T}_{k,t}} \alpha_{t^{\prime}} \mathcal{K}(x_{t^{\prime}},.)$$
 
 
 Le nombre de vecteurs supports augmente de 1 chaque fois que la perte est non nulle. De par le théorème 1, nous savons que ce nombre est borné dès lors que les données sont séparables dans l'espace de redescription. 
