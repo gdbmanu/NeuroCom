@@ -382,7 +382,7 @@ There is however an important caveat to be mentioned.
 Indeed, whatever the sequences $\tilde{\mathcal{Y}}_T = (\tilde{y}_1$, ..., $\tilde{y}_T)$, only $T$ feedbacks signals out of $KT$ possible feedbacks are actually read,
 %Only a $1/K$ portion of all feedback signals necessary to reach 
 %perfect classification are actually observed, 
-and each separatrix $w_k$ relies on a series of observations : $\mathcal{T}_k = \{t: \tilde{y}_t = k\}$.
+and each separatrix $w_k$ relies on a series of observations : $\{t: \tilde{y}_t = k\}$.
 %, forming a particular path of actions. 
 This sequence probes the environment without necessarily uncovering all of it. The theorem provides a bound on the \emph{observed} cumulative loss, ignoring every unobserved losses. 
 %An appropriate uniform exploration policy is thus needed in order {\color{red} to provide effective classification improvement.}
@@ -440,7 +440,7 @@ loss will be at most four time that of any linear
 classifier $U$ (including any loss-minimizer classifier $U^*$). 
 
 
-Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA loss is considered in one run. For the classification error to be bounded, stationarity of samples generation as well as policy uniformity need to be assumed for the exhaustion of constraints be statistically granted.  
+Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA loss is visited in one run. For the classification error to be bounded, stationarity of samples generation as well as policy uniformity need to be assumed for the exhaustion of constraints be statistically granted.  
 
 Moreover, additional regularization needs to be considered to attain $O(\sqrt{T})$ regret (see \cite{crammer2006online}), that 
 we do not develop here for brevity. 
@@ -456,7 +456,7 @@ we do not develop here for brevity.
 
 \subsection{Gradient-descent approach}
 
-Aside the XXX presented above, the gradient-based approach to sparse online discriminative classification, as proposed by \cite{kivinen2004online}, relies on minimizing the regularized risk:
+Aside the quadratic optimization setup presented above, the gradient-based approach to sparse online discriminative classification, as proposed by \cite{kivinen2004online}, relies on minimizing the regularized risk:
 $$R(W) = \mathbb{E}\left[ l + \frac{\lambda}{2}\|W\|^2\right]$$
 with $\lambda$ a regularization parameter.
 
