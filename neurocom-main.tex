@@ -353,7 +353,7 @@ which leads to algorithm \ref{algo:quad}.
 \end{algorithm}
 
 This setup is called "passive-aggressive" for it combines a conservative approach (ignore $x_t$ if $l_t=0$) with a tight update (optimize the classifier according to $x_t$ if $l_t>0$).
-In its original formulation ($C \rightarrow \infty$), this learning setup implements a "one-shot" update, i.e. carries out a zero-loss  after update. A finite stiffness parameter $C$ allows for a more progressive update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
+In its original formulation ($C \rightarrow \infty$), this learning setup implements a "one-shot" update, i.e. carries out a zero-loss  after update. A finite stiffness parameter $C$ provides a more progressive update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
 
 In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good the current choice is, without telling how good or bad other choices would be. Solving the system carries out a single update on the  $\tilde{y}^\text{th}$ separatrix. 
 
@@ -366,7 +366,7 @@ Under this focused examination, it is worth considering an alternate classifier 
 
 \begin{theorem}
 	\label{theo:BPAT1}
-	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of separable examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, let $\tilde{y}_1,...,\tilde{y}_T$ be a sequence of responses, with $\tilde{y}_t\in \{1,...,K\}$, 
+	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of separable examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t\parallel\leqslant R$ for all t, let $\tilde{y}_1,...,\tilde{y}_T$ be a sequence of responses, with $\tilde{y}_t\in \{1,...,K\}$, 
 	and let $U \in \mathbb{R}^{K\times d}$ be such that $ \forall t, l^*_t=0$. Then, assuming $C \rightarrow \infty$, the cumulative squared loss of algorithm \ref{algo:quad} is bounded by,
 	\begin{equation}
 	\sum_{t=1}^{T} l_t^2 \leqslant R^2 \parallel{U}\parallel^2
@@ -437,7 +437,7 @@ This bound is once again identical to that obtained by
 \cite{crammer2006online} in the supervised case. 
 It tells in short that, for large $T$, the average squared 
 loss will be at most four time that of any linear 
-classifier $U$ (including any loss-minimizer classifier $U^*$). 
+classifier $U$ (including that of a loss-minimizer classifier $U^*$). 
 
 
 Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA loss is visited in one run. For the classification error to be bounded, stationarity of samples generation as well as policy uniformity need to be assumed for the exhaustion of constraints be statistically granted.  
@@ -526,7 +526,7 @@ Then, following \cite{kivinen2004online}, a strict control on the number of supp
 \end{algorithm}
 
 
-\subsection{Extensions}
+\subsection{Kernel Extension}
 Le plongement des données d'entrée dans des espaces de Hilbert à noyaux reproduisants (RKHS) permet d'étendre notre approche aux jeux de données non linéairement séparables. 
 
 Soit $\mathcal{H}$ un espace de Hilbert à noyaux reproduisants dont le produit scalaire est défini à l'aide de la fonction noyau $\mathcal{K}$. On note $\mathcal{K}(x,.)$ la projection de l'exemplaire $x$ dans $\mathcal{H}$, avec $\forall f \in \mathcal{H}, \langle f,\mathcal{K}(x,.)\rangle_\mathcal{H} = f(x) $.
