@@ -371,7 +371,7 @@ Under this focused examination, it is worth considering an alternate classifier 
 \begin{theorem}
 	\label{theo:BPAT1}
 	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of separable examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t\parallel\leqslant R$ for all t, let $\tilde{y}_1,...,\tilde{y}_T$ be a sequence of responses, with $\tilde{y}_t\in \{1,...,K\}$, 
-	and let $U \in \mathbb{R}^{K\times d}$ be such that $ \forall t, l^*_t=0$. Then, assuming $C \rightarrow \infty$, the cumulative squared loss of algorithm \ref{algo:quad} is bounded by,
+	and let $U \in \mathbb{R}^{K\times d}$ be such that $ \forall t, l^*_t=0$. Then, assuming $C \rightarrow \infty$, the cumulative squared loss of algorithm \ref{algo:quad} is bounded by:
 	\begin{equation}
 	\sum_{t=1}^{T} l_t^2 \leqslant R^2 \parallel{U}\parallel^2
 	\end{equation}
@@ -576,6 +576,116 @@ The total number of reference vectors is incremented each time a non-zero loss i
 %utiliser, les macros les définitions de théorèmes etc... Nous
 %recommandons le paquet \texttt{hyperref} puisque les documents
 %\texttt{PDF} seront en ligne si vous avez donné
+\subsection{Databases}
+\label{subsec:BPAE}
+Nous évaluons ici notre algorithme à l'aide de deux jeux de données synthétiques et trois jeu de données réels dont les caractéristiques sont fournies dans la table Table~\ref{table:mce}.
+
+\begin{table}[h]
+	\caption{Caractéristiques des cinq jeux de données}
+	\label{table:mce}
+	\begin{center}
+		\begin{tabular}{l l l l}
+			{\bf Jeu}  & {\bf nb ex.} & {\bf dim.} & {\bf K}\\
+			\hline
+			SynSep & $10^5$ 	& 400 	& 9 \\
+			
+			SynNonSep & $10^5$ & 400 	& 9 \\
+			
+			RCV1-v2  & $10^5$ 	& 47236 	& 53 \\
+			
+			Pendigits 	& 7494	& 16	& 10	\\
+			
+			Segment & 2310	& 19	& 7	\\
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\paragraph{Jeux de données}
+Les 3 premiers jeux de données testent le comportement de l'algorithme dans le cas de données de grande dimension, c'est à dire pour des données susceptibles de provoquer de l'encombrement mémoire avec les approches d'ordre 2 classiques. Il s'agit typiquement de vecteurs de caractéristiques basés sur l'analyse de textes, dont le nombre de caractéristiques peut avoisiner les 50000.
+
+Le premier jeu de données, nommé SynSep, est un jeu de données synthétique linéairement séparable, qui simule de façon simplifiée des données de type document.  Les différentes coordonnées représentent des termes d'un petit vocabulaire de taille $400$. Il est constitué de 9 classes. Le nombre d'exemplaire généré est $10^5$.
+La méthode de construction de ce jeu de données peut être trouvées dans \cite{kakade2008efficient}. 
+
+Le second jeu de données, nommé SynNonSep,est construit de la même façon, à l'exception d'un bruit de label à 5\%, ce qui rend le jeu de données non-séparable. 
+
+Le troisième jeu de données provient de la collection Reuters RCV1-v2 \cite{David04RCV}.
+Le jeu original est constitué d'instances multi-label. Afin d'obtenir un label par instance, nous effectuons le prétraitement proposé par \cite{RB08a}. Le jeu obtenu est constitué de 53-classes, la dimension des vecteurs est 47236 et le nombre d'instances est $10^5$. 
+
+Les deux derniers jeux de données sont constitués de données réelles, de dimension plus faible, et avec un nombre d'exemplaires également plus faible. Nous comparons dans ce cas différents algorithmes en plongeant les données dans des espaces de fonctions noyaux.  
+
+Le quatrième jeu de données, nommé Pendigits, est un jeu de données réel créé pa E. Alpaydin and F. Alimoglu \cite{alimoglu1996combining}. 
+Il contient 7494 instances, avec 16 caractéristiques par instance et 10 classes. 
+
+Le cinquième jeu de données appelé `Segment' \cite{Lichman:2013} contient 2310 instances, chacune d'elle étant un extrait d'images naturelles basé sur des régions de 3x3 pixels, avec 19 caractéristiques et 7 classes. 
+
+
+%The fourth and fifth data sets are collected from \cite{letter26SC,number10SC}. The fourth data set is to identify each of a large number of black-and-white rectangular pixel displays as one of the 26 capital letters in the English alphabet. The character images were based on 20 different fonts and each letter within these 20 fonts was randomly distorted to produce a file of 20000 unique stimuli. Each stimuli was converted into 16 primitive numerical attributes (statistical moments and edge counts). It forms a 26-class, 16-dimensional real data set of size $20000$. The fifth data set is a digit data base made by collecting 250 samples from 44 writers, using only (x,y) coordinate information represented as constant length feature vectors, which were resampled to 8 points per digit (therefore the data set contains 8 points $\times$ 2 coordinates = 16 features). This one is a 10-class, 16-dimensional real data set of size $10992$.
+
+Les paramètres utilisés dans les différentes simulations sont donnés dans la table 2. Ces paramètres ont été choisis par validation croisée sur le taux de classification final, afin de comparer de manière fiable les différentes méthodes utilisées. 
+
+
+\begin{table}[h]
+	\caption{Paramètres utilisés pour les différents jeux de données. Pour les en-têtes de colonne, P. désigne le Perceptron, PA désigne le Passif Agressif, B désigne le Banditron, C désigne le Confidit, BPA est le Bandit Passif Agressif, KB est le Kernel Banditron, KBPA est le Kernel BPA et KSGD est le gradient stochastique à noyaux. Pour les en-têtes de lignes, SS désigne SynSep, SN SynNonSep, R Reuters, P Pendigits et S Segment.}
+	\label{table:bpa}
+	\vspace{.3cm}
+	\begin{small}
+		
+		%\begin{center}
+		
+		%		\begin{tabular}{llllll}
+		%			
+		%			\hline
+		%			{\bf }  & {\bf P} & {\bf PA } & {\bf B}& {\bf C} & {\bf BPA}\\
+		%			\hline
+		%			SS & $\varnothing$ & $C=0$ & $\varepsilon = 0.014$ &$\eta = 10^3$ & $\varepsilon = 0.4$\\
+		%			&&&&& $C = \infty$\\
+		%			
+		%			SN & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.65$ & $\eta = 10^3$& $\varepsilon = 0.8$\\
+		%			&&&&& $C = 10^{-2}$\\			
+		%			R & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.4$ & $\eta = 10^2$ & $\varepsilon = 0.2$\\
+		%			&&&&& $C = 10^{-2}$\\
+		%			\hline
+		%			&{\bf KB} & {\bf BPA} & {\bf KBPA} &{\bf KSGD}\\
+		%			\hline
+		%			P & $\sigma = 1$ & $C = 10^{-2}$ &$\sigma = 1$&$\sigma = 1$\\
+		%			&&$\varepsilon = 0.2$& $C = 1$ & $H = 500$\\
+		%			&&& $\varepsilon = 0.2$ &\\
+		%			S & $\sigma = 10$ & $C = 10^{-2}$ & $\sigma = 10$&$\sigma = 10$\\
+		%			&&$\varepsilon = 0.2$& $C = 1$& $H = 200$\\
+		%			&&& $\varepsilon = 0.2$ &
+		%			%LR(26 letters) & null &  $C=0.1$ & $\varepsilon = 0.2$& $\eta=10^2$ & $\varepsilon = 0.8,C= 1$ \\
+		%			
+		%			%LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\
+		%			
+		%		\end{tabular}
+		\hspace{-.8cm}
+		\begin{tabular}{llllll}
+			
+			\hline
+			{\bf }  & {\bf P} & {\bf PA } & {\bf B}& {\bf C} & {\bf BPA}\\
+			\hline
+			SS & $\varnothing$ & $C=\infty$ & $\varepsilon = 0.014$ &$\eta = 10^3$ & $\varepsilon = 0.4$\\
+			&&&&& $C = \infty$\\
+			
+			SN & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.65$ & $\eta = 10^3$& $\varepsilon = 0.8$\\
+			&&&&& $C = 10^{-2}$\\			
+			R & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.4$ & $\eta = 10^2$ & $\varepsilon = 0.2$\\
+			&&&&& $C = 10^{-2}$\\
+			\hline
+			&{\bf KB} & {\bf BPA} & {\bf KBPA} &{\bf KSGD}\\
+			\hline
+			P & $\sigma = 10$ & $\varepsilon = 0.3$ &$\sigma = 10$&$\sigma = 10$\\
+			&$\varepsilon =0.1$&& $\varepsilon = 0.3$ & $H = 500$\\
+			S & $\sigma = 1$ & $\varepsilon = 0.3$ & $\sigma = 1$&$\sigma = 1$\\
+			&$\varepsilon =0.1$&&$\varepsilon = 0.3$ & $H = 200$\\
+			%LR(26 letters) & null &  $C=0.1$ & $\varepsilon = 0.2$& $\eta=10^2$ & $\varepsilon = 0.8,C= 1$ \\
+			
+			%LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\
+			
+		\end{tabular}
+		%\end{center}
+	\end{small}
+\end{table}
 
 
 \section{Experiments}
@@ -999,15 +1109,15 @@ Moreover, experimental evaluation shows that BPA performs better than other algo
 \begin{proof}
 	Define $\Delta_t$ to be:
 	\[\Delta_t = \parallel{W_{t-1}-U}\parallel^2-\parallel{W_t-U}\parallel^2\]
-	By summing $\Delta_t$ over all $t$ from 1 to $T$,  $\sum_t \Delta_t$ is shown to be a telescopic sum which collapses to
+	Summing $\Delta_t$ over all $t$ from 1 to $T$ collapses to:
 	\begin{align}
 	\sum_{t=1}^{T}\Delta_t &= \sum_{t=1}^{T} \left( \parallel{W_{t-1} - U}\parallel^2-\parallel{W_t - U}\parallel^2 \right)\nonumber\\ 
-	&= \parallel{W_0 - U}\parallel^2-\parallel{W_t-U}\parallel^2\nonumber
+	&= \parallel{W_0 - U}\parallel^2-\parallel{W_T-U}\parallel^2\nonumber
 	\end{align}	
-	By the initialization of $W_0 = \vec{0}$, 
+	Given that $W_0 = \vec{0}$, 
 	\begin{equation}
 	\label{equa:delta}
-	\sum_{t=1}^{T}\Delta_t = \parallel{U}\parallel^2 - \parallel{W_t-U}\parallel^2 \leqslant \parallel{U}\parallel^2 
+	\sum_{t=1}^{T}\Delta_t = \parallel{U}\parallel^2 - \parallel{W_T-U}\parallel^2 \leqslant \parallel{U}\parallel^2 
 	\end{equation}
 	
 	Using the definition of update : %in Eq.\ref{eq:,
@@ -1033,7 +1143,7 @@ Moreover, experimental evaluation shows that BPA performs better than other algo
 	\Delta_t\geqslant& 2l_t\frac{l_t - l_t^{\ast}}{\parallel{x_t}\parallel^2}-\frac{l_t^2}{\parallel{x_t}\parallel^2}\nonumber\\
 	=& \frac{l_t^2-2l_t l_t^{\ast}}{\parallel x_t\parallel^2}\nonumber
 	\end{align}
-	If all examples are separable, $\exists U$ such that $\forall t \in [1,...,T]$ , $l_t^{\ast} = 0$ ,
+	Given that $U$ is such that $\forall t \in [1,...,T]$ , $l_t^{\ast} = 0$,
 	%, following the Eq.~\ref{sumDelta},
 	
 	\[\Rightarrow \parallel{U}\parallel^2 \geqslant \sum_{t=1}^{T}\Delta_t \geqslant \sum_{t=1}^{T}  \frac{l_t^2}{\parallel{x_t}\parallel^2}
@@ -1045,7 +1155,7 @@ Moreover, experimental evaluation shows that BPA performs better than other algo
 
 \section{Proof of Theorem \ref{theo:BPAT2}}\label{app:thm2}
 \begin{proof}
-	By the proof of Theorem \ref{theo:BPAT1}, 
+	From the proof of Theorem \ref{theo:BPAT1}, 
 	\[\sum_{t=1}^{T}l_t^2 \leqslant R^2\cdot \parallel{U}\parallel^2 + 2\sum_{t=1}^{T}l_t l_t^{\ast}\]
 	To upper bound the right side of the above inequality, we denote $a_t = \sqrt{\sum_{t=1}^{T}l_t^2}$ and $b_t = \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}$, 
 	\begin{align}
