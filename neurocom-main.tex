@@ -193,7 +193,8 @@ X^k \triangleq (\vec{0}, ..., & x, ..., \vec{0}) \in \mathbb{R}^{K d}\\
 The expectation of the update is shown to be that of the multiclass perceptron, and a convergence to the correponding perceptron classifier is obtained, with a finite bound on the cumulative error in linearly separable cases. 
 
 {\color{blue}
-Toujours dans le cadre des classifieurs linéaires, plusieurs algorithmes d'apprentissage de bandits contextuels ont été proposés dans la littérature. Dans nos expérimentations numériques, nous considérerons également ici l'algorithme ``Confidit'' proposé par Crammer et Gentile \cite{crammer2013multiclass}, reposant sur le perceptron d'ordre 2 et l'exploration non stochastique basée sur le principe UCB \cite{lai1985asymptotically}, et présentant des profils de convergence plus favorables que le Banditron. }
+Toujours dans le cadre des classifieurs linéaires, plusieurs algorithmes d'apprentissage de bandits contextuels ont été proposés dans la littérature. Dans nos expérimentations numériques, nous considérerons également ici l'algorithme ``Confidit'' proposé par Crammer et Gentile \cite{crammer2013multiclass}, reposant sur le perceptron d'ordre 2 et l'exploration non stochastique basée sur le principe UCB \cite{lai1985asymptotically}, et présentant des profils de convergence plus favorables que le Banditron. A AJOUTER : Newtron, Li et al 2010, ngo 2014}
+
 
 
 \paragraph{Online risk minimization}
@@ -216,24 +217,25 @@ The classifier is updated through local measures of a loss function $$l_t = l(x_
 %The loss thus relies on a combiation of \emph{internal} information (current classifier's parameters, current choice) and \emph{external} information (input vector, feedback). On contrary to the offline setting, the classifier's current value $W_t$ plays a significant role in defining the future direction. 
 
 Different loss function and margin constraints can be defined depending on task and feedback characteristics. 
-Under the multiclass setting, two principal margin constraint schemes can be set up, namely the \emph{normative} margin and the \emph{relative} margin. 
+Under the multiclass setting, two principal margin constraint schemes can be set up, namely the \emph{relative} margin and the \emph{normative} margin. 
 
 \begin{itemize}
-	\item In the \emph{normative} margin case, the classifier is expected to provide a response that overtakes in norm a reference value $a$. A typical normative margin setup is the one-vs-all (OVA) setup, having  $a = 1$ for reference,  i.e. $\forall k$: \begin{align}%\label{eq:OVA}
+	\item Compliant with the Kessler's construction (see \cite{duda1973pattern}), the \emph{relative} margin setup (see \cite{crammer2003ultraconservative}) establish a distance reference $a$, so that the linear score of the class-compliant separatrix $\langle w_y, x\rangle$ is expected to overtake  the other linear scores by at least $a$, i.e. (taking $a=1$)
+	\begin{equation}
+	\label{eq:rel} \langle w_y, x \rangle \geq 1 + \max_{k \neq y} \langle w_k, x \rangle  	
+	\end{equation}
+	and a corresponding relative multiclass \emph{hinge loss} is:
+	\begin{equation}
+	\label{eq:rel-loss} l (x,W,y) =  \left[ 1 +  \langle w_y, x \rangle - \max_{k \neq y} \langle w_k, x\rangle\right]_+\end{equation}
+	with $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
+	\item  Compliant with the one-vs-all (OVA) construction, the \emph{normative} margin setup imposes the classifier to provide a response that overtakes in norm a reference value $a$. Taking  $a = 1$ for reference, it tells $\forall k$: \begin{align}%\label{eq:OVA}
 	&\langle w_k, x \rangle \geq 1 &\text{ if } y = k \label{eq:OVA-A}\\
 	&\langle w_k, x \rangle \leq -1 &\text{ if }y \neq k \label{eq:OVA-B}
 	\end{align}
 	and a corresponding normative multiclass \emph{hinge loss} is:  
 	\begin{equation}\label{eq:OVA-loss} l(x,W,y) = \sum_{k=1}^K \left[1 + (1 - 2 \delta(y,k)) \langle w_k,x \rangle\right]_+
 	\end{equation}
-	with $\delta(i,j) =1$ if $i = j$ and 0 elsewhere, and $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
-	\item Under  a \emph{relative} margin setup (see \cite{crammer2003ultraconservative}) \--- compliant with the Kessler's construction (see \cite{duda1973pattern}) \--- there is no absolute reference value but instead a distance reference, so that the linear score of the class-compliant separatrix $\langle w_y, x\rangle$ is expected to overtake  the other linear scores by at least $a$, i.e. (taking $a=1$)
-	\begin{equation}
- \label{eq:rel} \langle w_y, x \rangle \geq 1 + \max_{k \neq y} \langle w_k, x \rangle  	
- \end{equation}
-	and a corresponding relative multiclass \emph{hinge loss} is:
-	\begin{equation}
-	\label{eq:rel-loss} l (x,W,y) =  \left[ 1 +  \langle w_y, x \rangle - \max_{k \neq y} \langle w_k, x\rangle\right]_+\end{equation}
+	with $\delta(i,j) =1$ if $i = j$.
 \end{itemize}
 
 
@@ -306,7 +308,7 @@ that adapts the one-vs-all normative margin constraint (presented in eqs.(\ref{e
 %and show in contrast a conservation of the update sparsity.
 % (see theorem \ref{theo:BPAT1}). %(or conservativeness). 
 
-On contrary to the supervised case, where a full information set $\{\delta(y,1), ..., \delta(y,K)\}$ is disposable, a single bit $\delta(y,\tilde{y})$ is disclosed in our case, the other bits being unset. 
+On contrary to the supervised case, where a full information set $\{\delta(y,1), ..., \delta(y,K)\}$ is disposable, a single bit $\delta(y,\tilde{y})$ is disclosed in our case, the other bits being undisclosed. 
 A rapid inspection shows that the full set could be deduced in the label hit case ($y = \tilde{y}$), allowing for $K$ separatrices updates (see \cite{chen2009beyond}). Following the sparsity argument however,
 %, we follow the "ultraconservative" view proposed by \cite{crammer2003ultraconservative}, 
 only the  currently inspected label $\tilde{y}$ is  considered  for the update, for one separatrix at most may be updated at each round. 
@@ -324,8 +326,8 @@ i.e.~:
 \end{align}
 %Dans le premier cas (le choix est correct), la perte décroît avec $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ jusqu'à 0. Au contraire, dans le second cas (choix incorrect), la perte augmente avec le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$.
 %Minimiser la perte revient donc à faire croître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ dans le premier cas, et à faire décroître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$  dans le second cas.}
-This "agnostic" approach to non-explicitely disclosed labels %avoids weight coefficients asymmetry in the label hit case and 
-renders the method (i) independent to the labels set cardinality, (ii) independent to the actual classification achievement (avoiding unnecessary weight updates at high classification rates) (iii) independent to the actual exploration/exploitation rate and (iv) more resilient to label noise. 
+{\color{blue} This "agnostic" approach to non-explicitely disclosed labels %avoids weight coefficients asymmetry in the label hit case and 
+renders the method (i) independent to the labels set cardinality, (ii) independent to the actual classification achievement (avoiding unnecessary weight updates at high classification rates) (iii) independent to the actual exploration/exploitation rate and (iv) more resilient to label noise.}
 
 \subsection{Quadratic optimization}
  
@@ -536,7 +538,7 @@ The extension of the linear discriminant setup to
 RKHS (Reproducible Kernel Hilbert Space) redescription space 
 allows to deal with non-linearly separable learning sets at the cost of additional free parameters (kernel specific parameters). 
 
-Let $\mathcal{K}(.,.)$ a mapping from $ \mathbb{R}^d \times \mathbb{R}^d$ to $ \mathbb{R}^+$ having the Mercer property (see \cite{scholkopf2002learning}). Let $\mathcal{K}(x,.)$ be the projection of example $x$ in $\mathcal{H}$. Then, by construction, a scalar product $\langle.,.\rangle_\mathcal{H}$ in $\mathcal{H}$ is such that: 
+Let $\mathcal{K}(.,.)$ a mapping from $ \mathbb{R}^d \times \mathbb{R}^d$ to $ \mathbb{R}^+$ having the reproducing property (see \cite{scholkopf2002learning}). Let $\mathcal{K}(x,.)$ be the projection of example $x$ in $\mathcal{H}$. Then, by construction, a scalar product $\langle.,.\rangle_\mathcal{H}$ in $\mathcal{H}$ is such that: 
  $$\forall w \in \mathcal{H}, \langle w,\mathcal{K}(x,.)\rangle_\mathcal{H} = w(x) $$
 Given previous notations, each classifier $W = (w_1,...,w_k)$ is now defined in $\mathcal{H}^K$ and:
  \begin{align}\label{eq:X-kernel}
@@ -579,18 +581,18 @@ The total number of reference vectors is incremented each time a non-zero loss i
 %recommandons le paquet \texttt{hyperref} puisque les documents
 %\texttt{PDF} seront en ligne si vous avez donné
 \section{Experiments}
-\subsection{Databases}
+\subsection{Datasets}
 \label{subsec:BPAE}
 
 %Nous évaluons ici notre algorithme à l'aide de deux jeux de données synthétiques et trois jeu de données réels dont les caractéristiques sont fournies dans la table Table~\ref{table:mce}.
-Different algorithms are evaluated on two synthetic datasets and three real-world datasets. Their principal characteristics are provided in table ~\ref{table:mce}.
+Different algorithms are evaluated on two synthetic datasets and three real-world datasets, in order to test different aspects of the multiclass  setting. Their principal characteristics are provided in table ~\ref{table:mce}.
 
 \begin{table}[h]
-	\caption{Five datasets principal features}
+	\caption{Five datasets features, with $n$ the number of instances, $d$ the dimension of vectors and $K$ the number of labels.}
 	\label{table:mce}
 	\begin{center}
 		\begin{tabular}{l l l l}
-			{\bf Jeu}  & {\bf nb ex.} & {\bf dim.} & {\bf K}\\
+			{\bf Dataset}  & {\bf $n$} & {\bf $d$} & {\bf $K$}\\
 			\hline
 			SynSep & $10^5$ 	& 400 	& 9 \\
 			
@@ -606,34 +608,45 @@ Different algorithms are evaluated on two synthetic datasets and three real-worl
 \end{table}
 
 %\paragraph{Jeux de données}
-Les 3 premiers jeux de données testent le comportement de l'algorithme dans le cas de données de grande dimension, c'est à dire pour des données susceptibles de provoquer de l'encombrement mémoire avec les approches d'ordre 2 classiques. Il s'agit typiquement de vecteurs de caractéristiques basés sur l'analyse de textes, dont le nombre de caractéristiques peut avoisiner les 50000.
 
-Le premier jeu de données, nommé SynSep, est un jeu de données synthétique linéairement séparable, qui simule de façon simplifiée des données de type document.  Les différentes coordonnées représentent des termes d'un petit vocabulaire de taille $400$. Il est constitué de 9 classes. Le nombre d'exemplaire généré est $10^5$.
-La méthode de construction de ce jeu de données peut être trouvées dans \cite{kakade2008efficient}. 
+The two first datasets mimick text documents vector encoding, with a small-vocabulary of dimension 400. $10^5$ instances, belonging to 9 different classes, are generated. The detailed construction of the two datasets is given in \cite{kakade2008efficient}. In the first dataset, called  "SynSep", the different classes are linearly separable. In the second dataset, called "SynNonSep", a 5\% label noise is introduced, rendering the dataset non separable.  
 
-Le second jeu de données, nommé SynNonSep,est construit de la même façon, à l'exception d'un bruit de label à 5\%, ce qui rend le jeu de données non-séparable. 
+The third dataset comes from the Reuters RCV1-v2 collection (see \cite{David04RCV}). This dataset is typical of text mining applications, containing high dimension vectors (47,236 vocabulary entries), and a large number of instances ($10^5$). Those numbers allow to test the algorithms capability to deal with real-world scaling. 
+The original dataset contains multi-label instances.  In order to fit the single label setup, we adopt the preprocessing method proposed by \cite{RB08a}, issuing a 53-class dataset.  
 
-Le troisième jeu de données provient de la collection Reuters RCV1-v2 \cite{David04RCV}.
-Le jeu original est constitué d'instances multi-label. Afin d'obtenir un label par instance, nous effectuons le prétraitement proposé par \cite{RB08a}. Le jeu obtenu est constitué de 53-classes, la dimension des vecteurs est 47236 et le nombre d'instances est $10^5$. 
+%Les 3 premiers jeux de données testent le comportement de l'algorithme dans le cas de données de grande dimension, c'est à dire pour des données susceptibles de provoquer de l'encombrement mémoire avec les approches d'ordre 2 classiques. Il s'agit typiquement de vecteurs de caractéristiques basés sur l'analyse de textes, dont le nombre de caractéristiques peut avoisiner les 50000.
 
-Les deux derniers jeux de données sont constitués de données réelles, de dimension plus faible, et avec un nombre d'exemplaires également plus faible. Nous comparons dans ce cas différents algorithmes en plongeant les données dans des espaces de fonctions noyaux.  
 
-Le quatrième jeu de données, nommé Pendigits, est un jeu de données réel créé pa E. Alpaydin and F. Alimoglu \cite{alimoglu1996combining}. 
-Il contient 7494 instances, avec 16 caractéristiques par instance et 10 classes. 
 
-Le cinquième jeu de données appelé `Segment' \cite{Lichman:2013} contient 2310 instances, chacune d'elle étant un extrait d'images naturelles basé sur des régions de 3x3 pixels, avec 19 caractéristiques et 7 classes. 
+
+%Le troisième jeu de données provient de la collection Reuters RCV1-v2 \cite{David04RCV}.
+%Le jeu original est constitué d'instances multi-label. Afin d'obtenir un label par instance, nous effectuons le prétraitement proposé par . Le jeu obtenu est constitué de 53-classes, la dimension des vecteurs est 47236 et le nombre d'instances est $10^5$. 
+
+%Les deux derniers jeux de données sont constitués de données réelles, de dimension plus faible, et avec un nombre d'exemplaires également plus faible. Nous comparons dans ce cas différents algorithmes en plongeant les données dans des espaces de fonctions noyaux.  
+
+The two last datasets are real-world datasets, having a smaller number of instances and a smaller dimension, allowing to test the algorithms performance and sparsity in Kernel embedding case.   
+The fourth dataset, named "Pendigit", was created by \cite{alimoglu1996combining}. It owns 7494 instances, with 16 features per instance and 10 classes. 
+The fifth dataset, named  "Segment" \cite{Lichman:2013}, owns 2310 instances. Each feature vector is build from 3x3 pixels excerpts from natural images, with 19 features per instance and 7 classes. 
 
 
 %The fourth and fifth data sets are collected from \cite{letter26SC,number10SC}. The fourth data set is to identify each of a large number of black-and-white rectangular pixel displays as one of the 26 capital letters in the English alphabet. The character images were based on 20 different fonts and each letter within these 20 fonts was randomly distorted to produce a file of 20000 unique stimuli. Each stimuli was converted into 16 primitive numerical attributes (statistical moments and edge counts). It forms a 26-class, 16-dimensional real data set of size $20000$. The fifth data set is a digit data base made by collecting 250 samples from 44 writers, using only (x,y) coordinate information represented as constant length feature vectors, which were resampled to 8 points per digit (therefore the data set contains 8 points $\times$ 2 coordinates = 16 features). This one is a 10-class, 16-dimensional real data set of size $10992$.
+
+\subsection{Algorithms}
+
+
+
+Tous les algorithmes comparés sont des algorithmes d'apprentissage en ligne. Le classifieur est donc mis à jour après chaque essai et évolue continuellement au cours de la session d'apprentissage. Chaque exemplaire n'est présenté qu'une seule fois. L'apprentissage du classifieur démarre dès la présentation du premier exemplaire et s'achève après la présentation du dernier exemplaire. Pour chaque exemplaire présenté, on mesure la réussite sous forme d'erreur $\mathbf{1}_{\hat{y}_t\neq y_t}$ ou de perte $l_t$. 
+
+Les algorithmes du Perceptron et Passif-Agressif sont des algorithmes \emph{supervisés}. Ils disposent donc d'une information de classification plus riche que les algorithmes Banditron, Confidit et Bandit Passif-Agressif qui ne disposent que d'une information de type bandit (autrement dit binaire).
+
 
 Les paramètres utilisés dans les différentes simulations sont donnés dans la table 2. Ces paramètres ont été choisis par validation croisée sur le taux de classification final, afin de comparer de manière fiable les différentes méthodes utilisées. 
 
 
 \begin{table}[h]
-	\caption{Paramètres utilisés pour les différents jeux de données. Pour les en-têtes de colonne, P. désigne le Perceptron, PA désigne le Passif Agressif, B désigne le Banditron, C désigne le Confidit, BPA est le Bandit Passif Agressif, KB est le Kernel Banditron, KBPA est le Kernel BPA et KSGD est le gradient stochastique à noyaux. Pour les en-têtes de lignes, SS désigne SynSep, SN SynNonSep, R Reuters, P Pendigits et S Segment.}
+	\caption{Free parameters setting for different algorithms. Pour les en-têtes de colonne, P. désigne le Perceptron, PA désigne le Passif Agressif, B désigne le Banditron, C désigne le Confidit, BPA est le Bandit Passif Agressif, KB est le Kernel Banditron, KBPA est le Kernel BPA et KSGD est le gradient stochastique à noyaux. Pour les en-têtes de lignes, SS désigne SynSep, SN SynNonSep, R Reuters, P Pendigits et S Segment.}
 	\label{table:bpa}
-	\vspace{.3cm}
-	\begin{small}
+
 		
 		%\begin{center}
 		
@@ -663,7 +676,8 @@ Les paramètres utilisés dans les différentes simulations sont donnés dans la
 		%			%LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\
 		%			
 		%		\end{tabular}
-		\hspace{-.8cm}
+		%\hspace{-.8cm}
+		\begin{center}
 		\begin{tabular}{llllll}
 			
 			\hline
@@ -688,16 +702,13 @@ Les paramètres utilisés dans les différentes simulations sont donnés dans la
 			%LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\
 			
 		\end{tabular}
-		%\end{center}
-	\end{small}
+
+	\end{center}
 \end{table}
 
 
-\section{Experiments}
 
-Tous les algorithmes comparés sont des algorithmes d'apprentissage en ligne. Le classifieur est donc mis à jour après chaque essai et évolue continuellement au cours de la session d'apprentissage. Chaque exemplaire n'est présenté qu'une seule fois. L'apprentissage du classifieur démarre dès la présentation du premier exemplaire et s'achève après la présentation du dernier exemplaire. Pour chaque exemplaire présenté, on mesure la réussite sous forme d'erreur $\mathbf{1}_{\hat{y}_t\neq y_t}$ ou de perte $l_t$. 
-
-Les algorithmes du Perceptron et Passif-Agressif sont des algorithmes \emph{supervisés}. Ils disposent donc d'une information de classification plus riche que les algorithmes Banditron, Confidit et Bandit Passif-Agressif qui ne disposent que d'une information de type bandit (autrement dit binaire).
+\subsection{Metrics}
 
 Les mesures utilisées pour comparer les algorithmes sont le taux d'erreur cumulé et le taux d'erreur moyen. Le taux d'erreur cumulé se définit à chaque essai $t$ comme le nombre d'erreurs jusqu'à $t$, soit:
 $$M_t = \sum_{t'=1}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}} $$
@@ -705,6 +716,8 @@ Le taux d'erreur moyen, calculé par fenêtre de 100 essais, permet d'estimer pl
 $$\forall t>99, \bar{m}_t = \frac{1}{100} \sum_{t'=t - 99}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}}$$
 
 Dans le cas du Banditron et du Bandit Passif-Agressif qui utilisent une politique d'exploration $\varepsilon$-glouton, le choix effectif $\tilde{y}_t$ diffère de $\hat{y}_t$ dans une proportion égale à $\varepsilon$. Une erreur résiduelle subsiste donc nécessairement, même lorsque le classifieur sépare correctement les données. Pour l'évaluation, nous considérons l'erreur de classification et non l'erreur effective, autrement dit nous négligeons l'erreur d'exploration des algorithmes de Banditron et de Bandit Passif Agressif, afin de comparer de manière équitable les caractéristiques des classifieurs calculés par les différents algorithmes.
+
+\subsection{Results}
 
 \begin{figure}[htp]
 	\centerline{\bf (a)}
