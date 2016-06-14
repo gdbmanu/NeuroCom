@@ -495,7 +495,7 @@ Then, following \cite{kivinen2004online}, a strict control on the number of supp
 
 %\paragraph{}
 \begin{algorithm}[t!]
-	\caption{H-horizon gradient descent}
+	\caption{H-horizon gradient descent}\label{algo:HGD}
 	\begin{algorithmic}
 		
 		\STATE Parameters:  $\varepsilon$, $\eta$, $\lambda$, $H$
@@ -585,10 +585,10 @@ The total number of reference vectors is incremented each time a non-zero loss i
 \label{subsec:BPAE}
 
 %Nous évaluons ici notre algorithme à l'aide de deux jeux de données synthétiques et trois jeu de données réels dont les caractéristiques sont fournies dans la table Table~\ref{table:mce}.
-Different algorithms are evaluated on two synthetic datasets and three real-world datasets, in order to test different aspects of the multiclass  setting. Their principal characteristics are provided in table ~\ref{table:mce}.
+In order to test different aspects of the multiclass setting, the algorithms are evaluated on two synthetic datasets and three real-world datasets.  Their principal characteristics are provided in table ~\ref{table:mce}.
 
 \begin{table}[h]
-	\caption{Five datasets features, with $n$ the number of instances, $d$ the dimension of vectors and $K$ the number of labels.}
+	\caption{Five datasets considered, with $n$ the number of instances, $d$ the vectors dimension and $K$ the number of labels.}
 	\label{table:mce}
 	\begin{center}
 		\begin{tabular}{l l l l}
@@ -609,9 +609,9 @@ Different algorithms are evaluated on two synthetic datasets and three real-worl
 
 %\paragraph{Jeux de données}
 
-The two first datasets mimick text documents vector encoding, with a small-vocabulary of dimension 400. $10^5$ instances, belonging to 9 different classes, are generated. The detailed construction of the two datasets is given in \cite{kakade2008efficient}. In the first dataset, called  "SynSep", the different classes are linearly separable. In the second dataset, called "SynNonSep", a 5\% label noise is introduced, rendering the dataset non separable.  
+The two first datasets mimick text documents vector encoding, with a small 400-dimensional vocabulary. $10^5$ instances, belonging to 9 different classes, are generated. The detailed construction of the two datasets is given in \cite{kakade2008efficient}. In the first dataset, called  \textit{SynSep}, the different classes are linearly separable. In the second dataset, called \textit{SynNonSep}, a 5\% label noise is introduced, rendering the dataset non separable.  
 
-The third dataset comes from the Reuters RCV1-v2 collection (see \cite{David04RCV}). This dataset is typical of text mining applications, containing high dimension vectors (47,236 vocabulary entries), and a large number of instances ($10^5$). Those numbers allow to test the algorithms capability to deal with real-world scaling. 
+The third dataset comes from the Reuters \textit{RCV1-v2} collection (see \cite{David04RCV}). This dataset is typical of text mining applications, containing high dimension vectors (47,236 vocabulary entries), and a large number of instances ($10^5$). Those numbers allow to test the algorithms capability to deal with real-world scaling. 
 The original dataset contains multi-label instances.  In order to fit the single label setup, we adopt the preprocessing method proposed by \cite{RB08a}, issuing a 53-class dataset.  
 
 %Les 3 premiers jeux de données testent le comportement de l'algorithme dans le cas de données de grande dimension, c'est à dire pour des données susceptibles de provoquer de l'encombrement mémoire avec les approches d'ordre 2 classiques. Il s'agit typiquement de vecteurs de caractéristiques basés sur l'analyse de textes, dont le nombre de caractéristiques peut avoisiner les 50000.
@@ -625,97 +625,113 @@ The original dataset contains multi-label instances.  In order to fit the single
 %Les deux derniers jeux de données sont constitués de données réelles, de dimension plus faible, et avec un nombre d'exemplaires également plus faible. Nous comparons dans ce cas différents algorithmes en plongeant les données dans des espaces de fonctions noyaux.  
 
 The two last datasets are real-world datasets, having a smaller number of instances and a smaller dimension, allowing to test the algorithms performance and sparsity in Kernel embedding case.   
-The fourth dataset, named "Pendigit", was created by \cite{alimoglu1996combining}. It owns 7494 instances, with 16 features per instance and 10 classes. 
-The fifth dataset, named  "Segment" \cite{Lichman:2013}, owns 2310 instances. Each feature vector is build from 3x3 pixels excerpts from natural images, with 19 features per instance and 7 classes. 
+The fourth dataset, named \textit{Pendigit}, was created by \cite{alimoglu1996combining}. It owns 7494 instances, with 16 features per instance and 10 classes. 
+The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instances. Each feature vector is build from $3\times3$ pixels excerpts from natural images, with 19 features per instance and 7 classes. 
 
 
 %The fourth and fifth data sets are collected from \cite{letter26SC,number10SC}. The fourth data set is to identify each of a large number of black-and-white rectangular pixel displays as one of the 26 capital letters in the English alphabet. The character images were based on 20 different fonts and each letter within these 20 fonts was randomly distorted to produce a file of 20000 unique stimuli. Each stimuli was converted into 16 primitive numerical attributes (statistical moments and edge counts). It forms a 26-class, 16-dimensional real data set of size $20000$. The fifth data set is a digit data base made by collecting 250 samples from 44 writers, using only (x,y) coordinate information represented as constant length feature vectors, which were resampled to 8 points per digit (therefore the data set contains 8 points $\times$ 2 coordinates = 16 features). This one is a 10-class, 16-dimensional real data set of size $10992$.
 
 \subsection{Algorithms}
 
-
-
-Tous les algorithmes comparés sont des algorithmes d'apprentissage en ligne. Le classifieur est donc mis à jour après chaque essai et évolue continuellement au cours de la session d'apprentissage. Chaque exemplaire n'est présenté qu'une seule fois. L'apprentissage du classifieur démarre dès la présentation du premier exemplaire et s'achève après la présentation du dernier exemplaire. Pour chaque exemplaire présenté, on mesure la réussite sous forme d'erreur $\mathbf{1}_{\hat{y}_t\neq y_t}$ ou de perte $l_t$. 
-
-Les algorithmes du Perceptron et Passif-Agressif sont des algorithmes \emph{supervisés}. Ils disposent donc d'une information de classification plus riche que les algorithmes Banditron, Confidit et Bandit Passif-Agressif qui ne disposent que d'une information de type bandit (autrement dit binaire).
-
-
-Les paramètres utilisés dans les différentes simulations sont donnés dans la table 2. Ces paramètres ont été choisis par validation croisée sur le taux de classification final, afin de comparer de manière fiable les différentes méthodes utilisées. 
-
-
 \begin{table}[h]
-	\caption{Free parameters setting for different algorithms. Pour les en-têtes de colonne, P. désigne le Perceptron, PA désigne le Passif Agressif, B désigne le Banditron, C désigne le Confidit, BPA est le Bandit Passif Agressif, KB est le Kernel Banditron, KBPA est le Kernel BPA et KSGD est le gradient stochastique à noyaux. Pour les en-têtes de lignes, SS désigne SynSep, SN SynNonSep, R Reuters, P Pendigits et S Segment.}
+	\caption{Parameters setting for different algorithms and different datasets.  {\bf P} stands for Perceptron, {\bf PA} for Passive Agressive, {\bf B} for Banditron, {\bf C} for Confidit, {\bf KB} for the Kernel Banditron, {\bf K-Algo1} and {\bf K-Algo2} for the Kernel  realization of algorithms 1 and 2.}
 	\label{table:bpa}
-
-		
-		%\begin{center}
-		
-		%		\begin{tabular}{llllll}
-		%			
-		%			\hline
-		%			{\bf }  & {\bf P} & {\bf PA } & {\bf B}& {\bf C} & {\bf BPA}\\
-		%			\hline
-		%			SS & $\varnothing$ & $C=0$ & $\varepsilon = 0.014$ &$\eta = 10^3$ & $\varepsilon = 0.4$\\
-		%			&&&&& $C = \infty$\\
-		%			
-		%			SN & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.65$ & $\eta = 10^3$& $\varepsilon = 0.8$\\
-		%			&&&&& $C = 10^{-2}$\\			
-		%			R & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.4$ & $\eta = 10^2$ & $\varepsilon = 0.2$\\
-		%			&&&&& $C = 10^{-2}$\\
-		%			\hline
-		%			&{\bf KB} & {\bf BPA} & {\bf KBPA} &{\bf KSGD}\\
-		%			\hline
-		%			P & $\sigma = 1$ & $C = 10^{-2}$ &$\sigma = 1$&$\sigma = 1$\\
-		%			&&$\varepsilon = 0.2$& $C = 1$ & $H = 500$\\
-		%			&&& $\varepsilon = 0.2$ &\\
-		%			S & $\sigma = 10$ & $C = 10^{-2}$ & $\sigma = 10$&$\sigma = 10$\\
-		%			&&$\varepsilon = 0.2$& $C = 1$& $H = 200$\\
-		%			&&& $\varepsilon = 0.2$ &
-		%			%LR(26 letters) & null &  $C=0.1$ & $\varepsilon = 0.2$& $\eta=10^2$ & $\varepsilon = 0.8,C= 1$ \\
-		%			
-		%			%LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\
-		%			
-		%		\end{tabular}
-		%\hspace{-.8cm}
-		\begin{center}
+	%\begin{center}
+	
+	%		\begin{tabular}{llllll}
+	%			
+	%			\hline
+	%			{\bf }  & {\bf P} & {\bf PA } & {\bf B}& {\bf C} & {\bf BPA}\\
+	%			\hline
+	%			SS & $\varnothing$ & $C=0$ & $\varepsilon = 0.014$ &$\eta = 10^3$ & $\varepsilon = 0.4$\\
+	%			&&&&& $C = \infty$\\
+	%			
+	%			SN & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.65$ & $\eta = 10^3$& $\varepsilon = 0.8$\\
+	%			&&&&& $C = 10^{-2}$\\			
+	%			R & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.4$ & $\eta = 10^2$ & $\varepsilon = 0.2$\\
+	%			&&&&& $C = 10^{-2}$\\
+	%			\hline
+	%			&{\bf KB} & {\bf BPA} & {\bf KBPA} &{\bf KSGD}\\
+	%			\hline
+	%			P & $\sigma = 1$ & $C = 10^{-2}$ &$\sigma = 1$&$\sigma = 1$\\
+	%			&&$\varepsilon = 0.2$& $C = 1$ & $H = 500$\\
+	%			&&& $\varepsilon = 0.2$ &\\
+	%			S & $\sigma = 10$ & $C = 10^{-2}$ & $\sigma = 10$&$\sigma = 10$\\
+	%			&&$\varepsilon = 0.2$& $C = 1$& $H = 200$\\
+	%			&&& $\varepsilon = 0.2$ &
+	%			%LR(26 letters) & null &  $C=0.1$ & $\varepsilon = 0.2$& $\eta=10^2$ & $\varepsilon = 0.8,C= 1$ \\
+	%			
+	%			%LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\
+	%			
+	%		\end{tabular}
+	%\hspace{-.8cm}
+	\begin{center}
 		\begin{tabular}{llllll}
 			
 			\hline
-			{\bf }  & {\bf P} & {\bf PA } & {\bf B}& {\bf C} & {\bf BPA}\\
+			{\bf Dataset}  & {\bf P} & {\bf PA } & {\bf B}& {\bf C} & {\bf Algo1}\\
 			\hline
-			SS & $\varnothing$ & $C=\infty$ & $\varepsilon = 0.014$ &$\eta = 10^3$ & $\varepsilon = 0.4$\\
-			&&&&& $C = \infty$\\
+			Synsep & $\varnothing$ & $C\rightarrow\infty$ & $\varepsilon = 0.014$ &$\eta = 10^3$ & $\varepsilon = 0.4$\\
+			&&&&& $C \rightarrow \infty$\\
 			
-			SN & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.65$ & $\eta = 10^3$& $\varepsilon = 0.8$\\
+			SynNonSep & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.65$ & $\eta = 10^3$& $\varepsilon = 0.8$\\
 			&&&&& $C = 10^{-2}$\\			
-			R & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.4$ & $\eta = 10^2$ & $\varepsilon = 0.2$\\
+			RCV1-v2 & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.4$ & $\eta = 10^2$ & $\varepsilon = 0.2$\\
 			&&&&& $C = 10^{-2}$\\
 			\hline
-			&{\bf KB} & {\bf BPA} & {\bf KBPA} &{\bf KSGD}\\
+			&{\bf KB} & {\bf Algo1} & {\bf K-Algo1} &{\bf K-Algo2}\\
 			\hline
-			P & $\sigma = 10$ & $\varepsilon = 0.3$ &$\sigma = 10$&$\sigma = 10$\\
-			&$\varepsilon =0.1$&& $\varepsilon = 0.3$ & $H = 500$\\
-			S & $\sigma = 1$ & $\varepsilon = 0.3$ & $\sigma = 1$&$\sigma = 1$\\
-			&$\varepsilon =0.1$&&$\varepsilon = 0.3$ & $H = 200$\\
+			Pendigit & $\sigma = 10$ & $\varepsilon = 0.3$ &$\varepsilon = 0.3$&$\sigma = 10$\\
+			&$\varepsilon =0.1$&& $\sigma = 10$ & $H = 500$\\
+			Segment & $\sigma = 1$ & $\varepsilon = 0.3$ & $\varepsilon = 0.3$ &$\sigma = 1$\\
+			&$\varepsilon =0.1$&&$\sigma = 1$ & $H = 200$\\
 			%LR(26 letters) & null &  $C=0.1$ & $\varepsilon = 0.2$& $\eta=10^2$ & $\varepsilon = 0.8,C= 1$ \\
 			
-			%LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\
-			
-		\end{tabular}
-
+			%LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\	
+		\end{tabular}	
 	\end{center}
 \end{table}
+
+
+Only the online learning setup is here considered. For a given dataset, each instance is only presented once. The classifier update starts right after the first instance presentation, and finishes at the last one. For each instance, a single response is carried out, and a single corresponding feedback is obtained.
+
+For comparison, both full-feedback and 1-bit feedback learning setups are tested:
+\begin{itemize}
+	\item The multiclass perceptron (see \cite{duda1973pattern}) and the multiclass passive-aggressive setup (see  \cite{crammer2006online}) have a full feedback at disposal.
+	\item The Banditron (\cite{kakade2008efficient}), Confidit (\cite{crammer2013multiclass}), and our Algorithms \ref{algo:quad} and  \ref{algo:HGD} only have a 1-bit feedback at disposal.
+\end{itemize} 
+
+In order to faithfully compare the methods, all parameters are obtained by cross-validation on the final classification rate. The resulting parameters used in simulation are given in table \ref{table:bpa}. 
+
+%Tous les algorithmes comparés sont des algorithmes d'apprentissage en ligne. Le classifieur est donc mis à jour après chaque essai et évolue continuellement au cours de la session d'apprentissage. Chaque exemplaire n'est présenté qu'une seule fois. L'apprentissage du classifieur démarre dès la présentation du premier exemplaire et s'achève après la présentation du dernier exemplaire. Pour chaque exemplaire présenté, on mesure la réussite sous forme d'erreur $\mathbf{1}_{\hat{y}_t\neq y_t}$ ou de perte $l_t$. 
+
+
+
+%Les paramètres utilisés dans les différentes simulations sont donnés dans la table 2. Ces paramètres ont été choisis par validation croisée sur le taux de classification final, afin de comparer de manière fiable les différentes méthodes utilisées. 
+
+
 
 
 
 \subsection{Metrics}
 
-Les mesures utilisées pour comparer les algorithmes sont le taux d'erreur cumulé et le taux d'erreur moyen. Le taux d'erreur cumulé se définit à chaque essai $t$ comme le nombre d'erreurs jusqu'à $t$, soit:
-$$M_t = \sum_{t'=1}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}} $$
-Le taux d'erreur moyen, calculé par fenêtre de 100 essais, permet d'estimer plus précisément l'évolution des performances des algorithmes au cours de l'apprentissage:
-$$\forall t>99, \bar{m}_t = \frac{1}{100} \sum_{t'=t - 99}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}}$$
+%Les mesures utilisées pour comparer les algorithmes sont le taux d'erreur cumulé et le taux d'erreur moyen. 
 
-Dans le cas du Banditron et du Bandit Passif-Agressif qui utilisent une politique d'exploration $\varepsilon$-glouton, le choix effectif $\tilde{y}_t$ diffère de $\hat{y}_t$ dans une proportion égale à $\varepsilon$. Une erreur résiduelle subsiste donc nécessairement, même lorsque le classifieur sépare correctement les données. Pour l'évaluation, nous considérons l'erreur de classification et non l'erreur effective, autrement dit nous négligeons l'erreur d'exploration des algorithmes de Banditron et de Bandit Passif Agressif, afin de comparer de manière équitable les caractéristiques des classifieurs calculés par les différents algorithmes.
+The metrics used to compare the different algorithms are the cumulative error rate and the average error rate. 
+\begin{itemize}
+\item The cumulative error rate is defined at each round $t$ as the sum of errors until $t$, i.e.:
+$$M_t = \sum_{t'=1}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}} $$
+\item The average error rate, carried out over 100-round sliding windows, allows for a more refined estimate of the continuing improvement over learning sessions, i.e.:
+$$\forall t>99, \bar{m}_t = \frac{1}{100} \sum_{t'=t - 99}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}}$$
+\end{itemize}
+
+\paragraph{Remark} Both Banditron and Algorithm \ref{algo:quad} use an $\varepsilon$-greedy exploration policy, that has a direct effect on the  classification rate, for the actual response  $\tilde{y}_t$ is differents from $\hat{y}_t$ (in a proportion equal to $\varepsilon$). A residual exploration error thus necessarily exists, whatever effective the classifier $W$ at separating the data. In order to properly compare algorithms, we need to evenly evaluate improvement at different $\varepsilon$, i.e. only use the internal noise-free estimate $\hat{y}_t$ for algorithm evaluation.
+
+%Dans le cas du Banditron et du Bandit Passif-Agressif qui utilisent une politique d'exploration $\varepsilon$-glouton, le choix effectif $\tilde{y}_t$ diffère de $\hat{y}_t$ dans une proportion égale à $\varepsilon$. Une erreur résiduelle subsiste donc nécessairement, même lorsque le classifieur sépare correctement les données. Pour l'évaluation, nous considérons l'erreur de classification et non l'erreur effective, autrement dit nous négligeons l'erreur d'exploration des algorithmes de Banditron et de Bandit Passif Agressif, afin de comparer de manière équitable les caractéristiques des classifieurs calculés par les différents algorithmes.
+
+
+Dans le cas de l'apprentissage en ligne, le nombre d'exemplaires supports des classifieurs croît au cours de l'apprentissage, ce qui tend faire croître le temps de calcul. Nous mesurons ainsi croissance du taux temps de calcul au cours de l'apprentissage pour les différents algorithmes considérés. Soit $c_t$ le temps de calcul à l'instant $t$.  Le temps de calcul moyen est calculé comme~: 
+$$\forall t>99, \bar{c}_t = \frac{1}{100} \sum_{t'=t - 99}^t c_{t^\prime}$$
 
 \subsection{Results}
 
@@ -803,8 +819,7 @@ Les paramètres sont donnés dans la table 2.
 	\label{pic:SKT}
 \end{figure}
 
-Dans le cas de l'apprentissage en ligne, le nombre d'exemplaires supports des classifieurs croît au cours de l'apprentissage, ce qui tend faire croître le temps de calcul. Nous mesurons ainsi croissance du taux temps de calcul au cours de l'apprentissage pour les différents algorithmes considérés. Soit $c_t$ le temps de calcul à l'instant $t$.  Le temps de calcul moyen est calculé comme~: 
-$$\forall t>99, \bar{c}_t = \frac{1}{100} \sum_{t'=t - 99}^t c_{t^\prime}$$
+
 
 Les Figures~\ref{pic:PKT} et \ref{pic:SKT} présentent l'évolution du temps de calcul pour les différents algorithmes considérés sur les bases Pendigit  et Segment.  Le BPA linéaire présente comme attendu un temps de calcul indépendant du temps. On constate ensuite des temps de calcul croissants pour les trois algorithmes à noyaux. La croissance la plus forte (corissance linéaire) est observée comme attendu dans le cas du Banditron qui ajoute un exemplaire à la base des vecteurs supports à chaque nouvel essai. L'algorithme BPA présente une croissance moins marquée du nombre de vecteurs supports, du fait de la fonction de coût de type ``hinge loss'' qui permet d'ignorer les exemplaires ne produisant pas de perte.  on constate en particulier sur la base Segment une tendance à la stabilisation du temps de calcul. Enfin l'algorithme KSGD indique un temps de calcul de croissance significativement plus faible, du fait du principe de troncature utilisé. Dans le cas de la base Segments, les performances des deux algorithmes s'avèrent néanmoins très proches, indiquant la bonne parcimonie de l'algorithme BPA.
 
