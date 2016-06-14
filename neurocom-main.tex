@@ -491,7 +491,7 @@ where $\sigma_t$ is the number of updates at time $t$, i.e.
 $$\sigma_t = \sum_{t^\prime=1}^t \mathbf{1}_{l_{t^\prime} > 0}$$  
 and the cardinality of the non-zero coefficients correspond to the number of observation vectors effectively stored in memory.
 
-Then, following \cite{kivinen2004online}, a strict control on the number of support  vectors may be imposed, though "old" coefficients exponentially vanish while new updates take place. A $H$-"horizon" truncation principle may be adopted, with every $\alpha_{t^\prime}$ such that $\sigma_t - \sigma_{t^\prime} > H$ set to 0. The truncation error can then be shown to  exponentially decrease with $H$ (see \cite{kivinen2004online}). This approach is of course well-adapted to the non-stationary case, where context-related categories change over time.
+Then, following \cite{kivinen2004online}, a strict control on the number of prototype vectors may be imposed, though "old" coefficients exponentially vanish while new updates take place. A $H$-"horizon" truncation principle may be adopted, with every $\alpha_{t^\prime}$ such that $\sigma_t - \sigma_{t^\prime} > H$ set to 0. The truncation error can then be shown to  exponentially decrease with $H$ (see \cite{kivinen2004online}). This approach is of course well-adapted to the non-stationary case, where context-related categories change over time.
 
 %\paragraph{}
 \begin{algorithm}[t!]
@@ -564,12 +564,12 @@ $$W_t = \sum_{t^\prime = 1} ^t \alpha_{t^\prime} X_{t^\prime}^{\tilde{y}_{t^\pri
 $$
 % \mathcal{K}(x_{t^\prime},.)$$
 so that, taking definition (\ref{eq:X-kernel}), and setting $\forall k, \mathcal{T}_{k,t} = \{{t^{\prime}} \leq t: \tilde{y}_{t^{\prime}} = k \text{ and } l_{t^{\prime}} > 0\}$, each 
-separatrix $w_{k,t}$ is now defined by a set of reference vectors 
+separatrix $w_{k,t}$ is now defined by a set of prototypes 
 $\{x_{t^{\prime}}\}_{{t^{\prime}}\in \mathcal{T}_{k,t}}$ 
 so that 
 	$$w_{k,t} = \sum_{t^{\prime}\in \mathcal{T}_{k,t}} \alpha_{t^{\prime}} \mathcal{K}(x_{t^{\prime}},.)$$
 
-The total number of reference vectors is incremented each time a non-zero loss is carried out. From theorem \ref{theo:BPAT1}, we know this number is bounded since any dataset is separable in the redescription space. 
+The total number of prototypes is incremented each time a non-zero loss is carried out. From theorem \ref{theo:BPAT1}, we know this number is bounded since every dataset is separable in infinite-dimensional redescription spaces. 
 
   
 %Le nombre de vecteurs supports augmente de 1 chaque fois que la perte est non nulle. De par le théorème 1, nous savons que ce nombre est borné dès lors que les données sont séparables dans l'espace de redescription. 
@@ -624,7 +624,7 @@ The original dataset contains multi-label instances.  In order to fit the single
 
 %Les deux derniers jeux de données sont constitués de données réelles, de dimension plus faible, et avec un nombre d'exemplaires également plus faible. Nous comparons dans ce cas différents algorithmes en plongeant les données dans des espaces de fonctions noyaux.  
 
-The two last datasets are real-world datasets, having a smaller number of instances and a smaller dimension, allowing to test the algorithms performance and sparsity in Kernel embedding case.   
+The two last datasets are real-world datasets, having a smaller number of instances and a smaller dimension, allowing to test the algorithms performance and sparsity in the Kernel embedding case.   
 The fourth dataset, named \textit{Pendigit}, was created by \cite{alimoglu1996combining}. It owns 7494 instances, with 16 features per instance and 10 classes. 
 The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instances. Each feature vector is build from $3\times3$ pixels excerpts from natural images, with 19 features per instance and 7 classes. 
 
@@ -701,7 +701,7 @@ For comparison, both full-feedback and 1-bit feedback learning setups are tested
 	\item The Banditron (\cite{kakade2008efficient}), Confidit (\cite{crammer2013multiclass}), and our Algorithms \ref{algo:quad} and  \ref{algo:HGD} only have a 1-bit feedback at disposal.
 \end{itemize} 
 
-In order to faithfully compare the methods, all parameters are obtained by cross-validation on the final classification rate. The resulting parameters used in simulation are given in table \ref{table:bpa}. 
+In order to faithfully compare the methods, all parameters are obtained by cross-validation on the final classification rate. The resulting parameters, as they are used in simulations, are given in table \ref{table:bpa}. 
 
 %Tous les algorithmes comparés sont des algorithmes d'apprentissage en ligne. Le classifieur est donc mis à jour après chaque essai et évolue continuellement au cours de la session d'apprentissage. Chaque exemplaire n'est présenté qu'une seule fois. L'apprentissage du classifieur démarre dès la présentation du premier exemplaire et s'achève après la présentation du dernier exemplaire. Pour chaque exemplaire présenté, on mesure la réussite sous forme d'erreur $\mathbf{1}_{\hat{y}_t\neq y_t}$ ou de perte $l_t$. 
 
@@ -709,7 +709,11 @@ In order to faithfully compare the methods, all parameters are obtained by cross
 
 %Les paramètres utilisés dans les différentes simulations sont donnés dans la table 2. Ces paramètres ont été choisis par validation croisée sur le taux de classification final, afin de comparer de manière fiable les différentes méthodes utilisées. 
 
+{\color{blue} Dans le cas de jeux de données de petite dimension, nous comparons le comportement des algorithmes dans le cas du plongement des données dans des espaces de fonctions noyaux. Nous notons ainsi KBanditron le Banditron à noyaux, KBPA le Bandit Passif Agressif à noyaux et KSGD l'approche basée sur la descente de gradient régularisée présenté dans la partie 2.3. Le paramètre de raideur est ici $C = \infty$, autrement dit nous considérons les données linéairement séparables dans l'espace de redescription. Nous ne présentons pas ici l'algorithme Confidit pour lequel la généralisation aux espaces de fonctions noyaux est moins directe. 
 
+La fonction noyau utilisée dans ce cadre est la fonction de Laplace, soit~:
+\[K(x,y) = \exp{\left(-\frac{\parallel{x-y}\parallel}{\sigma}\right)}\]
+Les paramètres sont donnés dans la table 2. }
 
 
 
@@ -725,13 +729,12 @@ $$M_t = \sum_{t'=1}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}} $$
 $$\forall t>99, \bar{m}_t = \frac{1}{100} \sum_{t'=t - 99}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}}$$
 \end{itemize}
 
-\paragraph{Remark} Both Banditron and Algorithm \ref{algo:quad} use an $\varepsilon$-greedy exploration policy, that has a direct effect on the  classification rate, for the actual response  $\tilde{y}_t$ is differents from $\hat{y}_t$ (in a proportion equal to $\varepsilon$). A residual exploration error thus necessarily exists, whatever effective the classifier $W$ at separating the data. In order to properly compare algorithms, we need to evenly evaluate improvement at different $\varepsilon$, i.e. only use the internal noise-free estimate $\hat{y}_t$ for algorithm evaluation.
+\paragraph{Remark} Both the Banditron and our bandit extension to the OVA Passive-Aggressive setup (Algorithm \ref{algo:quad}) use an $\varepsilon$-greedy exploration policy, that has direct effect on the  classification rate, for the actual response  $\tilde{y}_t$ is differents from $\hat{y}_t$ (in a proportion equal to $\varepsilon$). A residual exploration error thus necessarily exists, whatever effective the classifier $W$ is at separating the data. In order to properly compare algorithms, we need to evenly evaluate improvement whatever the value of $\varepsilon$, i.e. only use the internal noise-free estimate $\hat{y}_t$ for proper algorithm evaluation.
 
 %Dans le cas du Banditron et du Bandit Passif-Agressif qui utilisent une politique d'exploration $\varepsilon$-glouton, le choix effectif $\tilde{y}_t$ diffère de $\hat{y}_t$ dans une proportion égale à $\varepsilon$. Une erreur résiduelle subsiste donc nécessairement, même lorsque le classifieur sépare correctement les données. Pour l'évaluation, nous considérons l'erreur de classification et non l'erreur effective, autrement dit nous négligeons l'erreur d'exploration des algorithmes de Banditron et de Bandit Passif Agressif, afin de comparer de manière équitable les caractéristiques des classifieurs calculés par les différents algorithmes.
 
-
-Dans le cas de l'apprentissage en ligne, le nombre d'exemplaires supports des classifieurs croît au cours de l'apprentissage, ce qui tend faire croître le temps de calcul. Nous mesurons ainsi croissance du taux temps de calcul au cours de l'apprentissage pour les différents algorithmes considérés. Soit $c_t$ le temps de calcul à l'instant $t$.  Le temps de calcul moyen est calculé comme~: 
-$$\forall t>99, \bar{c}_t = \frac{1}{100} \sum_{t'=t - 99}^t c_{t^\prime}$$
+Under the kernel approach, the number of prototype vectors is expected to grow up across the learning session, making the response delay grow in proportion. The actual calculation time $c_t$ is measured at each round during learning sessions, and an average over 100 ms sliding windows is calculated as follows:
+ $$\forall t>99, \bar{c}_t = \frac{1}{100} \sum_{t'=t - 99}^t c_{t^\prime}$$
 
 \subsection{Results}
 
@@ -800,11 +803,7 @@ Dans le cas de SynNonSep, le taux de croissance de l'erreur cumulée est linéai
 Enfin, la base Reuters, qui présente le cas de figure le plus réaliste, permet de mettre en évidence les bonnes performances de l'approche BPA. Dans tous les cas, les taux d'erreurs cumulés sont croissants mais la croissance est sous linéaire, indiquant une bon comportement d'apprentissage pour tous les algorithmes. Les deux algorithmes supervisés présentent des performances comparables, avec un taux d'erreurs cumulées légèrement plus faible  que confidit et BPA, et des pentes finales à peu près comparables. Le résultat le plus saisissant ici est de constater les performances des algorithmes BPA et Confidit, très proches de celles des algorithmes supervisés malgré le nombre de classes élevé (53). Le taux d'erreurs cumulées se révèle par ailleurs un peu plus favorable pour BPA que pour Confidit, ce qui est également notable étant donnée la moindre complexité algorithmique de l'algorithme BPA \footnote{L'algorithme Confidit nécessite en effet une estimation de la covariance des échantillons, cette matrice de covariance étant réduite en haute dimension à une simple diagonale.}. Seul l'algorithme du Banditron semble encore une fois présenter une performance d'apprentissage significativement plus faible. 
 
 
-Dans le cas de jeux de données de petite dimension, nous comparons le comportement des algorithmes dans le cas du plongement des données dans des espaces de fonctions noyaux. Nous notons ainsi KBanditron le Banditron à noyaux, KBPA le Bandit Passif Agressif à noyaux et KSGD l'approche basée sur la descente de gradient régularisée présenté dans la partie 2.3. Le paramètre de raideur est ici $C = \infty$, autrement dit nous considérons les données linéairement séparables dans l'espace de redescription. Nous ne présentons pas ici l'algorithme Confidit pour lequel la généralisation aux espaces de fonctions noyaux est moins directe. 
 
-La fonction noyau utilisée dans ce cadre est la fonction de Laplace, soit~:
-\[K(x,y) = \exp{\left(-\frac{\parallel{x-y}\parallel}{\sigma}\right)}\]
-Les paramètres sont donnés dans la table 2. 
 
 \begin{figure}[t!]
 	\includegraphics[width=\linewidth]{figs/Pendigits_kernel_T.png}
