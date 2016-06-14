@@ -149,7 +149,7 @@ Multiclass classification requires  finding an appropriate class $y \in \{1,... 
 The \textit{decision function} (or policy) $\tilde{y}_t \sim h(x_t)$ embodies both prior information about the regularity of the universe and experience-based information. A reasonable assumption  is to consider that  close-by contexts should provide close-by rewards distributions. 
 The linear approach to classification means to separate the input space in regions, where the different regions are defined by a set of linear mappings. We consider in that case a  classifier 
 \begin{equation}\label{eq:W}
-W = (w_1,..,w_k) \in \mathbb{R}^{K \times d}
+W = (w_1,..,w_k) \in \mathbb{R}^{K d}
 \end{equation} so that, for every categorical response $k$, a \emph{similarity score} $\langle w_k, x_t\rangle$ is carried out. 
 %defined as a set of $K$ linear mappings. 
 The linear assumption allows ($i$) to 
@@ -180,9 +180,9 @@ Given an initial set of $K$ null-vector hyperplanes $W_0 = (\vec{0}, ..., \vec{0
 \begin{equation} \label{eq:banditron-update}
 W_t = W_{t-1} + \frac{\delta(\tilde{y}_t ,y_t) X_t^{\tilde{y}_t}}{P(\tilde{Y}=\tilde{y}_t)} - X_t^{\hat{y}_t}
 \end{equation}   
-with the convention 
+with the convention:
 \begin{align}\label{eq:X}
-X^k = (\vec{0}, ..., & x, ..., \vec{0}) \in \mathbb{R}^{K \times d}\\
+X^k \triangleq (\vec{0}, ..., & x, ..., \vec{0}) \in \mathbb{R}^{K d}\\
 &\mid\nonumber\\
 &k\nonumber
 \end{align}
@@ -371,7 +371,7 @@ Under this focused examination, it is worth considering an alternate classifier 
 \begin{theorem}
 	\label{theo:BPAT1}
 	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of separable examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t\parallel\leqslant R$ for all t, let $\tilde{y}_1,...,\tilde{y}_T$ be a sequence of responses, with $\tilde{y}_t\in \{1,...,K\}$, 
-	and let $U \in \mathbb{R}^{K\times d}$ be such that $ \forall t, l^*_t=0$. Then, assuming $C \rightarrow \infty$, the cumulative squared loss of algorithm \ref{algo:quad} is bounded by:
+	and let $U \in \mathbb{R}^{K d}$ be such that $ \forall t, l^*_t=0$. Then, assuming $C \rightarrow \infty$, the cumulative squared loss of algorithm \ref{algo:quad} is bounded by:
 	\begin{equation}
 	\sum_{t=1}^{T} l_t^2 \leqslant R^2 \parallel{U}\parallel^2
 	\end{equation}
@@ -432,7 +432,7 @@ Considering the theorem guarantees a zero loss after a fixed number of updates, 
 
 \begin{theorem}
 	\label{theo:BPAT2}
-	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, let $\tilde{y}_1,...,\tilde{y}_T$ be a sequence of responses, with $\tilde{y}_t\in \{1,...,K\}$. Then for any  $U \in \mathbb{R}^{K\times d}$, and assuming $C \rightarrow \infty$, the cumulative squared loss of algorithm \ref{algo:quad} is bounded by:
+	Let $(x_1,y_1),...,(x_T,y_T)$ be a sequence of examples where $x_t \in \mathbb{R}^d$, $y_t\in \{1,...,K\}$ and $\parallel x_t \parallel\leqslant R$ for all t, let $\tilde{y}_1,...,\tilde{y}_T$ be a sequence of responses, with $\tilde{y}_t\in \{1,...,K\}$. Then for any  $U \in \mathbb{R}^{K d}$, and assuming $C \rightarrow \infty$, the cumulative squared loss of algorithm \ref{algo:quad} is bounded by:
 	\[\sum_{t=1}^{T}l_t^2 \leqslant \left(R\parallel{U}\parallel+2 \sqrt{\sum_{t=1}^{T}(l_t^{\ast})^2}\right)^2 \]
 \end{theorem}
 
@@ -532,7 +532,9 @@ Then, following \cite{kivinen2004online}, a strict control on the number of supp
 
 
 \subsection{Kernel Extension}
-The extension of the linear discriminant setup to reproducible kernel Hilbert spaces (RKHS) allows deal with non-linearly separable learning sets at the cost of additional free parameters (specific kernel features). 
+The extension of the linear discriminant setup to 
+RKHS (Reproducible Kernel Hilbert Space) redescription space 
+allows to deal with non-linearly separable learning sets at the cost of additional free parameters (kernel specific parameters). 
 
 Let $\mathcal{K}(.,.)$ a mapping from $ \mathbb{R}^d \times \mathbb{R}^d$ to $ \mathbb{R}^+$ having the Mercer property (see \cite{scholkopf2002learning}). Let $\mathcal{K}(x,.)$ be the projection of example $x$ in $\mathcal{H}$. Then, by construction, a scalar product $\langle.,.\rangle_\mathcal{H}$ in $\mathcal{H}$ is such that: 
  $$\forall w \in \mathcal{H}, \langle w,\mathcal{K}(x,.)\rangle_\mathcal{H} = w(x) $$
@@ -576,12 +578,15 @@ The total number of reference vectors is incremented each time a non-zero loss i
 %utiliser, les macros les définitions de théorèmes etc... Nous
 %recommandons le paquet \texttt{hyperref} puisque les documents
 %\texttt{PDF} seront en ligne si vous avez donné
+\section{Experiments}
 \subsection{Databases}
 \label{subsec:BPAE}
-Nous évaluons ici notre algorithme à l'aide de deux jeux de données synthétiques et trois jeu de données réels dont les caractéristiques sont fournies dans la table Table~\ref{table:mce}.
+
+%Nous évaluons ici notre algorithme à l'aide de deux jeux de données synthétiques et trois jeu de données réels dont les caractéristiques sont fournies dans la table Table~\ref{table:mce}.
+Different algorithms are evaluated on two synthetic datasets and three real-world datasets. Their principal characteristics are provided in table ~\ref{table:mce}.
 
 \begin{table}[h]
-	\caption{Caractéristiques des cinq jeux de données}
+	\caption{Five datasets principal features}
 	\label{table:mce}
 	\begin{center}
 		\begin{tabular}{l l l l}
@@ -600,7 +605,7 @@ Nous évaluons ici notre algorithme à l'aide de deux jeux de données synthéti
 	\end{center}
 \end{table}
 
-\paragraph{Jeux de données}
+%\paragraph{Jeux de données}
 Les 3 premiers jeux de données testent le comportement de l'algorithme dans le cas de données de grande dimension, c'est à dire pour des données susceptibles de provoquer de l'encombrement mémoire avec les approches d'ordre 2 classiques. Il s'agit typiquement de vecteurs de caractéristiques basés sur l'analyse de textes, dont le nombre de caractéristiques peut avoisiner les 50000.
 
 Le premier jeu de données, nommé SynSep, est un jeu de données synthétique linéairement séparable, qui simule de façon simplifiée des données de type document.  Les différentes coordonnées représentent des termes d'un petit vocabulaire de taille $400$. Il est constitué de 9 classes. Le nombre d'exemplaire généré est $10^5$.
