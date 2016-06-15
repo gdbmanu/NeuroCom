@@ -609,9 +609,12 @@ In order to test different aspects of the multiclass setting, the algorithms are
 
 %\paragraph{Jeux de données}
 
-The two first datasets mimick text documents vector encoding, with a small 400-dimensional vocabulary. $10^5$ instances, belonging to 9 different classes, are generated. The detailed construction of the two datasets is given in \cite{kakade2008efficient}. In the first dataset, called  \textit{SynSep}, the different classes are linearly separable. In the second dataset, called \textit{SynNonSep}, a 5\% label noise is introduced, rendering the dataset non separable.  
+Under the one-bit feedback multiclass online learning setup, most numerical experiments concentrate on text-mining applications (see for instance \cite{crammer2013multiclass}), having both large dimensional sparse vector text representations, a large number of examples, and up to 30-50  labels. Such databases provide a good testbed for realistic scale constraints, with linear models generally effective to separate the data. 
+In order to both test scaling and sparsity, we both consider text mining databases and more traditional machine learning databases, having smaller memory footprint but stronger non-linear constraints.
 
-The third dataset comes from the Reuters \textit{RCV1-v2} collection (see \cite{David04RCV}). This dataset is typical of text mining applications, containing high dimension vectors (47,236 vocabulary entries), and a large number of instances ($10^5$). Those numbers allow to test the algorithms capability to deal with real-world scaling. 
+Our two first datasets mimick text documents vectors, with small 400-dimensional vocabulary. $10^5$ instances, belonging to 9 different classes, are generated. The detailed construction of those datasets is given in \cite{kakade2008efficient}. In the first one, called  \textit{SynSep}, the different classes are linearly separable. In the second one, called \textit{SynNonSep}, a 5\% label noise is introduced, rendering the dataset non separable.  
+
+The third dataset comes from the Reuters \textit{RCV1-v2} collection (see \cite{David04RCV}). This dataset is a typical  text mining setup, containing both high dimensional vectors (47,236 vocabulary entries) and a large number of instances ($10^5$). 
 The original dataset contains multi-label instances.  In order to fit the single label setup, we adopt the preprocessing method proposed by \cite{RB08a}, issuing a 53-class dataset.  
 
 %Les 3 premiers jeux de données testent le comportement de l'algorithme dans le cas de données de grande dimension, c'est à dire pour des données susceptibles de provoquer de l'encombrement mémoire avec les approches d'ordre 2 classiques. Il s'agit typiquement de vecteurs de caractéristiques basés sur l'analyse de textes, dont le nombre de caractéristiques peut avoisiner les 50000.
@@ -624,7 +627,7 @@ The original dataset contains multi-label instances.  In order to fit the single
 
 %Les deux derniers jeux de données sont constitués de données réelles, de dimension plus faible, et avec un nombre d'exemplaires également plus faible. Nous comparons dans ce cas différents algorithmes en plongeant les données dans des espaces de fonctions noyaux.  
 
-The two last datasets are real-world datasets, having a smaller number of instances and a smaller dimension, allowing to test the algorithms performance and sparsity in the Kernel embedding case.   
+The two last datasets are typical machine learning real-world datasets, having a smaller number of instances and a smaller dimension, allowing to test sparsity in the Kernel embedding case.   
 The fourth dataset, named \textit{Pendigit}, was created by \cite{alimoglu1996combining}. It owns 7494 instances, with 16 features per instance and 10 classes. 
 The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instances. Each feature vector is build from $3\times3$ pixels excerpts from natural images, with 19 features per instance and 7 classes. 
 
@@ -634,7 +637,7 @@ The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instan
 \subsection{Algorithms}
 
 \begin{table}[h]
-	\caption{Parameters setting for different algorithms and different datasets.  {\bf P} stands for Perceptron, {\bf PA} for Passive Agressive, {\bf B} for Banditron, {\bf C} for Confidit, {\bf KB} for the Kernel Banditron, {\bf K-Algo1} and {\bf K-Algo2} for the Kernel  realization of algorithms 1 and 2.}
+	\caption{Parameters setting for different algorithms and different datasets.  {\bf P} stands for Perceptron, {\bf PA} for Passive Agressive, {\bf B} for Banditron, {\bf C} for Confidit, {\bf K-B} for the Kernel Banditron, {\bf K-Algo1} and {\bf K-Algo2} for the Kernel  realization of algorithms 1 and 2.}
 	\label{table:bpa}
 	%\begin{center}
 	
@@ -679,12 +682,12 @@ The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instan
 			RCV1-v2 & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.4$ & $\eta = 10^2$ & $\varepsilon = 0.2$\\
 			&&&&& $C = 10^{-2}$\\
 			\hline
-			&{\bf KB} & {\bf Algo1} & {\bf K-Algo1} &{\bf K-Algo2}\\
+			&{\bf K-B} & {\bf Algo1} & {\bf K-Algo1} &{\bf K-Algo2}\\
 			\hline
-			Pendigit & $\sigma = 10$ & $\varepsilon = 0.3$ &$\varepsilon = 0.3$&$\sigma = 10$\\
-			&$\varepsilon =0.1$&& $\sigma = 10$ & $H = 500$\\
-			Segment & $\sigma = 1$ & $\varepsilon = 0.3$ & $\varepsilon = 0.3$ &$\sigma = 1$\\
-			&$\varepsilon =0.1$&&$\sigma = 1$ & $H = 200$\\
+			Pendigit & $\sigma = 10$ & $\varepsilon = 0.3$ &$\sigma = 10$&$\sigma = 10$\\
+			&$\varepsilon =0.1$&& $\varepsilon = 0.3$ & $H = 500$\\
+			Segment & $\sigma = 1$ & $\varepsilon = 0.3$ & $\sigma = 1$ &$\sigma = 1$\\
+			&$\varepsilon =0.1$&&$\varepsilon = 0.3$ & $H = 200$\\
 			%LR(26 letters) & null &  $C=0.1$ & $\varepsilon = 0.2$& $\eta=10^2$ & $\varepsilon = 0.8,C= 1$ \\
 			
 			%LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\	
@@ -693,7 +696,7 @@ The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instan
 \end{table}
 
 
-Only the online learning setup is here considered. For a given dataset, each instance is only presented once. The classifier update starts right after the first instance presentation, and finishes at the last one. For each instance, a single response is carried out, and a single corresponding feedback is obtained.
+Only the online learning setup is here considered. For a given dataset, each instance is presented once. The classifier update starts right after the first instance presentation, and finishes at the last one. For each instance, a single response is carried out, and a single corresponding feedback is obtained.
 
 For comparison, both full-feedback and 1-bit feedback learning setups are tested:
 \begin{itemize}
@@ -701,7 +704,7 @@ For comparison, both full-feedback and 1-bit feedback learning setups are tested
 	\item The Banditron (\cite{kakade2008efficient}), Confidit (\cite{crammer2013multiclass}), and our Algorithms \ref{algo:quad} and  \ref{algo:HGD} only have a 1-bit feedback at disposal.
 \end{itemize} 
 
-In order to faithfully compare the methods, all parameters are obtained by cross-validation on the final classification rate. The resulting parameters, as they are used in simulations, are given in table \ref{table:bpa}. 
+
 
 %Tous les algorithmes comparés sont des algorithmes d'apprentissage en ligne. Le classifieur est donc mis à jour après chaque essai et évolue continuellement au cours de la session d'apprentissage. Chaque exemplaire n'est présenté qu'une seule fois. L'apprentissage du classifieur démarre dès la présentation du premier exemplaire et s'achève après la présentation du dernier exemplaire. Pour chaque exemplaire présenté, on mesure la réussite sous forme d'erreur $\mathbf{1}_{\hat{y}_t\neq y_t}$ ou de perte $l_t$. 
 
@@ -709,13 +712,15 @@ In order to faithfully compare the methods, all parameters are obtained by cross
 
 %Les paramètres utilisés dans les différentes simulations sont donnés dans la table 2. Ces paramètres ont été choisis par validation croisée sur le taux de classification final, afin de comparer de manière fiable les différentes méthodes utilisées. 
 
-{\color{blue} Dans le cas de jeux de données de petite dimension, nous comparons le comportement des algorithmes dans le cas du plongement des données dans des espaces de fonctions noyaux. Nous notons ainsi KBanditron le Banditron à noyaux, KBPA le Bandit Passif Agressif à noyaux et KSGD l'approche basée sur la descente de gradient régularisée présenté dans la partie 2.3. Le paramètre de raideur est ici $C = \infty$, autrement dit nous considérons les données linéairement séparables dans l'espace de redescription. Nous ne présentons pas ici l'algorithme Confidit pour lequel la généralisation aux espaces de fonctions noyaux est moins directe. 
-
-La fonction noyau utilisée dans ce cadre est la fonction de Laplace, soit~:
+In the specific case of the kernel approach (Pendigit and Segment databases), the non-separability assumption allows to withdraw the stiffness parameter, i.e. to consider $C \rightarrow \infty$. The Kernel function used in simulations is the Laplacian kernel, i.e.~:
 \[K(x,y) = \exp{\left(-\frac{\parallel{x-y}\parallel}{\sigma}\right)}\]
-Les paramètres sont donnés dans la table 2. }
+whose radius is set by parameter $\sigma > 0$.
+The Confidit Algorithm, for which the kernel extension is not straightforward, is not tested in that case.
 
+%{\color{blue} Dans le cas de jeux de données de petite dimension, nous comparons le comportement des algorithmes dans le cas du plongement des données dans des espaces de fonctions noyaux. Nous notons ainsi KBanditron le Banditron à noyaux, KBPA le Bandit Passif Agressif à noyaux et KSGD l'approche basée sur la descente de gradient régularisée présenté dans la partie 2.3. Le paramètre de raideur est ici , autrement dit nous considérons les données linéairement séparables dans l'espace de redescription. Nous ne présentons pas ici l'algorithme Confidit pour lequel la généralisation aux espaces de fonctions noyaux est moins directe. 
+%}
 
+In order to faithfully compare the methods, the different parameters (if any) are calculated by cross-validation over the final classification rate. The resulting parameters, as used in simulations, are given in table \ref{table:bpa}. 
 
 \subsection{Metrics}
 
@@ -729,7 +734,7 @@ $$M_t = \sum_{t'=1}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}} $$
 $$\forall t>99, \bar{m}_t = \frac{1}{100} \sum_{t'=t - 99}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}}$$
 \end{itemize}
 
-\paragraph{Remark} Both the Banditron and our bandit extension to the OVA Passive-Aggressive setup (Algorithm \ref{algo:quad}) use an $\varepsilon$-greedy exploration policy, that has direct effect on the  classification rate, for the actual response  $\tilde{y}_t$ is differents from $\hat{y}_t$ (in a proportion equal to $\varepsilon$). A residual exploration error thus necessarily exists, whatever effective the classifier $W$ is at separating the data. In order to properly compare algorithms, we need to evenly evaluate improvement whatever the value of $\varepsilon$, i.e. only use the internal noise-free estimate $\hat{y}_t$ for proper algorithm evaluation.
+\paragraph{Remark} Both the Banditron and our bandit extension to the OVA Passive-Aggressive setup (Algorithm \ref{algo:quad}) use an $\varepsilon$-greedy exploration policy, that has direct effect on the  classification rate, for the actual response  $\tilde{y}_t$ is differents from $\hat{y}_t$ (in a proportion equal to $\varepsilon$). A residual exploration error thus necessarily exists, whatever effective the classifier $W$ is at separating the data. In order to properly compare algorithms, we need to evenly evaluate improvement whatever the value of $\varepsilon$, i.e. only use the internal noise-free estimate $\hat{y}_t$ for algorithm evaluation.
 
 %Dans le cas du Banditron et du Bandit Passif-Agressif qui utilisent une politique d'exploration $\varepsilon$-glouton, le choix effectif $\tilde{y}_t$ diffère de $\hat{y}_t$ dans une proportion égale à $\varepsilon$. Une erreur résiduelle subsiste donc nécessairement, même lorsque le classifieur sépare correctement les données. Pour l'évaluation, nous considérons l'erreur de classification et non l'erreur effective, autrement dit nous négligeons l'erreur d'exploration des algorithmes de Banditron et de Bandit Passif Agressif, afin de comparer de manière équitable les caractéristiques des classifieurs calculés par les différents algorithmes.
 
@@ -753,8 +758,11 @@ Under the kernel approach, the number of prototype vectors is expected to grow u
 	%\label{pic:BPARCVerr}
 \end{figure}
 
-Les figures \ref{pic:BPASNSerr} et  \ref{pic:BPARCVerr}  présentent l'effet du paramètre d'exploration $\varepsilon$ sur les taux d'erreur obtenus en fin de session par le Banditron et le BPA, sur les bases SynNonSep et Reuters. Contrairement au Banditron, le taux de réussite du BPA est remarquablement insensible à la valeur de $\varepsilon$. Autrement dit, les performances d'apprentissage sont les mêmes pour un $\varepsilon$ faible que pour un $\varepsilon$ élevé. Ce résultat permet d'envisager la mise en place de politiques à taux d'exploration variable, afin de de profiter en fin d'apprentissage des bonnes performances du classifieur.
-Par ailleurs, dans les deux cas, le taux d'erreurs obtenu par BPA en fin de session est plus faible que celui du Banditron. 
+We investigate on Figures \ref{pic:BPASNSerr} %et  \ref{pic:BPARCVerr}  
+the effect of exploration parameter $\varepsilon$ on the final classification rate, for the banditron and the passive-aggressive based algorithm (Algo \ref{algo:quad}). Apart from better final classification achievement, the passive aggressive approach to 1-bit feedback learning is shown clearly unaffected by varying $\varepsilon$, on contrary to the banditron, having a clearer  exploration rate dependence. In other words, in our case, greedy exploitation and pure exploration show a same effectiveness in final classification rates. This result allows consider in practice variable exploration rates over a same learning session, in order to take advantage of the effective classification rates attained in the course of learning. 
+
+%présentent l'effet du paramètre d'exploration $\varepsilon$ sur les taux d'erreur obtenus en fin de session par le Banditron et le BPA, sur les bases SynNonSep et Reuters. Contrairement au Banditron, le taux de réussite du BPA est remarquablement insensible à la valeur de $\varepsilon$. Autrement dit, les performances d'apprentissage sont les mêmes pour un $\varepsilon$ faible que pour un $\varepsilon$ élevé. Ce résultat permet d'envisager la mise en place de politiques à taux d'exploration variable, afin de de profiter en fin d'apprentissage des bonnes performances du classifieur.
+%Par ailleurs, dans les deux cas, le taux d'erreurs obtenu par BPA en fin de session est plus faible que celui du Banditron. 
 
 
 %\begin{figure}[h!]
@@ -772,24 +780,16 @@ Par ailleurs, dans les deux cas, le taux d'erreurs obtenu par BPA en fin de sess
 \begin{figure}[ht!]
 	
 	\centerline{
-		\includegraphics[width=\linewidth]{figs/SynSep.eps}
+		\includegraphics[width=.6\linewidth]{figs/SynSep.eps}
 	}
-	\caption{Cumulative Errors on the synthetic data set of  SynSep.}
-	\label{pic:BPASS}
-\end{figure}
-\begin{figure}[ht!]
 	
 	\centerline{
-		\includegraphics[width=\linewidth]{figs/SynNonSep.eps}
+		\includegraphics[width=.6\linewidth]{figs/SynNonSep.eps}
 	}
-	\caption{Cumulative Errors on the synthetic data set of SynNonSep.}
-	\label{pic:BPASNS}
-\end{figure}
-\begin{figure}[ht!]
 	\centerline{
-		\includegraphics[width=\linewidth]{figs/RCV1_v2_53class.eps}}
-	\caption{Cumulative Errors  on the real data set of RCV1-v2 (53 classes).}
-	\label{pic:BPARCV}
+		\includegraphics[width=.6\linewidth]{figs/RCV1_v2_53class.eps}}
+	\caption{Cumulative Errors on the synthetic data set of  SynSep, SynNonSep and RCV1-v2 (53 classes).}
+	\label{pic:BPASS}
 \end{figure}
 
 Les figures \ref{pic:BPASS}, \ref{pic:BPASNS} et \ref{pic:BPARCV} comparent les algorithmes Perceptron, Passif-Agressif (PA), Banditron, Confidit et Bandit-Passif Agressif (BPA) sur les jeux de données de grande dimension SynSep, SynNonSep, et Reuters. 
