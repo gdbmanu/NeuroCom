@@ -339,7 +339,7 @@ $$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2\delta(y_t,\tilde{y}
 which leads to algorithm \ref{algo:quad}.
 
 \begin{algorithm}[t!]
-	\caption{Online quadratic optimization}\label{algo:quad}
+	\caption{one-Bit feedback Passive-Aggressive (BPA)}\label{algo:quad}
 	\begin{algorithmic}
 		\STATE Parameters:  $\varepsilon$, $C$
 		\STATE Set $W \leftarrow \vec{0}$
@@ -380,15 +380,15 @@ Under this focused examination, it is worth considering an alternate classifier 
 \end{theorem}
 (proof in \ref{app:thm1})
 
-The result obtained in that case is formally similar to that of  \cite{crammer2006online}. It states, in short, that a finite number of updates are needed to fit the classification constraints expressed by the observed series of losses. Whatever the series $\tilde{y}_1, ...,\tilde{y}_T$, there is a point at which all subsequent observed losses are equal to zero. This result grants final classifier sparsity in the separable case.
+The result obtained in that case is formally similar to that of  \cite{crammer2006online}. It states, in short, that a finite number of updates are needed to fit the classification constraints expressed by the observed series of losses. In particular, for large series ($\tilde{y}_1, ...,\tilde{y}_t, ...$), there is a point $t^*$ at which all subsequent observed losses are equal to zero. This result grants the classifier finite complexity in the separable case whatever the number of samples.
 
 There is however an important caveat to be mentioned. 
 %The possible sequences $\tilde{y}_1$, ..., $\tilde{y}_T$ include constant sequences, greedy sequence and pure random sequences. In other words, it is independent from the policy.
 % and optimal (zero-error) sequence. 
-Indeed, whatever the  $ (\tilde{y}_1$, ..., $\tilde{y}_T)$ sequence, only $T$ feedbacks signals out of $KT$ potential feedbacks are actually read,
+Indeed, given the  $ (\tilde{y}_1$, ..., $\tilde{y}_T)$ sequence, only $T$ feedbacks signals out of $KT$ potential feedbacks are actually read,
 %Only a $1/K$ portion of all feedback signals necessary to reach 
 %perfect classification are actually observed, 
-and each separatrix $w_k$ relies on a sub-series of observations : $\{t: \tilde{y}_t = k\}$.
+and each separatrix $w_k$ relies on a sub-series of observations $\{t: \tilde{y}_t = k\}$.
 %, forming a particular path of actions. 
 The sequence probes the environment without necessarily uncovering all of it. The theorem provides a bound on the \emph{observed} cumulative loss, ignoring every unobserved losses. 
 %An appropriate uniform exploration policy is thus needed in order {\color{red} to provide effective classification improvement.}
@@ -404,7 +404,7 @@ Considering the theorem guarantees a zero loss after a fixed number of updates, 
 
 %Two important cases need here to be examined:
 
-	\paragraph{Greedy deterministic policy} If $\tilde{y}_1, ...,\tilde{y}_T$ obey to a greedy deterministic choice $h$, and if $\exists t$ such that $\tilde{y}_t = y_t = k$, then, as $l_t$ is satisfied by $W^*$, $\langle w_k^*, x_t\rangle \geq 1$. Let us now assume that \emph{every sample $x$ from class $k$ lives in a convex set $\mathcal{C}_k$}. Then, if $\exists x \in \mathcal{C}_k$ with $h(x) \neq k$ and zero loss, then $\langle w_k^*, x\rangle < \langle w_{h(x)}^*, x\rangle \leq -1$. Then $\exists \rho \in [0,1]$ such that $x_\rho = \rho x + (1-\rho) x_t \in \mathcal{C}_k$ and 
+	\paragraph{Greedy deterministic policy} If $\tilde{y}_1, ...,\tilde{y}_t, ...$ obey to a greedy deterministic choice $h$, and if $\exists t$ such that $\tilde{y}_t = y_t = k$, then, as $l_t$ is satisfied by $W^*$, $\langle w_k^*, x_t\rangle \geq 1$. Let us now assume that \emph{every sample $x$ from class $k$ lies in a convex set $\mathcal{C}_k$}. Then, if $\exists x \in \mathcal{C}_k$ with $h(x) \neq k$ and zero loss, then $\langle w_k^*, x\rangle < \langle w_{h(x)}^*, x\rangle \leq -1$. Then $\exists \rho \in [0,1]$ such that $x_\rho = \rho x + (1-\rho) x_t \in \mathcal{C}_k$ and 
 	$-1 < \langle w_k^*,x_\rho \rangle < 1 $, which breaks out the zero loss condition. So, $\nexists x \in \mathcal{C}_k$ with $h(x) \neq k$, i.e. every sample from $\mathcal{C}_k$ is correctly classified.
 	\paragraph{Uniform random policy} If $\tilde{y}_1, ...,\tilde{y}_T$ obey to a uniform random choice (independent from $W$), the separatrix $w_k$ is probed on average $T/K$ times. By a simple combinatorial argument, the chance not finding $t$ such that $\tilde{y}_t = y_t = k$ exponentially decreases with $t$.
 	\paragraph{$\varepsilon$-greedy policy} Finally, an $\varepsilon$-greedy choice, that alternates between uniform sampling and greedy choice, guarantees a correct classification in the end.  
@@ -430,7 +430,8 @@ Considering the theorem guarantees a zero loss after a fixed number of updates, 
 %	\end{itemize}
 
 
-\paragraph{} If we turn now to an arbitrary classifier $U$, without separability assumption, the following theorem holds~:
+\vspace{.5cm} 
+If we turn now to an arbitrary classifier $U$, without separability assumption, the following theorem holds~:
 
 \begin{theorem}
 	\label{theo:BPAT2}
@@ -495,7 +496,7 @@ Then, following \cite{kivinen2004online}, a strict control on the number of prot
 
 %\paragraph{}
 \begin{algorithm}[t!]
-	\caption{H-horizon gradient descent}\label{algo:HGD}
+	\caption{H-horizon gradient descent (HGD)}\label{algo:HGD}
 	\begin{algorithmic}
 		
 		\STATE Parameters:  $\varepsilon$, $\eta$, $\lambda$, $H$
@@ -637,7 +638,7 @@ The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instan
 \subsection{Algorithms}
 
 \begin{table}[h]
-	\caption{Parameters setting for different algorithms and different datasets.  {\bf P} stands for Perceptron, {\bf PA} for Passive Agressive, {\bf B} for Banditron, {\bf C} for Confidit, {\bf K-B} for the Kernel Banditron, {\bf K-Algo1} and {\bf K-Algo2} for the Kernel  realization of algorithms 1 and 2.}
+	\caption{Parameters setting for different algorithms and different datasets.  {\bf P} stands for Perceptron, {\bf PA} for Passive Agressive, {\bf B} for Banditron, {\bf C} for Confidit, {\bf BPA} for the one-bit feedback Passive Aggressive (algorithm 1), {\bf K-B} for the Kernel Banditron, {\bf K-BPA} and {\bf K-HGD} for the Kernel  realization of algorithms 1 and 2.}
 	\label{table:bpa}
 	%\begin{center}
 	
@@ -672,7 +673,7 @@ The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instan
 		\begin{tabular}{llllll}
 			
 			\hline
-			{\bf Dataset}  & {\bf P} & {\bf PA } & {\bf B}& {\bf C} & {\bf Algo1}\\
+			{\bf Dataset}  & {\bf P} & {\bf PA } & {\bf B}& {\bf C} & {\bf BPA}\\
 			\hline
 			Synsep & $\varnothing$ & $C\rightarrow\infty$ & $\varepsilon = 0.014$ &$\eta = 10^3$ & $\varepsilon = 0.4$\\
 			&&&&& $C \rightarrow \infty$\\
@@ -682,7 +683,7 @@ The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instan
 			RCV1-v2 & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.4$ & $\eta = 10^2$ & $\varepsilon = 0.2$\\
 			&&&&& $C = 10^{-2}$\\
 			\hline
-			&{\bf K-B} & {\bf Algo1} & {\bf K-Algo1} &{\bf K-Algo2}\\
+			&{\bf K-B} & {\bf BPA} & {\bf K-BPA} &{\bf K-HGD}\\
 			\hline
 			Pendigit & $\sigma = 10$ & $\varepsilon = 0.3$ &$\sigma = 10$&$\sigma = 10$\\
 			&$\varepsilon =0.1$&& $\varepsilon = 0.3$ & $H = 500$\\
@@ -748,7 +749,7 @@ Under the kernel approach, the number of prototype vectors is expected to grow u
 	\centerline{\includegraphics[width=.9\linewidth]{figs/SynNonSep_gamma.eps}}
 	\centerline{\bf (b)}
 	\centerline{\includegraphics[width=.9\linewidth]{figs/Reuters_gamma.eps}}
-	\caption{Taux d'erreur moyen du Banditron et du BPA en fonction du taux d'exploration $\varepsilon$ {\bf(a)} sur le jeu de données SynNonSep et {\bf(b)} sur le jeu de données Reuters. }
+	\caption{Final error rate w.r.t exploration rate $\varepsilon$ on {\bf(a)} SynNonSep and {\bf(b)} Reuters. }
 	\label{pic:BPASNSerr}
 %\end{figure}
 
@@ -788,7 +789,7 @@ the effect of exploration parameter $\varepsilon$ on the final classification ra
 	}
 	\centerline{
 		\includegraphics[width=.6\linewidth]{figs/RCV1_v2_53class.eps}}
-	\caption{Cumulative Errors on the synthetic data set of  SynSep, SynNonSep and RCV1-v2 (53 classes).}
+	\caption{Cumulative Errors for SynSep (9 classes), SynNonSep (9 classes) and Reuters (53 classes).}
 	\label{pic:BPASS}
 \end{figure}
 
