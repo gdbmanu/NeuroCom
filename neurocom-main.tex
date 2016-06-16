@@ -447,7 +447,6 @@ It tells in short that, for large $T$, the average squared
 loss will be at most four time that of any linear 
 classifier $U$ (including that of a loss-minimizer classifier $U^*$). 
 
-
 Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA losses is visited in one run. For the classification error to be bounded, stationarity of samples generation as well as policy uniformity need to be assumed for the exhaustion of constraints be statistically granted.  
 
 This bound is moreover less tight than that of \cite{freund1997decision}, and  additional regularization needs to be set up to attain $O(\sqrt{T})$ regret (see \cite{crammer2006online}),  
@@ -464,39 +463,10 @@ we do not develop here for brevity.
 
 \subsection{Gradient-descent approach}
 
-Aside the quadratic optimization setup presented above, the gradient-based approach to sparse online discriminative classification, as proposed by \cite{kivinen2004online}, relies on minimizing the regularized risk:
-$$R(W) = \mathbb{E}\left[ l + \frac{\lambda}{2}\|W\|^2\right]$$
-with $\lambda$ a regularization parameter.
-
-Taking $l_t$ as in eq.(\ref{eq:loss}), the regularized risk gradient estimator at each step $t$ can be shown to be:
-$$g_t = \left\{
-\begin{array}{ll}
-\lambda W_{t-1} + (1 - 2 \delta(y_t,\tilde{y}_t)) X_t^{\tilde{y}_t} &\text{ if } l_t > 0\\
-\lambda W_{t-1} &\text{ elsewhere }(l_t=0)
-\end{array}
-\right.$$
-and a stochastic gradient descent approach with learning parameter $\eta$ provides the following update:
-$$W_t =  \left\{
-\begin{array}{ll}
-(1-\eta\lambda) W_{t-1} - \eta (1 - 2 \delta(y_t,\tilde{y}_t)) X_t^{\tilde{y}_t} &\text{ if } l_t > 0\\
-(1-\eta\lambda) W_{t-1} &\text{ elsewhere }(l_t = 0)
-\end{array}
-\right.$$
-In practice, the classifier output remaining unchanged when $l_t = 0$, and following a conservative approach, we omit the update in that case. 
-
-Then, the classifier can be made explicit in the form of a sum over observation vectors~:
-$$W_t = \sum_{t^\prime=1}^t \alpha_{t^\prime} X_t^{\tilde{y}_{t^\prime}}$$
-with:
-$$\alpha_{t^\prime} = \mathbf{1}_{l_{t^\prime} > 0}(1 - \eta \lambda)^{\sigma_t - \sigma_{t^\prime}-1}  \eta (2\delta(y_{t^\prime},\tilde{y}_{t^\prime})-1)$$
-where $\sigma_t$ is the number of updates at time $t$, i.e.
-$$\sigma_t = \sum_{t^\prime=1}^t \mathbf{1}_{l_{t^\prime} > 0}$$  
-and the cardinality of the non-zero coefficients correspond to the number of observation vectors effectively stored in memory.
-
-Then, following \cite{kivinen2004online}, a strict control on the number of prototype vectors may be imposed, though "old" coefficients exponentially vanish while new updates take place. A $H$-"horizon" truncation principle may be adopted, with every $\alpha_{t^\prime}$ such that $\sigma_t - \sigma_{t^\prime} > H$ set to 0. The truncation error can then be shown to  exponentially decrease with $H$ (see \cite{kivinen2004online}). This approach is of course well-adapted to the non-stationary case, where context-related categories change over time.
 
 %\paragraph{}
 \begin{algorithm}[t!]
-	\caption{H-horizon gradient descent (HGD)}\label{algo:HGD}
+	\caption{H-horizon Stochastic Gradient Descent (SGD)}\label{algo:HGD}
 	\begin{algorithmic}
 		
 		\STATE Parameters:  $\varepsilon$, $\eta$, $\lambda$, $H$
@@ -533,6 +503,38 @@ Then, following \cite{kivinen2004online}, a strict control on the number of prot
 	\end{algorithmic}
 \end{algorithm}
 
+Aside the quadratic optimization setup presented above, the gradient-based approach to sparse online discriminative classification, as proposed by \cite{kivinen2004online}, relies on minimizing the regularized risk:
+$$R(W) = \mathbb{E}\left[ l + \frac{\lambda}{2}\|W\|^2\right]$$
+with $\lambda$ a regularization parameter.
+
+Taking $l_t$ as in eq.(\ref{eq:loss}), the regularized risk gradient estimator at each step $t$ can be shown to be:
+$$g_t = \left\{
+\begin{array}{ll}
+\lambda W_{t-1} + (1 - 2 \delta(y_t,\tilde{y}_t)) X_t^{\tilde{y}_t} &\text{ if } l_t > 0\\
+\lambda W_{t-1} &\text{ elsewhere }(l_t=0)
+\end{array}
+\right.$$
+and a stochastic gradient descent approach with learning parameter $\eta$ provides the following update:
+$$W_t =  \left\{
+\begin{array}{ll}
+(1-\eta\lambda) W_{t-1} - \eta (1 - 2 \delta(y_t,\tilde{y}_t)) X_t^{\tilde{y}_t} &\text{ if } l_t > 0\\
+(1-\eta\lambda) W_{t-1} &\text{ elsewhere }(l_t = 0)
+\end{array}
+\right.$$
+In practice, the classifier output remaining unchanged when $l_t = 0$, and, following a conservative approach, we omit the update in that case. 
+
+Then, the classifier can be made explicit in the form of a sum over observation vectors~:
+$$W_t = \sum_{t^\prime=1}^t \alpha_{t^\prime} X_t^{\tilde{y}_{t^\prime}}$$
+with:
+$$\alpha_{t^\prime} = \mathbf{1}_{l_{t^\prime} > 0}(1 - \eta \lambda)^{\sigma_t - \sigma_{t^\prime}-1}  \eta (2\delta(y_{t^\prime},\tilde{y}_{t^\prime})-1)$$
+with $\mathbf{1}_u$ equal to 1 when $u$ is true and 0 elsewhere, and $\sigma_t$  the number of updates at time $t$, i.e.
+$$\sigma_t = \sum_{t^\prime=1}^t \mathbf{1}_{l_{t^\prime} > 0}$$  
+and the cardinality of the non-zero coefficients correspond to the number of observation vectors effectively stored in memory.
+
+Then, following \cite{kivinen2004online}, a strict control on the number of prototype vectors may be imposed, though "old" coefficients exponentially vanish while new updates take place. A $H$-"horizon" truncation principle may be adopted, with every $\alpha_{t^\prime}$ such that $\sigma_t - \sigma_{t^\prime} > H$ set to 0. The truncation error can then be shown to  exponentially decrease with $H$ (see \cite{kivinen2004online}). This approach is of course well-adapted to the non-stationary case, where context-related categories change over time.
+
+
+
 
 \subsection{Kernel Extension}
 The extension of the linear discriminant setup to 
@@ -541,7 +543,7 @@ allows to deal with non-linearly separable learning sets at the cost of addition
 
 Let $\mathcal{K}(.,.)$ a mapping from $ \mathbb{R}^d \times \mathbb{R}^d$ to $ \mathbb{R}^+$ having the reproducing property (see \cite{scholkopf2002learning}). Let $\mathcal{K}(x,.)$ be the projection of example $x$ in $\mathcal{H}$. Then, by construction, a scalar product $\langle.,.\rangle_\mathcal{H}$ in $\mathcal{H}$ is such that: 
  $$\forall w \in \mathcal{H}, \langle w,\mathcal{K}(x,.)\rangle_\mathcal{H} = w(x) $$
-Given previous notations, each classifier $W = (w_1,...,w_k)$ is now defined in $\mathcal{H}^K$ and:
+Keeping previous notations, each classifier $W = (w_1,...,w_k)$ is now defined in $\mathcal{H}^K$ and:
  \begin{align}\label{eq:X-kernel}
  X^k \triangleq (0(.), ..., & \mathcal{K}(x,.), ..., 0(.)) \in \mathcal{H}^{K}\\
  &\mid\nonumber\\
@@ -610,8 +612,8 @@ In order to test different aspects of the multiclass setting, the algorithms are
 
 %\paragraph{Jeux de données}
 
-Under the one-bit feedback multiclass online learning setup, most numerical experiments concentrate on text-mining applications (see for instance \cite{crammer2013multiclass}), having both large dimensional sparse vector text representations, a large number of examples, and up to 30-50  labels. Such databases provide a good testbed for realistic scale constraints, with linear models generally effective to separate the data. 
-In order to both test scaling and sparsity, we both consider text mining databases and more traditional machine learning databases, having smaller memory footprint but stronger non-linear constraints.
+Under the one-bit feedback multiclass online learning setup, most numerical experiments found in literature concentrate on text-mining applications (see for instance \cite{crammer2013multiclass}), having both large dimensional sparse vector text representations, a large number of examples, and up to 30-50  labels. Such databases provide a good testbed for realistic scale constraints, with linear models generally effective to separate the data. 
+In order to both test scaling and sparsity, we here both consider text mining databases and more traditional machine learning databases, having smaller memory footprint but stronger non-linear constraints.
 
 Our two first datasets mimick text documents vectors, with small 400-dimensional vocabulary. $10^5$ instances, belonging to 9 different classes, are generated. The detailed construction of those datasets is given in \cite{kakade2008efficient}. In the first one, called  \textit{SynSep}, the different classes are linearly separable. In the second one, called \textit{SynNonSep}, a 5\% label noise is introduced, rendering the dataset non separable.  
 
@@ -638,7 +640,7 @@ The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instan
 \subsection{Algorithms}
 
 \begin{table}[h]
-	\caption{Parameters setting for different algorithms and different datasets.  {\bf P} stands for Perceptron, {\bf PA} for Passive Agressive, {\bf B} for Banditron, {\bf C} for Confidit, {\bf BPA} for the one-bit feedback Passive Aggressive (algorithm 1), {\bf K-B} for the Kernel Banditron, {\bf K-BPA} and {\bf K-HGD} for the Kernel  realization of algorithms 1 and 2.}
+	\caption{Parameters setting for different algorithms and different datasets.  {\bf P} stands for Perceptron, {\bf PA} for Passive Agressive, {\bf B} for Banditron, {\bf C} for Confidit, {\bf BPA} for the one-Bit feedback Passive Aggressive (algorithm 1), {\bf K-B} for the kernel Banditron, {\bf K-BPA} and {\bf K-SGD} for the kernel  realization of BPA (algorithm 1) and SGD (algorithm 2).}
 	\label{table:bpa}
 	%\begin{center}
 	
@@ -683,7 +685,7 @@ The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instan
 			RCV1-v2 & $\varnothing$ & $C=10^{-2}$ & $\varepsilon =0.4$ & $\eta = 10^2$ & $\varepsilon = 0.2$\\
 			&&&&& $C = 10^{-2}$\\
 			\hline
-			&{\bf K-B} & {\bf BPA} & {\bf K-BPA} &{\bf K-HGD}\\
+			&{\bf K-B} & {\bf BPA} & {\bf K-BPA} &{\bf K-SGD}\\
 			\hline
 			Pendigit & $\sigma = 10$ & $\varepsilon = 0.3$ &$\sigma = 10$&$\sigma = 10$\\
 			&$\varepsilon =0.1$&& $\varepsilon = 0.3$ & $H = 500$\\
@@ -697,12 +699,12 @@ The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instan
 \end{table}
 
 
-Only the online learning setup is here considered. For a given dataset, each instance is presented once. The classifier update starts right after the first instance presentation, and finishes at the last one. For each instance, a single response is carried out, and a single corresponding feedback is obtained.
+Only  online learning methods are here considered for comparison. For a given dataset, each instance is presented once. The classifier update starts right after the first instance presentation, and finishes at the last one. For each instance, a single response is carried out, and a single corresponding feedback is obtained.
 
 For comparison, both full-feedback and 1-bit feedback learning setups are tested:
 \begin{itemize}
 	\item The multiclass perceptron (see \cite{duda1973pattern}) and the multiclass passive-aggressive setup (see  \cite{crammer2006online}) have a full feedback at disposal.
-	\item The Banditron (\cite{kakade2008efficient}), Confidit (\cite{crammer2013multiclass}), and our Algorithms \ref{algo:quad} and  \ref{algo:HGD} only have a 1-bit feedback at disposal.
+	\item The Banditron (\cite{kakade2008efficient}), Confidit (\cite{crammer2013multiclass}), and our algorithms BPA (algorithm \ref{algo:quad}) and HGD (algorithm \ref{algo:HGD}) only have a 1-bit feedback at disposal.
 \end{itemize} 
 
 
@@ -713,7 +715,7 @@ For comparison, both full-feedback and 1-bit feedback learning setups are tested
 
 %Les paramètres utilisés dans les différentes simulations sont donnés dans la table 2. Ces paramètres ont été choisis par validation croisée sur le taux de classification final, afin de comparer de manière fiable les différentes méthodes utilisées. 
 
-In the specific case of the kernel approach (Pendigit and Segment databases), the non-separability assumption allows to withdraw the stiffness parameter, i.e. to consider $C \rightarrow \infty$. The Kernel function used in simulations is the Laplacian kernel, i.e.~:
+In the specific kernel case (Pendigit and Segment databases), the non-separability assumption allows to withdraw the stiffness parameter, i.e. to consider $C \rightarrow \infty$. The Kernel function used in simulations is the Laplacian kernel, i.e.~:
 \[K(x,y) = \exp{\left(-\frac{\parallel{x-y}\parallel}{\sigma}\right)}\]
 whose radius is set by parameter $\sigma > 0$.
 The Confidit Algorithm, for which the kernel extension is not straightforward, is not tested in that case.
@@ -735,7 +737,7 @@ $$M_t = \sum_{t'=1}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}} $$
 $$\forall t>99, \bar{m}_t = \frac{1}{100} \sum_{t'=t - 99}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}}$$
 \end{itemize}
 
-\paragraph{Remark} Both the Banditron and our bandit extension to the OVA Passive-Aggressive setup (Algorithm \ref{algo:quad}) use an $\varepsilon$-greedy exploration policy, that has direct effect on the  classification rate, for the actual response  $\tilde{y}_t$ is differents from $\hat{y}_t$ (in a proportion equal to $\varepsilon$). A residual exploration error thus necessarily exists, whatever effective the classifier $W$ is at separating the data. In order to properly compare algorithms, we need to evenly evaluate improvement whatever the value of $\varepsilon$, i.e. only use the internal noise-free estimate $\hat{y}_t$ for algorithm evaluation.
+\paragraph{Remark} Both the Banditron and our bandit extension to the OVA Passive-Aggressive setup (Algorithm \ref{algo:quad}) use an $\varepsilon$-greedy exploration policy, that has direct effect on the  classification rate, for the actual response  $\tilde{y}_t$ differs from $\hat{y}_t$ in a proportion equal to $\varepsilon$. This residual exploration error persists whatever effective the classifier $W$ is at separating the data. In order to properly compare algorithms, we need to evenly evaluate improvement across $\varepsilon$ values, i.e. only use the internal noise-free estimate $\hat{y}_t$ for evaluation.
 
 %Dans le cas du Banditron et du Bandit Passif-Agressif qui utilisent une politique d'exploration $\varepsilon$-glouton, le choix effectif $\tilde{y}_t$ diffère de $\hat{y}_t$ dans une proportion égale à $\varepsilon$. Une erreur résiduelle subsiste donc nécessairement, même lorsque le classifieur sépare correctement les données. Pour l'évaluation, nous considérons l'erreur de classification et non l'erreur effective, autrement dit nous négligeons l'erreur d'exploration des algorithmes de Banditron et de Bandit Passif Agressif, afin de comparer de manière équitable les caractéristiques des classifieurs calculés par les différents algorithmes.
 
@@ -745,11 +747,11 @@ Under the kernel approach, the number of prototype vectors is expected to grow u
 \subsection{Results}
 
 \begin{figure}[htp]
-	\centerline{\bf (a)}
-	\centerline{\includegraphics[width=.9\linewidth]{figs/SynNonSep_gamma.eps}}
-	\centerline{\bf (b)}
-	\centerline{\includegraphics[width=.9\linewidth]{figs/Reuters_gamma.eps}}
-	\caption{Final error rate w.r.t exploration rate $\varepsilon$ on {\bf(a)} SynNonSep and {\bf(b)} Reuters. }
+	%\centerline{\bf (a)}
+	\centerline{\includegraphics[width=.7\linewidth]{figs/SynNonSep_gamma.eps}}
+	%\centerline{\bf (b)}
+	\centerline{\includegraphics[width=.7\linewidth]{figs/Reuters_gamma.eps}}
+	\caption{Banditron and one-Bit feedback Passive Aggressive (BPA) final error rate in function of the exploration rate $\varepsilon$, on SynNonSep (top) and Reuters (bottom) datasets. Parameters are in table 2.}
 	\label{pic:BPASNSerr}
 %\end{figure}
 
@@ -759,8 +761,8 @@ Under the kernel approach, the number of prototype vectors is expected to grow u
 	%\label{pic:BPARCVerr}
 \end{figure}
 
-We investigate on Figures \ref{pic:BPASNSerr} %et  \ref{pic:BPARCVerr}  
-the effect of exploration parameter $\varepsilon$ on the final classification rate, for the banditron and the passive-aggressive based algorithm (Algo \ref{algo:quad}). Apart from better final classification achievement, the passive aggressive approach to 1-bit feedback learning is shown clearly unaffected by varying $\varepsilon$, on contrary to the banditron, having a clearer  exploration rate dependence. In other words, in our case, greedy exploitation and pure exploration show a same effectiveness in final classification rates. This result allows consider in practice variable exploration rates over a same learning session, in order to take advantage of the effective classification rates attained in the course of learning. 
+We investigate on Figure \ref{pic:BPASNSerr} %et  \ref{pic:BPARCVerr}  
+the effect of the exploration parameter $\varepsilon$ on the final classification rate, for the Banditron and the one-Bit feedback Passive-Aggressive (algorithm \ref{algo:quad}). Apart from better final classification rate, the passive aggressive setup is shown oblivious to variable $\varepsilon$, on contrary to the Banditron having a known exploration rate dependence. Greedy exploitation and pure exploration show similar effectiveness in our case. In practice, this result allows consider decreasing exploration rates over learning sessions, for to take advantage of the classification rates attained in the course of learning. 
 
 %présentent l'effet du paramètre d'exploration $\varepsilon$ sur les taux d'erreur obtenus en fin de session par le Banditron et le BPA, sur les bases SynNonSep et Reuters. Contrairement au Banditron, le taux de réussite du BPA est remarquablement insensible à la valeur de $\varepsilon$. Autrement dit, les performances d'apprentissage sont les mêmes pour un $\varepsilon$ faible que pour un $\varepsilon$ élevé. Ce résultat permet d'envisager la mise en place de politiques à taux d'exploration variable, afin de de profiter en fin d'apprentissage des bonnes performances du classifieur.
 %Par ailleurs, dans les deux cas, le taux d'erreurs obtenu par BPA en fin de session est plus faible que celui du Banditron. 
@@ -778,7 +780,7 @@ the effect of exploration parameter $\varepsilon$ on the final classification ra
 %La figure \ref{pic:regret} donne une estimation du regret cumulé sur la base Reuters pour les 20000 premiers exemplaires, pour l'algorithme BPA, en utilisant pour la comparaison le classifieur obtenu en fin de session. On observe un taux de croissance du regret cumulé sous-linéaire, compatible avec la prédiction $O(\sqrt{t})$ (voir théorème 2). 
 
 
-\begin{figure}[ht!]
+\begin{figure}[htp]
 	
 	\centerline{
 		\includegraphics[width=.6\linewidth]{figs/SynSep.eps}
@@ -789,44 +791,49 @@ the effect of exploration parameter $\varepsilon$ on the final classification ra
 	}
 	\centerline{
 		\includegraphics[width=.6\linewidth]{figs/RCV1_v2_53class.eps}}
-	\caption{Cumulative Errors for SynSep (9 classes), SynNonSep (9 classes) and Reuters (53 classes).}
+	\caption{Perceptron, Passive-Aggressive (PA), Banditron, Confidit and one-Bit feedback Passive Aggressive (BPA) cumulative errors  over time for the SynSep (9 classes), SynNonSep (9 classes) and Reuters (53 classes) databases. Parameters are in table 2.}
 	\label{pic:BPASS}
 \end{figure}
 
-Les figures \ref{pic:BPASS}, \ref{pic:BPASNS} et \ref{pic:BPARCV} comparent les algorithmes Perceptron, Passif-Agressif (PA), Banditron, Confidit et Bandit-Passif Agressif (BPA) sur les jeux de données de grande dimension SynSep, SynNonSep, et Reuters. 
+The Perceptron, Passive-Aggressive (PA), Banditron, Confidit and one-Bit feedback Passive Aggressive (BPA) cumulative errors are compared on figure \ref{pic:BPASS} over the SynSep, SynNonSep and Reuters RCV1-v2 datasets. 
 
-Sur le premier jeu synthétique et linéairement séparable, on constate que la borne est rapidement atteinte pour Perceptron, PA, Confidit et BPA. Seul Banditron présente une courbe croissante qui ne permet pas de borner le taux d'erreurs cumulées.  On constate également, comme prévu, un taux d'erreur total plus faible pour les algorithmes supervisés que pour les algorithmes à feedback de Bandit.
+The first dataset being linearly separable, a final error bound is rapidly attained by all methods except for the Banditron showing only a monotonic decrease of the error rate. The convergence is shown even faster for the supervised methods (Perceptron and PA), for barely 20 errors are observed over $10^5$ instances. 
 
-Dans le cas de SynNonSep, le taux de croissance de l'erreur cumulée est linéaire, du fait du bruit de label de 5\% qui ne permet pas de supprimer les erreurs de classification. On constate ici une plus faible sensibilité des algorithmes Confidit et BPA au bruit de label, avec une pente plus faible que pour les algorithmes supervisés.
+%Sur le premier jeu synthétique et linéairement séparable, on constate que la borne est rapidement atteinte pour Perceptron, PA, Confidit et BPA. Seul Banditron présente une courbe croissante qui ne permet pas de borner le taux d'erreurs cumulées.  On constate également, comme prévu, un taux d'erreur total plus faible pour les algorithmes supervisés que pour les algorithmes à feedback de Bandit.
+
+In the SynNonSep case, as the  5\% label noise is irreductible, all methods show a linear growth of the cumulative error. However, the slower increase seen on Confidit and BPA  point out a better resilience to label noise, when compared to the supervised setup. This resilience, that was first noticed in \cite{crammer2013multiclass}, thus extends here to the BPA approach.
 
 %\textcolor{red}{OK-- Il manque les valeurs des paramètres pour les différents algorithmes (faire un tableau comme dans la partie précédente).}
 
-Enfin, la base Reuters, qui présente le cas de figure le plus réaliste, permet de mettre en évidence les bonnes performances de l'approche BPA. Dans tous les cas, les taux d'erreurs cumulés sont croissants mais la croissance est sous linéaire, indiquant une bon comportement d'apprentissage pour tous les algorithmes. Les deux algorithmes supervisés présentent des performances comparables, avec un taux d'erreurs cumulées légèrement plus faible  que confidit et BPA, et des pentes finales à peu près comparables. Le résultat le plus saisissant ici est de constater les performances des algorithmes BPA et Confidit, très proches de celles des algorithmes supervisés malgré le nombre de classes élevé (53). Le taux d'erreurs cumulées se révèle par ailleurs un peu plus favorable pour BPA que pour Confidit, ce qui est également notable étant donnée la moindre complexité algorithmique de l'algorithme BPA \footnote{L'algorithme Confidit nécessite en effet une estimation de la covariance des échantillons, cette matrice de covariance étant réduite en haute dimension à une simple diagonale.}. Seul l'algorithme du Banditron semble encore une fois présenter une performance d'apprentissage significativement plus faible. 
+The Reuters RCV1-v2 database provides a more realistic testbed.
+% allowing to highlight the BPA setup effectiveness. 
+The sub-linear cumulative error rate  shown by all methods indicate that learning is effective in all case, with, however, a clear gap between the Banditron and the other methods. In detail, the two supervised algorithms outperform by little BPA, followed by Confidit, and then the Banditron far behind. The first four methods show almost similar final slopes, on contrary to the Banditron showing a higher final error rate (see figure \ref{pic:BPASNSerr}). The good performances of BPA and Confidit are noticeable here, for the number of classes is high (53) and the labelling information consequently very scarce. 
+Moreover, the marked prevailing of BPA over Confidit is also noticeable for its algorithmic complexity is far lesser \footnote{Confidit uses a second order sample covariance estimates, this covariance matrix being reduced  to a mere diagonal in the high-dimensional case (see  \cite{crammer2013multiclass}).}. 
 
-
-
-
-\begin{figure}[t!]
-	\includegraphics[width=\linewidth]{figs/Pendigits_kernel_T.png}
-	\caption{Average training time for each instance of Data Pendigits.}
-	\label{pic:PKT}
-\end{figure}
-
-\begin{figure}[t!]
+\begin{figure}[htp]
+	\centerline{\includegraphics[width=.7\linewidth]{figs/Pendigits_kernel_T.png}}
 	\centerline{
-		\includegraphics[width=\linewidth]{figs/Segment_kernel_T.png}}
-	\caption{Average training time for each instance of Data Segment.}
-	\label{pic:SKT}
+		\includegraphics[width=.7\linewidth]{figs/Segment_kernel_T.png}}
+\caption{Linear BPA (algorithm 1), Laplace kernel BPA (algorithm 1), Laplace kernel SGD (algorithm 2)  and Laplace kernel Banditron average computation times over instance number on Pendigit (top) and Segment (bottom) databases. Parameters are in table 2.}
+\label{pic:PKT}	
 \end{figure}
 
+Linear BPA, kernel BPA, kernel SGD and kernel Banditron  are applied to the Pendigits and Segment datasets on figures \ref{pic:PKT} and \ref{pic:PKCM}. 
+Online learning with kernels being generally burdened by the increasing size of the prototype vectors set used in the classifier function (see \cite{kivinen2004online}), the objective here is mainly to compare the K-BPA native sparsity (algorithm \ref{algo:quad}) to the explicit sparsity control of the SGD method (algorithm \ref{algo:HGD}). The linear BPA provides a baseline reference, while the kernel-Banditron illustrates the upper bound computational costs of a non-sparse update. 
 
+%Sparse and conservative updates are thus preferred, for smaller prototype sets, and thus lesser computational costs, should be attained.  
+
+
+The evolving computational cost over time is shown on figure \ref{pic:PKT}.
 
 Les Figures~\ref{pic:PKT} et \ref{pic:SKT} présentent l'évolution du temps de calcul pour les différents algorithmes considérés sur les bases Pendigit  et Segment.  Le BPA linéaire présente comme attendu un temps de calcul indépendant du temps. On constate ensuite des temps de calcul croissants pour les trois algorithmes à noyaux. La croissance la plus forte (corissance linéaire) est observée comme attendu dans le cas du Banditron qui ajoute un exemplaire à la base des vecteurs supports à chaque nouvel essai. L'algorithme BPA présente une croissance moins marquée du nombre de vecteurs supports, du fait de la fonction de coût de type ``hinge loss'' qui permet d'ignorer les exemplaires ne produisant pas de perte.  on constate en particulier sur la base Segment une tendance à la stabilisation du temps de calcul. Enfin l'algorithme KSGD indique un temps de calcul de croissance significativement plus faible, du fait du principe de troncature utilisé. Dans le cas de la base Segments, les performances des deux algorithmes s'avèrent néanmoins très proches, indiquant la bonne parcimonie de l'algorithme BPA.
 
-\begin{figure}[t!]
+\begin{figure}[htp]
 	\centerline{
-		\includegraphics[width=\linewidth]{figs/Pendigits_kernel_CM.png}}
-	\caption{Cumulative Errors of Data Pendigits}
+		\includegraphics[width=.7\linewidth]{figs/Pendigits_kernel_CM.png}}
+	\centerline{
+	\includegraphics[width=.7\linewidth]{figs/Segment_kernel_CM.png}}
+	\caption{Linear BPA (algorithm 1), Laplace kernel BPA (algorithm 1), Laplace kernel SGD (algorithm 2)  and Laplace kernel Banditron cumulative errors over time on Pendigits (top) and Segment (bottom)  databases. Parameters are in table 2.}
 	\label{pic:PKCM}
 \end{figure}
 
@@ -837,12 +844,11 @@ Les Figures~\ref{pic:PKT} et \ref{pic:SKT} présentent l'évolution du temps de 
 %	\label{pic:PKM}
 %\end{figure}
 
-\begin{figure}[t!]
-	\centerline{
-		\includegraphics[width=\linewidth]{figs/Segment_kernel_CM.png}}
-	\caption{Cumulative Errors of Data Segment}
-	\label{pic:SKCM}
-\end{figure}
+%\begin{figure}[t!]
+	
+%	\caption{Cumulative Errors of Data Segment}
+%	\label{pic:SKCM}
+%\end{figure}
 
 %\begin{figure}[h!]
 %	\centerline{
