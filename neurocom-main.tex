@@ -603,9 +603,9 @@ In order to test different aspects of the multiclass setting, the algorithms are
 			
 			RCV1-v2  & $10^5$ 	& 47236 	& 53 \\
 			
-			Pendigits 	& 7494	& 16	& 10	\\
-			
 			Segment & 2310	& 19	& 7	\\
+			
+			Pendigits 	& 7494	& 16	& 10	\\
 		\end{tabular}
 	\end{center}
 \end{table}
@@ -631,8 +631,9 @@ The original dataset contains multi-label instances.  In order to fit the single
 %Les deux derniers jeux de données sont constitués de données réelles, de dimension plus faible, et avec un nombre d'exemplaires également plus faible. Nous comparons dans ce cas différents algorithmes en plongeant les données dans des espaces de fonctions noyaux.  
 
 The two last datasets are typical machine learning real-world datasets, having a smaller number of instances and a smaller dimension, allowing to test sparsity in the Kernel embedding case.   
-The fourth dataset, named \textit{Pendigit}, was created by \cite{alimoglu1996combining}. It owns 7494 instances, with 16 features per instance and 10 classes. 
-The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instances. Each feature vector is build from $3\times3$ pixels excerpts from natural images, with 19 features per instance and 7 classes. 
+The fourth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instances. Each feature vector is build from $3\times3$ pixels excerpts from natural images, with 19 features per instance and 7 classes. 
+The fifth dataset, named \textit{Pendigits}, was created by \cite{alimoglu1996combining} {\color{red}  (on what??)}. It owns 7494 instances, with 16 features per instance and 10 classes. 
+
 
 
 %The fourth and fifth data sets are collected from \cite{letter26SC,number10SC}. The fourth data set is to identify each of a large number of black-and-white rectangular pixel displays as one of the 26 capital letters in the English alphabet. The character images were based on 20 different fonts and each letter within these 20 fonts was randomly distorted to produce a file of 20000 unique stimuli. Each stimuli was converted into 16 primitive numerical attributes (statistical moments and edge counts). It forms a 26-class, 16-dimensional real data set of size $20000$. The fifth data set is a digit data base made by collecting 250 samples from 44 writers, using only (x,y) coordinate information represented as constant length feature vectors, which were resampled to 8 points per digit (therefore the data set contains 8 points $\times$ 2 coordinates = 16 features). This one is a 10-class, 16-dimensional real data set of size $10992$.
@@ -687,10 +688,11 @@ The fifth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instan
 			\hline
 			&{\bf K-B} & {\bf BPA} & {\bf K-BPA} &{\bf K-SGD}\\
 			\hline
-			Pendigit & $\sigma = 10$ & $\varepsilon = 0.3$ &$\sigma = 10$&$\sigma = 10$\\
-			&$\varepsilon =0.1$&& $\varepsilon = 0.3$ & $H = 500$\\
 			Segment & $\sigma = 1$ & $\varepsilon = 0.3$ & $\sigma = 1$ &$\sigma = 1$\\
 			&$\varepsilon =0.1$&&$\varepsilon = 0.3$ & $H = 200$\\
+			Pendigits & $\sigma = 10$ & $\varepsilon = 0.3$ &$\sigma = 10$&$\sigma = 10$\\
+			&$\varepsilon =0.1$&& $\varepsilon = 0.3$ & $H = 500$\\
+			
 			%LR(26 letters) & null &  $C=0.1$ & $\varepsilon = 0.2$& $\eta=10^2$ & $\varepsilon = 0.8,C= 1$ \\
 			
 			%LR(10 numbers) & null & $C=0.1$ & $\varepsilon= 0.4$& $\eta = 10$ & $\varepsilon = 0.6,C=1$\\	
@@ -715,7 +717,7 @@ For comparison, both full-feedback and 1-bit feedback learning setups are tested
 
 %Les paramètres utilisés dans les différentes simulations sont donnés dans la table 2. Ces paramètres ont été choisis par validation croisée sur le taux de classification final, afin de comparer de manière fiable les différentes méthodes utilisées. 
 
-In the specific kernel case (Pendigit and Segment databases), the non-separability assumption allows to withdraw the stiffness parameter, i.e. to consider $C \rightarrow \infty$. The Kernel function used in simulations is the Laplacian kernel, i.e.~:
+In the specific kernel case (Segment and Pendigits databases), the non-separability assumption allows to withdraw the stiffness parameter, i.e. to consider $C \rightarrow \infty$. The Kernel function used in simulations is the Laplacian kernel, i.e.~:
 \[K(x,y) = \exp{\left(-\frac{\parallel{x-y}\parallel}{\sigma}\right)}\]
 whose radius is set by parameter $\sigma > 0$.
 The Confidit Algorithm, for which the kernel extension is not straightforward, is not tested in that case.
@@ -791,7 +793,7 @@ the effect of the exploration parameter $\varepsilon$ on the final classificatio
 	}
 	\centerline{
 		\includegraphics[width=.6\linewidth]{figs/RCV1_v2_53class.eps}}
-	\caption{Perceptron, Passive-Aggressive (PA), Banditron, Confidit and one-Bit feedback Passive Aggressive (BPA) cumulative errors  over time for the SynSep (9 classes), SynNonSep (9 classes) and Reuters (53 classes) databases. Parameters are in table 2.}
+	\caption{Perceptron, Passive-Aggressive (PA), Banditron, Confidit and one-Bit feedback Passive Aggressive (BPA) cumulative errors  over trial number for the SynSep (9 classes), SynNonSep (9 classes) and Reuters (53 classes) databases. Parameters are in table 2.}
 	\label{pic:BPASS}
 \end{figure}
 
@@ -808,32 +810,33 @@ In the SynNonSep case, as the  5\% label noise is irreductible, all methods show
 The Reuters RCV1-v2 database provides a more realistic testbed.
 % allowing to highlight the BPA setup effectiveness. 
 The sub-linear cumulative error rate  shown by all methods indicate that learning is effective in all case, with, however, a clear gap between the Banditron and the other methods. In detail, the two supervised algorithms outperform by little BPA, followed by Confidit, and then the Banditron far behind. The first four methods show almost similar final slopes, on contrary to the Banditron showing a higher final error rate (see figure \ref{pic:BPASNSerr}). The good performances of BPA and Confidit are noticeable here, for the number of classes is high (53) and the labelling information consequently very scarce. 
-Moreover, the marked prevailing of BPA over Confidit is also noticeable for its algorithmic complexity is far lesser \footnote{Confidit uses a second order sample covariance estimates, this covariance matrix being reduced  to a mere diagonal in the high-dimensional case (see  \cite{crammer2013multiclass}).}. 
+Moreover, the marked prevailing of BPA over Confidit is also noticeable for its algorithmic complexity is much less\footnote{Confidit uses a second order sample covariance estimate, this covariance matrix being reduced  to a mere diagonal in the high-dimensional case (see  \cite{crammer2013multiclass}).}. 
 
 \begin{figure}[htp]
-	\centerline{\includegraphics[width=.7\linewidth]{figs/Pendigits_kernel_T.png}}
+
 	\centerline{
 		\includegraphics[width=.7\linewidth]{figs/Segment_kernel_T.png}}
-\caption{Linear BPA (algorithm 1), Laplace kernel BPA (algorithm 1), Laplace kernel SGD (algorithm 2)  and Laplace kernel Banditron average computation times over instance number on Pendigit (top) and Segment (bottom) databases. Parameters are in table 2.}
+	\centerline{\includegraphics[width=.7\linewidth]{figs/Pendigits_kernel_T.png}}
+\caption{Linear BPA (algorithm 1), kernel BPA (algorithm 1), kernel SGD (algorithm 2)  and kernel Banditron average computational cost over trial number on Segment (top) and Pendigits (bottom) databases. Parameters are in table 2.}
 \label{pic:PKT}	
 \end{figure}
 
-Linear BPA, kernel BPA, kernel SGD and kernel Banditron  are applied to the Pendigits and Segment datasets on figures \ref{pic:PKT} and \ref{pic:PKCM}. 
-Online learning with kernels being generally burdened by the increasing size of the prototype vectors set used in the classifier function (see \cite{kivinen2004online}), the objective here is mainly to compare the K-BPA native sparsity (algorithm \ref{algo:quad}) to the explicit sparsity control of the SGD method (algorithm \ref{algo:HGD}). The linear BPA provides a baseline reference, while the kernel-Banditron illustrates the upper bound computational costs of a non-sparse update. 
+Linear BPA, kernel BPA, kernel SGD and kernel Banditron  are applied to the Segment and Pendigits datasets on figures \ref{pic:PKT} and \ref{pic:PKCM}. 
+Online learning with kernels being generally burdened by the increasing size of the prototype vectors set used by the classifier (see \cite{kivinen2004online}), the objective here is mainly to compare the K-BPA native sparsity (algorithm \ref{algo:quad}) to the explicit sparsity control of the SGD method (algorithm \ref{algo:HGD}). The linear BPA provides a baseline reference, while the kernel-Banditron illustrates the upper bound computational costs of a non-sparse update. 
 
 %Sparse and conservative updates are thus preferred, for smaller prototype sets, and thus lesser computational costs, should be attained.  
 
 
-The evolving computational cost over time is shown on figure \ref{pic:PKT}.
+The evolving computational cost over time is shown on figure \ref{pic:PKT}. Apart from the linear case, showing a baseline constant cost over time, all kernel-based setups show a monotonic cost rise over time, with the best computational costs obtained for the K-SGD, followed by the K-BPA, and finally the K-Banditron giving an upper bound linear cost rise.  The computational cost of a learning session is consequently $0(T)$ for the linear BPA, $O(T^2)$ for the K-Banditron and in between for the two other cases. The BPA algorithm is expected to reach a constant computational cost after the final number of prototypes is reached, this number being set to 200 on the Segment database and 500  on the Pendigits one. A plateau is roughly observed after 1000 trials on the Segment database, while a continuing rising at slow rate is observed in the other case. The BPA algorithm, while being more costly, show a very close sparsity on the segment database while having a more marked difference on the Pendigits database, showing in general the sparsity effectiveness of the BPA approach.
 
-Les Figures~\ref{pic:PKT} et \ref{pic:SKT} présentent l'évolution du temps de calcul pour les différents algorithmes considérés sur les bases Pendigit  et Segment.  Le BPA linéaire présente comme attendu un temps de calcul indépendant du temps. On constate ensuite des temps de calcul croissants pour les trois algorithmes à noyaux. La croissance la plus forte (corissance linéaire) est observée comme attendu dans le cas du Banditron qui ajoute un exemplaire à la base des vecteurs supports à chaque nouvel essai. L'algorithme BPA présente une croissance moins marquée du nombre de vecteurs supports, du fait de la fonction de coût de type ``hinge loss'' qui permet d'ignorer les exemplaires ne produisant pas de perte.  on constate en particulier sur la base Segment une tendance à la stabilisation du temps de calcul. Enfin l'algorithme KSGD indique un temps de calcul de croissance significativement plus faible, du fait du principe de troncature utilisé. Dans le cas de la base Segments, les performances des deux algorithmes s'avèrent néanmoins très proches, indiquant la bonne parcimonie de l'algorithme BPA.
 
 \begin{figure}[htp]
-	\centerline{
-		\includegraphics[width=.7\linewidth]{figs/Pendigits_kernel_CM.png}}
+	
 	\centerline{
 	\includegraphics[width=.7\linewidth]{figs/Segment_kernel_CM.png}}
-	\caption{Linear BPA (algorithm 1), Laplace kernel BPA (algorithm 1), Laplace kernel SGD (algorithm 2)  and Laplace kernel Banditron cumulative errors over time on Pendigits (top) and Segment (bottom)  databases. Parameters are in table 2.}
+\centerline{
+	\includegraphics[width=.7\linewidth]{figs/Pendigits_kernel_CM.png}}
+	\caption{Linear BPA (algorithm 1), kernel BPA (algorithm 1), kernel SGD (algorithm 2)  and kernel Banditron cumulative errors over trial number on Segment  (top) and Pendigits(bottom)  databases. Parameters are in table 2.}
 	\label{pic:PKCM}
 \end{figure}
 
@@ -857,10 +860,14 @@ Les Figures~\ref{pic:PKT} et \ref{pic:SKT} présentent l'évolution du temps de 
 %	\label{pic:SKM}
 %\end{figure}
 
-Les figures  \ref{pic:PKCM} %, \ref{pic:PKM}, 
-et \ref{pic:SKCM} 
+Now turning to the classification rates, the cumulative error rates obtained by linear BPA, kernel BPA, kernel SGD and kernel Banditron on the Segment and Pendigits databases are shown on figure~\ref{pic:PKCM}. %, \ref{pic:PKM}, 
+%et \ref{pic:SKCM} 
 %et \ref{pic:SKM}  
-présentent enfin les taux d'erreur moyens et cumulés produits par ces différents algorithmes au cours de l'apprentissage des bases Pendigit et Segment. Les courbes d'erreurs cumulées mettent en évidence dans ce cas de l'approche à noyaux sur l'approche linéaire, du fait du caractère non-linéairement séparable des données utilisées. Par ailleurs, l'algorithme BPA présente dans les deux cas les meilleurs performances d'apprentissage que l'algorithme du Banditron. L'algorithme KSGD présente de bonnes performances en début d'apprentissage, mais tend ensuite à atteindre un plateau de performances (du fait de la troncature) tandis que BPA présente une amélioration plus régulière lui permettant de dépasser les performances de KSGD en fin de session. On constate en particulier des taux d'erreurs très faibles en fin de session pour la base Pendigit. Ces performances d'apprentissage sont remarquables du fait de l'absence d'information de classification complète.  
+The first trend to notice is the prevailing of the Kernel setup over the linear one in that case, in particular when considering the Segment database where the linear BPA hardly shows improvement over time. 
+ The banditron is generally close to the worst-case scenario while the K-SGD, despite good initial startup, shows difficulty to capitalize improvement after a while (in particular on the Pendigits case). In contrast, the kernel BPA is clearly found to outperform the two other methods, in particular regarding te final error rate. In particular, the final error rate of K-BPA on the Pendigits database is less than 2\%, which is more than 5 time better than the other methods.  This final state-of-the-art classification performances is quite remarkable, given the online setup and partial feedback used here. 
+
+
+%présentent enfin les taux d'erreur moyens et cumulés produits par ces différents algorithmes au cours de l'apprentissage des bases Segment and Pendigits. Les courbes d'erreurs cumulées mettent en évidence dans ce cas de l'approche à noyaux sur l'approche linéaire, du fait du caractère non-linéairement séparable des données utilisées. Par ailleurs, l'algorithme BPA présente dans les deux cas les meilleurs performances d'apprentissage que l'algorithme du Banditron. L'algorithme KSGD présente de bonnes performances en début d'apprentissage, mais tend ensuite à atteindre un plateau de performances (du fait de la troncature) tandis que BPA présente une amélioration plus régulière lui permettant de dépasser les performances de KSGD en fin de session. On constate en particulier des taux d'erreurs très faibles en fin de session pour la base Pendigit. Ces performances d'apprentissage sont remarquables du fait de l'absence d'information de classification complète.  
 
 %\begin{figure}[h!]
 %\label{pic:PKR}
@@ -1095,12 +1102,30 @@ présentent enfin les taux d'erreur moyens et cumulés produits par ces différe
 %%\subsection{Conclusion}
 \section{Conclusion}
 \label{sec:conclusion}
-{Conclusion}
-\label{subsec:BPAC}
 
-We proposed a novel algorithm for online multiclass classification with bandit feedback. By the advantage of PA max-margin principle, BPA appears effective to address the bandit online learning setting. Its main advantage is its linear complexity in space that allows to deal with high dimensional data sets and a large number of classes, on the contrary to second-order methods. The practicability of this algorithm is verified theoretically by showing a competitive loss bound.
+{\color{green}
 
-Moreover, experimental evaluation shows that BPA performs better than other algorithms on  real datasets, even better than the algorithms with full feedback on the data sets non-separable.
+
+1. les bornes obtenues
+
+2. approx memes perf que confidit (ou ordre 2) avec en plus : (1) une moindre complexité et (2) la parcimonie des mises à jour. }
+
+We compare in this paper several online learning setups that apply to the case  when the expected label is not fully disclosed, but instead a single bit  telling whether the current output is correct or incorrect. The initial absence of explicit label information sets to randomly sample the label space, in the manner of contextual bandits, and consider the exploration exploitation trade-off in the decision process. 
+
+%Nous avons proposé dans cet article un nouvel algorithme d'apprentissage en ligne de classifieurs multiclasses dans le cas où l'information de classification est binaire (réponse correcte ou incorrecte). L'absence d'information de label explicite conduit à échantillonner de manière aléatoire l'espace des labels, sur le modèle des bandits contextuels. L'approche utilisée ici pour l'exploration est $\varepsilon$-glouton, soit une alternance entre échantillonnage uniforme et exploitation. 
+
+L'algorithme développé repose  sur l'optimisation à chaque essai d'une fonction de coût spécifique, sur le modèle de l'approche ``Passive Agressive'' proposée par \cite{crammer2006online}. 
+L'analyse mathématique permet de mettre en évidence des bornes sur la somme des coûts cumulés, à la fois dans le cas séparable et dans le cas non séparable, comparables aux bornes obtenues dans le cas supervisé.
+
+Les expériences numériques confirment le bon comportement de l'algorithme d'apprentissage, à la fois sur des données de grande dimension et sur des jeux de données non-linéairement séparables. Tout en présentant une complexité algorithmique similaire, notre approche dépasse systématiquement les performances de l'algorithme du Banditron \cite{kakade2008efficient}. En particulier, nous observons une faible sensibilité au taux d'exploration $\varepsilon$, soit une conservations des performances depuis l'échantillonnage pur jusqu'à l'exploitation ``gloutonne'' de la réponse du classifieur. Cette propriété permet en conditions réelles d'envisager une implémentation de l'algorithme avec un $\varepsilon$ décroissant au cours de l'apprentissage.    
+
+Les courbes d'apprentissage montrent des performances similaires aux méthodes d'ordre 2, tout en présentant une complexité linéaire en espace. 
+Cette complexité faible permet en particulier d'appliquer aisément cette approche aux données de grande dimension. Les expériences montrent également un bon comportement dans le cas où le nombre de classes est assez élevé (ici 53 classes dans le cas de la base Reuters).  
+Dans le cas où les données ne sont pas linéairement séparables, l'algorithme présente une bonne parcimonie, permettant d'éviter une croissance trop importante du nombre de vecteurs supports au cours de l'apprentissage.
+
+Plus généralement, ces résultats illustrent le fait qu'une information de classification minimale (ici binaire) se révèle suffisante pour un apprentissage multi-classes performant, offrant en particulier des bornes de convergence comparable en ordre de grandeur à celles reposant sur une information de classification complète.
+
+
 
 %In the next section, we will take BPA to deal with non-linear data sets  by combining the Kernel method. 
 
