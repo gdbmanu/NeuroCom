@@ -135,7 +135,7 @@ Two well-known setups obey to this class, i.e. the contextual bandit setup (see 
 The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback (see \cite{kakade2008efficient}), for the payoff is either 0 (failure) or 1 (success). This case lies at the crossroad of the supervised online learning setup and the bandit setup.  A one-bit feedback reflects a ``hit-or-miss'' learning situations, in which a single bit indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, this problem is bound to the online approach and was only recently addressed by the community (see \cite{kakade2008efficient}, \cite{gentile2012multilabel}, etc.). 
 Apart from the original work of \cite{kakade2008efficient}, most recent approaches to this problem are based on regularized linear models (see \cite{li2010contextual}, \cite{crammer2013multiclass}, \cite{ngo2013upper}), to which the powerful methods of contextual bandit, including UCB-like non-stochastic exploration strategy (see \cite{lai1985asymptotically}), do apply. While providing almost optimal convergence rates, model-based approaches suffer from a quadratic complexity in space that limits their applicability to large-dimensional datasets.  On contrary, discriminant-based approaches to online classification (see \cite{anlauf1989adatron}, \cite{crammer2006online}) only provide upper bounds on the error rate, but display linear scaling in size with smaller memory footprint. 
 
-We adapt in this paper the quadratic optimization approach proposed by \cite{crammer2006online} to the one-bit feedback case, where online learning relies on a local norm minimization under standard linear-convex constraints. Our conservative approach allows to determine similar regret bounds than in the original paper of \cite{crammer2006online}, providing strong guaranties on  convergence capabilities, that are confronted to the other methods over synthetic and real datasets.  
+We adapt in this paper the quadratic optimization approach proposed by \cite{crammer2006online} to the one-bit feedback case, where online learning relies on a local norm minimization under standard linear-convex constraints. Our conservative approach allows to determine similar regret bounds than the original paper of \cite{crammer2006online}, providing strong guaranties on  convergence capabilities, that are confronted to other methods over synthetic and real datasets.  
 
 \section{Outlook}
 
@@ -146,19 +146,21 @@ The sequential organization of learning is present in the most traditional setup
 
 \subsection{Linear models}
 Multiclass classification requires  finding an appropriate class $y \in \{1,... K\}$ for every observation vector $x \in \mathbb{R}^d$.
-The \textit{decision function} (or policy) $h(x_t)$
-allows to carry out the categorical response $\tilde{y}_t \sim h(x_t)$. The decision function embodies both prior information about the regularity of the universe and experience-based information. A reasonable assumption  is to consider that  close-by contexts should provide close-by rewards distributions. 
-The linear approach to classification means to separate the input space in regions, where the different regions are defined by a set of linear mappings. We consider in that case a  classifier 
+The \textit{decision function} (or policy) $h$
+allows to carry out a categorical response $\tilde{y}_t \sim h(x_t)$. The decision function embodies both prior information about the regularity of the universe and experience-based information. A reasonable assumption  is to consider that  close-by contexts should provide close-by rewards distributions. 
+The linear approach to classification means 
+%to separate the input space in regions, where the different regions are 
+define a set of linear mappings:
 \begin{equation}\label{eq:W}
-W = (w_1,..,w_k) \in \mathbb{R}^{K d}
-\end{equation} so that, for every categorical response $k$, a \emph{similarity score} $\langle w_k, x_t\rangle$ is carried out. 
+W = (w_1,..,w_K) \in \mathbb{R}^{K d}
+\end{equation} so that, for every category $k$, a \emph{similarity score} $\langle w_k, x_t\rangle$ is carried out. 
 %defined as a set of $K$ linear mappings. 
 The linear assumption allows ($i$) to 
 settle choice (or action) over class similarity prediction and ($ii$) to update models over prediction accuracy.
 % distributions of rewards biased by a context $x$ that is given to the gambler before decision making. The universe is now made of couples (context, rewards distribution). 
 %Two principal approaches are identified in the supervised setting. 
 
-The set of linear mappings can either be considered class-prototypes or class-separatrices. The first case implements a \textit{model-based} approach, and the second a \textit{discriminant-based} approach. In the first case,  second order gradient descent methods such as natural gradient (see \cite{amari2000adaptive}), Gauss-Newton (see \cite{le2004large}), and second order perceptron (see \cite{cesa2005second}) provide almost optimal convergence rates while scaling quadratically with exemplar dimension.
+The set of linear mappings can either be considered class-prototypes or class-separatrices. The first case implements a \textit{model-based} approach, and the second a \textit{discriminant-based} approach. In the first case,  second order gradient descent methods such as natural gradient (see \cite{amari2000adaptive}), Gauss-Newton (see \cite{le2004large}), and second order perceptron (see \cite{cesa2005second}) provide almost optimal convergence rates while scaling quadratically with observation vector dimension.
 %Sequential gradient descent/Markov chain approach to learning is now commonplace in supervised learning for its prominent regularization (see \cite{le2004large}) and auto-encoding 
 %properties, powerfully exploited in the RBM approach (see \cite{hinton2006fast}).
 In the second case, the quadratic optimization approach (see \cite{anlauf1989adatron}, \cite{crammer2006online}) only provide upper bounds on the error rate but display linear scaling in size, label-unbalance robustness and more generally provide a smaller memory footprint. 
@@ -168,7 +170,7 @@ In the second case, the quadratic optimization approach (see \cite{anlauf1989ada
 The one-bit feedback is a specific online learning setup that implements, in a principled way, the scarce labelling information problem. After reading $\tilde{y}_t$, instead of providing a label, the universe provides a single bit of information called the \textit{label hit}, i.e. $f_t = 1$ if  $\tilde{y}_t=y_t$ and $f_t = 0$ elsewhere. The objective, just as in the supervised case, is to avoid label misses and maximise labels hits. A specific update function needs to be defined to allow label hit improvement over time. 
 
 \paragraph{Banditron} This problem was coined the ``bandit feedback classification problem'' by \cite{kakade2008efficient}. Taking inspiration from the multiclass perceptron (\cite{duda1973pattern}), a time-effective algorithm, called the ``Banditron'', is established:
-$K$ linear mappings $w_1, ..., w_K$ are defined and the candidate response winner $\hat{y}$ relies on a best-match policy, i.e.
+$K$ linear mappings $w_1, ..., w_K$ are defined and the candidate response  $\hat{y}$ relies on a best-match policy, i.e.
 \begin{equation}\label{eq:argmax}
 \hat{y} = \underset{k \in\{1,..,K\}}{\text{argmax}}  \langle w_k, x \rangle
 \end{equation}
@@ -177,13 +179,14 @@ Contrarily to the supervised case, an \textit{exploration} policy needs to be de
 P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}
 \end{equation}
  with $\varepsilon \in [0,1]$.
-Given an initial set of $K$ null-vector hyperplanes $W_0 = (\vec{0}, ..., \vec{0})$ and an actual output $\tilde{y}_t$, the update at time $t$ is ~:
+Given a set of linear mappings $W_{t-1}$ % = (w_{1,t-1}, ..., w_{K,t-1})$ 
+and an actual output $\tilde{y}_t$, the update at time $t$ is ~:
 \begin{equation} \label{eq:banditron-update}
 W_t = W_{t-1} + \frac{\delta(\tilde{y}_t ,y_t) X_t^{\tilde{y}_t}}{P(\tilde{Y}=\tilde{y}_t)} - X_t^{\hat{y}_t}
 \end{equation}   
 with the convention:
 \begin{align}\label{eq:X}
-X^k \triangleq (\vec{0}, ..., & x, ..., \vec{0}) \in \mathbb{R}^{K d}\\
+X_t^k \triangleq (\vec{0}, ..., & x_t, ..., \vec{0}) \in \mathbb{R}^{K d}\\
 &\mid\nonumber\\
 &k\nonumber
 \end{align}
@@ -191,16 +194,20 @@ X^k \triangleq (\vec{0}, ..., & x, ..., \vec{0}) \in \mathbb{R}^{K d}\\
  \begin{equation}\label{eq:simil-dot-product}
  \langle W, X^k\rangle = \langle w_k, x\rangle
  \end{equation}
-The expectation of the update is shown to be that of the multiclass perceptron, and a convergence to the correponding perceptron classifier is obtained, with a finite bound on the cumulative error in linearly separable cases. 
+The expectation of the update is shown to be that of the multiclass perceptron, and a convergence to the corresponding  classifier is obtained, with a finite bound on the cumulative error in linearly separable cases. 
 
 \paragraph{Second-order models} 
-{\color{blue}
-Toujours dans le cadre des classifieurs linéaires, plusieurs algorithmes d'apprentissage de bandits contextuels ont été proposés dans la littérature. Dans nos expérimentations numériques, nous considérerons également ici l'algorithme ``Confidit'' proposé par Crammer et Gentile \cite{crammer2013multiclass}, reposant sur le perceptron d'ordre 2 et l'exploration non stochastique basée sur le principe UCB \cite{lai1985asymptotically}, et présentant des profils de convergence plus favorables que le Banditron. A AJOUTER : Newtron, Li et al 2010, ngo 2014}
+Apart from the Banditron, a majority of learning setups address the one-bit bandit feedback classification problem using derivatives of the lin-UCB  (see \cite{auer2002using}) and second-order perceptron (see \cite{cesa2005second}). They allow to carry out confidence intervals over reward predictions, based on the observation vectors covariance matrix $\langle{X_t^{\tilde{y}_t}}^\top {X_t^{\tilde{y}_t}}\rangle$, and adapt the exploration policy through an UCB scheme (see \cite{lai1985asymptotically}), providing $O(\sqrt{T})$ regret bounds in the stationary case (see \cite{li2010contextual}, \cite{hazan2011newtron}, \cite{crammer2013multiclass}, \cite{ngo2013upper}).
+The close to optimal regret bounds obtained here are harmed by an $O(d^2)$ scaling and a lack of sparsity that justifies our closer inspection to the separatrix-based setup.
+
+%  predicting both ith explicit storing for each class the expected to the linear projection.
+%{\color{blue}
+%Toujours dans le cadre des classifieurs linéaires, plusieurs algorithmes d'apprentissage de bandits contextuels ont été proposés dans la littérature. Dans nos expérimentations numériques, nous considérerons également ici l'algorithme ``Confidit'' proposé par Crammer et Gentile \cite{crammer2013multiclass}, reposant sur le perceptron d'ordre 2 et l'exploration non stochastique basée sur le principe UCB \cite{lai1985asymptotically}, et présentant des profils de convergence plus favorables que le Banditron. A AJOUTER : Newtron, Li et al 2010, ngo 2014}
 
 
 
 \subsection{Online risk minimization}
-Under the discriminant approach to linear classification, the separating hyperplanes are expected to optimally separate the input space according to the misclassification risk. This risk can for instance be minimized through a margin principle (see \cite{vapnik1998statistical}), imposing a non-zero distance of known class exemplars to the classification boundaries. 
+Under the discriminant approach to linear classification, a set of separating hyperplanes are expected to optimally separate the input space according to the misclassification risk. This risk can for instance be estimated through a margin principle (see \cite{vapnik1998statistical}), imposing a non-zero distance of known class exemplars to the classification boundaries. 
 
 %In contrast with the \textit{offline} setting, where the classifiers are obtained through quadratic optimization over a finite set of classified exemples (see \cite{vapnik1998statistical}), no predefinite database is considered under the online setting. 
 %The observation vectors arrive sequentially according to a temporal index $t$ (temporal order). 
@@ -211,7 +218,8 @@ Following   \cite{kivinen2004online} and \cite{crammer2006online}, we consider a
 %Our objective here is to provide a way to extend those local online optimization approaches  to the \emph{binary feedback} case, where the feedback is composed of a single bit of information $f_t \in\{0,1\}$, i.e. $f_t = 1$ if the class proposed by the clasifier is correct and 0 otherwise. This setup may provide avenues toward the more general contextual bandit and  reinforcement learning setups.
 %given an objective (or loss) function considered defined over the full input space.
 %A feedback is a \emph{local} measure of  learning achievement (or failure), 
-The classifier is updated through local measures of a loss function $$l_t = l(x_t,W_{t-1},y_t)$$
+The classifier is updated through local measures of a loss function: 
+$$l_t = l(x_t,W_{t-1},y_t)$$
  %
  Contrarily to a mere reward (or penalty), a loss function comes with an implicit set point, namely $l_t=0$, that grants response correctness under a margin constraint. In \cite{kivinen2004online}, a loss-minimizer gradient descent update is combined with a norm-minimizer on the decision function, while \cite{crammer2006online} adopt a quadratic norm-minimal condition $\min_W ||W - W_{t-1}||^2$ on each update. In both cases local changes are shown to provide global improvement, e.g. \cite{kivinen2004online} show the stochastic gradient to converge to a global minimum and \cite{crammer2006online} show the total number of updates to be bounded in the linearly-separable case.
 
@@ -241,7 +249,7 @@ Under the multiclass setting, two principal margin constraint schemes can be set
 \end{itemize}
 
 
-The normative setup is clearly overconstrained regarding the classification task (see \cite{crammer2003ultraconservative}), but in counterpart provides mapping-independence among the different classes.
+The normative setup puts additional constraints regarding the classification task (see \cite{crammer2003ultraconservative}), but in counterpart provides mapping-independence among the different classes.
 
 %{\color{red} Except for the multiclass perceptron (see  \cite{duda1973pattern} and \cite{freund1999large}), which does not rely on 
 %Not all multiclass online learning algorithms fall either into the normative or the relative category. 
@@ -250,7 +258,7 @@ The normative setup is clearly overconstrained regarding the classification task
 
 
 
-{\color{green} Notion de conservatisme vs exhausivité (Anlauf) et progressisme (Kivinen).}
+%{\color{green} Notion de conservatisme vs exhausivité (Anlauf) et progressisme (Kivinen).}
 
 
 
@@ -301,7 +309,7 @@ On contrary to their supervised counterpart, class-separatrices updates in the B
 
 {\color{green} Previous generalizations of the relative margin constraint (see eq. (\ref{eq:rel})) were shown dense over time (see \cite{kakade2008efficient} and \cite{zhong2015esann}).} 
 
-The ability to choose class-relevant example vectors is however a critical property of the discriminant approach, that needs to be conserved in the partially supervised setup considered here. 
+The ability to choose class-relevant observation vectors is however a critical property of the discriminant approach, that needs to be conserved in the partially supervised setup considered here. 
 We consider here a specific loss function:
 $$l_t = l(x_t,W_{t-1},\tilde{y}_t,f_t)$$
 with $f_t = \delta(y_t,\tilde{y}_t)$,
@@ -363,9 +371,11 @@ which leads to algorithm \ref{algo:quad}.
 This setup is called ``passive-aggressive'' for it combines a conservative approach (ignore $x_t$ if $l_t=0$) with a tight update (optimize the classifier according to $x_t$ if $l_t>0$).
 In its original formulation ($C \rightarrow \infty$), this learning setup implements a ``one-shot'' update, i.e. carries out a zero-loss  after update. A finite stiffness parameter $C$ provides a more progressive (less ``aggressive'') update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
 
-In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good the current choice is, without telling how good or bad other choices would be. Solving the system carries out a single update on the  $\tilde{y}^\text{th}$ separatrix. 
+In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good the current choice is, without telling how good or bad other choices would be. Solving the system carries out a single update of the  $\tilde{y}_t^\text{th}$ separatrix. 
 
-Under this focused examination, it is worth considering an alternate classifier $U$ in parallel with $W_{t-1}$. The same examination of $\tilde{y}_t$ at time $t$ provides an alternate feedback $l^*_t = l(x_t,U,\tilde{y}_t,f_t)$. By construction, if the data are separable under OVA constraints (see eq. (\ref{eq:OVA-A}-\ref{eq:OVA-B})), there exist at least one classifier $U$ such that $\forall (t, \tilde{y}_t), l^*_t = 0$. In that case, the following theorem holds:
+\subsection{Linear separability}
+The passive-aggressive setup provides solid error bounds in the linearly-separable case. 
+When trying to upper-bound the number of mistakes, it is worth considering an alternate classifier $U$ that provides an alternate feedback $l^*_t = l(x_t,U,\tilde{y}_t,f_t)$. By construction, if the data vectors are separable under OVA constraints (see eq. (\ref{eq:OVA-A}-\ref{eq:OVA-B})), there exist at least one classifier $U$ such that $\forall (t, \tilde{y}_t), l^*_t = 0$. In that case, the following theorem holds:
 
 %\subsubsection{Analyse}
 
@@ -396,8 +406,8 @@ The sequence probes the environment without necessarily uncovering all of it. Th
 %An appropriate uniform exploration policy is thus needed in order {\color{red} to provide effective classification improvement.}
 Consequently, the loss (or squared loss) \emph{is not an upper bound of the classification mistake.} The theorem thus does not guarantees that every example will be correctly classified in the end. This would depends on (i) the particular policy followed in the course of learning and (ii)  additional assumptions on sample regularity.   
 
-Let us consider now that a fixed policy is applied throughout the session. Depending on the particular policy applied, additional guarantees can be obtained.  
-Considering the theorem guarantees a zero loss after a fixed number of updates, let us note  $W^*$ this zero-loss final classifier. Then $\forall k \in 1,...,K$, 
+Let us now consider  that a fixed policy is applied throughout the session. Depending on the particular policy applied and dataset regularity assumptions, additional guarantees can be obtained. Let us now assume that \emph{every sample $x$ from class $k$ lies in a convex set $\mathcal{C}_k$}. 
+Considering the theorem grants a zero loss after a fixed number of updates, let us note  $W^*$ this zero-loss final classifier. Then $\forall k \in 1,...,K$, 
 %First, the classifier $U$ is composed of $K$ different separatrices, so that its norm is expected to grow linearly with $K$.
 
 %if a single policy $h$ is followed in the course of learning, 
@@ -406,7 +416,7 @@ Considering the theorem guarantees a zero loss after a fixed number of updates, 
 
 %Two important cases need here to be examined:
 
-	\paragraph{Greedy deterministic policy} If $\tilde{y}_1, ...,\tilde{y}_t, ...$ obey to a greedy deterministic choice $h$, and if $\exists t$ such that $\tilde{y}_t = y_t = k$, then, as $l_t$ is satisfied by $W^*$, $\langle w_k^*, x_t\rangle \geq 1$. Let us now assume that \emph{every sample $x$ from class $k$ lies in a convex set $\mathcal{C}_k$}. Then, if $\exists x \in \mathcal{C}_k$ with $h(x) \neq k$ and zero loss, then $\langle w_k^*, x\rangle < \langle w_{h(x)}^*, x\rangle \leq -1$. Then $\exists \rho \in [0,1]$ such that $x_\rho = \rho x + (1-\rho) x_t \in \mathcal{C}_k$ and 
+	\paragraph{Greedy deterministic policy} If $\tilde{y}_1, ...,\tilde{y}_t, ...$ obey to a greedy deterministic choice $h$, and if $\exists t$ such that $\tilde{y}_t = y_t = k$, then, as $l_t$ is satisfied by $W^*$, $\langle w_k^*, x_t\rangle \geq 1$.  Then, if $\exists x \in \mathcal{C}_k$ with $h(x) \neq k$ and zero loss, then $\langle w_k^*, x\rangle < \langle w_{h(x)}^*, x\rangle \leq -1$. Then $\exists \rho \in [0,1]$ such that $x_\rho = \rho x + (1-\rho) x_t \in \mathcal{C}_k$ and 
 	$-1 < \langle w_k^*,x_\rho \rangle < 1 $, which breaks out the zero loss condition. So, $\nexists x \in \mathcal{C}_k$ with $h(x) \neq k$, i.e. every sample from $\mathcal{C}_k$ is correctly classified.
 	\paragraph{Uniform random policy} If $\tilde{y}_1, ...,\tilde{y}_T$ obey to a uniform random choice (independent from $W$), the separatrix $w_k$ is probed on average $T/K$ times. By a simple combinatorial argument, the chance not finding $t$ such that $\tilde{y}_t = y_t = k$ exponentially decreases with $t$.
 	\paragraph{$\varepsilon$-greedy policy} Finally, an $\varepsilon$-greedy choice, that alternates between uniform sampling and greedy choice, guarantees a correct classification in the end.  
@@ -432,8 +442,9 @@ Considering the theorem guarantees a zero loss after a fixed number of updates, 
 %	\end{itemize}
 
 
-\vspace{.5cm} 
-If we turn now to an arbitrary classifier $U$, without separability assumption, the following theorem holds~:
+%\vspace{.5cm} 
+\subsection{Stationary case}
+If we turn now to an arbitrary classifier $U$, and withdraw the separability assumption. Then, for any given dataset, the following theorem holds~:
 
 \begin{theorem}
 	\label{theo:BPAT2}
@@ -528,9 +539,9 @@ In practice, the classifier output remaining unchanged when $l_t = 0$, and, foll
 Then, the classifier can be made explicit in the form of a sum over observation vectors~:
 $$W_t = \sum_{t^\prime=1}^t \alpha_{t^\prime} X_t^{\tilde{y}_{t^\prime}}$$
 with:
-$$\alpha_{t^\prime} = \mathbf{1}_{l_{t^\prime} > 0}(1 - \eta \lambda)^{\sigma_t - \sigma_{t^\prime}-1}  \eta (2\delta(y_{t^\prime},\tilde{y}_{t^\prime})-1)$$
-with $\mathbf{1}_u$ equal to 1 when $u$ is true and 0 elsewhere, and $\sigma_t$  the number of updates at time $t$, i.e.
-$$\sigma_t = \sum_{t^\prime=1}^t \mathbf{1}_{l_{t^\prime} > 0}$$  
+$$\alpha_{t^\prime} = \mathbf{1}_{\{l_{t^\prime} > 0\}}(1 - \eta \lambda)^{\sigma_t - \sigma_{t^\prime}-1}  \eta (2\delta(y_{t^\prime},\tilde{y}_{t^\prime})-1)$$
+with $\mathbf{1}_{\{u\}}$ equal to 1 when $u$ is true and 0 elsewhere, and $\sigma_t$  the number of updates at time $t$, i.e.
+$$\sigma_t = \sum_{t^\prime=1}^t \mathbf{1}_{\{l_{t^\prime} > 0\}}$$  
 and the cardinality of the non-zero coefficients correspond to the number of observation vectors effectively stored in memory.
 
 Then, following \cite{kivinen2004online}, a strict control on the number of prototype vectors may be imposed, though ``old'' coefficients exponentially vanish while new updates take place. A $H$-horizon truncation principle may be adopted, with every $\alpha_{t^\prime}$ such that $\sigma_t - \sigma_{t^\prime} > H$ set to 0. The truncation error can then be shown to  exponentially decrease with $H$ (see \cite{kivinen2004online}). This approach is of course well-adapted to the non-stationary case, where context-related categories change over time.
@@ -540,7 +551,7 @@ Then, following \cite{kivinen2004online}, a strict control on the number of prot
 
 \subsection{Kernel Extension}
 The extension of the linear discriminant setup to 
-RKHS (Reproducible Kernel Hilbert Space) redescription space 
+RKHS (Reproducible Kernel Hilbert Space) redescription spaces 
 allows to deal with non-linearly separable learning sets at the cost of additional free parameters (kernel specific parameters). 
 
 Let $\mathcal{K}(.,.)$ a mapping from $ \mathbb{R}^d \times \mathbb{R}^d$ to $ \mathbb{R}^+$ having the reproducing property (see \cite{scholkopf2002learning}). Let $\mathcal{K}(x,.)$ be the projection of example $x$ in $\mathcal{H}$. Then, by construction, a scalar product $\langle.,.\rangle_\mathcal{H}$ in $\mathcal{H}$ is such that: 
@@ -574,7 +585,7 @@ $\{x_{t^{\prime}}\}_{{t^{\prime}}\in \mathcal{T}_{k,t}}$
 so that 
 	$$w_{k,t} = \sum_{t^{\prime}\in \mathcal{T}_{k,t}} \alpha_{t^{\prime}} \mathcal{K}(x_{t^{\prime}},.)$$
 
-The total number of prototypes is incremented each time a non-zero loss is carried out. From theorem \ref{theo:BPAT1}, we know this number is bounded since every dataset is separable in infinite-dimensional redescription spaces. 
+The total number of prototypes is incremented each time a non-zero loss is read out. From theorem \ref{theo:BPAT1}, we know this number is bounded since every dataset is separable in infinite-dimensional redescription spaces. 
 
   
 %Le nombre de vecteurs supports augmente de 1 chaque fois que la perte est non nulle. De par le théorème 1, nous savons que ce nombre est borné dès lors que les données sont séparables dans l'espace de redescription. 
@@ -590,7 +601,8 @@ The total number of prototypes is incremented each time a non-zero loss is carri
 \label{subsec:BPAE}
 
 %Nous évaluons ici notre algorithme à l'aide de deux jeux de données synthétiques et trois jeu de données réels dont les caractéristiques sont fournies dans la table Table~\ref{table:mce}.
-In order to test different aspects of the multiclass setting, the algorithms are evaluated on two synthetic datasets and three real-world datasets.  Their principal characteristics are provided in table ~\ref{table:mce}.
+%In order to test different aspects of the multiclass setting, the 
+Different algorithms are evaluated on two synthetic datasets and three real-world datasets.  Their principal characteristics are provided in table ~\ref{table:mce}.
 
 \begin{table}[h]
 	\caption{Five datasets considered, with $n$ the number of instances, $d$ the vectors dimension and $K$ the number of labels.}
@@ -633,8 +645,8 @@ The original dataset contains multi-label instances.  In order to fit the single
 %Les deux derniers jeux de données sont constitués de données réelles, de dimension plus faible, et avec un nombre d'exemplaires également plus faible. Nous comparons dans ce cas différents algorithmes en plongeant les données dans des espaces de fonctions noyaux.  
 
 The two last datasets are typical machine learning real-world datasets, having a smaller number of instances and a smaller dimension, allowing to test sparsity in the Kernel embedding case.   
-The fourth dataset, named  \textit{Segment} \cite{Lichman:2013}, owns 2310 instances. Each feature vector is build from $3\times3$ pixels excerpts from natural images, with 19 features per instance and 7 classes. 
-The fifth dataset, named \textit{Pendigits}, was created by \cite{alimoglu1996combining} {\color{red}  (on what??)}. It owns 7494 instances, with 16 features per instance and 10 classes. 
+The fourth dataset, named  \textit{Segment} (UCI's Image Segmentation Data Set -- \cite{Lichman:2013}), owns 2310 instances. Each feature vector is build from $3\times3$ pixels excerpts from natural images, with 19 features per instance and 7 classes. 
+The fifth dataset, named \textit{Pendigits} (UCI's Pen-Based Recognition of Handwritten Digits Data Set -- \cite{alimoglu1996combining}), based on preprocessed (normalization and downsampling) of $(x,y)$ coordinate encoded handwritten digits. It owns 7494 instances, with 16 features per instance and 10 classes. 
 
 
 
@@ -643,7 +655,7 @@ The fifth dataset, named \textit{Pendigits}, was created by \cite{alimoglu1996co
 \subsection{Algorithms}
 
 \begin{table}[h]
-	\caption{Parameters setting for different algorithms and different datasets.  {\bf P} stands for Perceptron, {\bf PA} for Passive Agressive, {\bf B} for Banditron, {\bf C} for Confidit, {\bf BPA} for the one-Bit feedback Passive Aggressive (algorithm 1), {\bf K-B} for the kernel Banditron, {\bf K-BPA} and {\bf K-SGD} for the kernel  realization of BPA (algorithm 1) and SGD (algorithm 2).}
+	\caption{Parameters setting for different algorithms and different datasets.  {\bf P} stands for Perceptron, {\bf PA} for Passive Agressive, {\bf B} for Banditron, {\bf C} for Confidit, {\bf BPA} for the one-Bit feedback Passive Aggressive (algorithm 1), {\bf K-B} for the kernel Banditron, {\bf K-BPA}  for the kernel  realization of BPA (algorithm 1) and {\bf K-SGD} for the kernel  realization of SGD (algorithm 2).}
 	\label{table:bpa}
 	%\begin{center}
 	
@@ -805,11 +817,11 @@ The first dataset being linearly separable, a final error bound is rapidly attai
 
 %Sur le premier jeu synthétique et linéairement séparable, on constate que la borne est rapidement atteinte pour Perceptron, PA, Confidit et BPA. Seul Banditron présente une courbe croissante qui ne permet pas de borner le taux d'erreurs cumulées.  On constate également, comme prévu, un taux d'erreur total plus faible pour les algorithmes supervisés que pour les algorithmes à feedback de Bandit.
 
-In the SynNonSep case, as the  5\% label noise is irreductible, all methods show a linear growth of the cumulative error. However, the slower increase seen on Confidit and BPA  point out a better resilience to label noise, when compared to the supervised setup. This resilience, that was first noticed in \cite{crammer2013multiclass}, thus extends here to the BPA approach.
+In the SynNonSep case, as the  5\% label noise is irreductible, all methods show a linear growth of the cumulative error. However, the slower increase seen on Confidit and BPA  point out a better resilience to label noise, when compared to the supervised setup. This resilience, that was noticed in \cite{crammer2013multiclass} and \cite{ngo2013upper}, thus extends here to the BPA approach.
 
 %\textcolor{red}{OK-- Il manque les valeurs des paramètres pour les différents algorithmes (faire un tableau comme dans la partie précédente).}
 
-The Reuters RCV1-v2 database provides a more realistic testbed.
+The Reuters RCV1-v2 database provides a  scale-realistic testbed.
 % allowing to highlight the BPA setup effectiveness. 
 The sub-linear cumulative error rate  shown by all methods indicate that learning is effective in all case, with, however, a clear gap between the Banditron and the other methods. In detail, the two supervised algorithms outperform by little BPA, followed by Confidit, and then the Banditron far behind. The first four methods show almost similar final slopes, on contrary to the Banditron showing a higher final error rate (see figure \ref{pic:BPASNSerr}). The good performances of BPA and Confidit are noticeable here, for the number of classes is high (53) and the labelling information consequently very scarce. 
 Moreover, the marked prevailing of BPA over Confidit is also noticeable for its algorithmic complexity is much less\footnote{Confidit uses a second order sample covariance estimate, this covariance matrix being reduced  to a mere diagonal in the high-dimensional case (see  \cite{crammer2013multiclass}).}. 
@@ -1113,7 +1125,7 @@ The first thing to be noticed is the prevailing of the Kernel setups over the li
 
 2. approx memes perf que confidit (ou ordre 2) avec en plus : (1) une moindre complexité et (2) la parcimonie des mises à jour. }
 
-We compare in this paper several online learning setups that apply to the case  when the expected label is not fully disclosed, but instead a single bit  telling whether the current output is correct or incorrect. The initial absence of explicit label information sets to randomly sample the label space, in the manner of contextual bandits, and consider the exploration exploitation trade-off in the decision process. 
+We compare in this paper several online learning setups that apply to the case  when the expected label is not fully disclosed, but instead a single bit, telling whether the current output is correct or incorrect, is provided. The  absence of explicit label information XXX to randomly sample the label space, in the manner of contextual bandits, and consider the exploration exploitation trade-off in the decision process. 
 
 %Nous avons proposé dans cet article un nouvel algorithme d'apprentissage en ligne de classifieurs multiclasses dans le cas où l'information de classification est binaire (réponse correcte ou incorrecte). L'absence d'information de label explicite conduit à échantillonner de manière aléatoire l'espace des labels, sur le modèle des bandits contextuels. L'approche utilisée ici pour l'exploration est $\varepsilon$-glouton, soit une alternance entre échantillonnage uniforme et exploitation. 
 
@@ -1169,6 +1181,9 @@ Plus généralement, ces résultats illustrent le fait qu'une information de cla
 %% \bibitem[ ()]{}
 
 % %\end{thebibliography}
+\section*{Acknowledgements}
+
+This work was supported by the China Studentship Council (CSC). Thanks to Liva Ralaivola (LIF, Marseille, France) for fruitful discussions.
 
 \appendix
 \section{Proof of Theorem \ref{theo:BPAT1}}\label{app:thm1}
