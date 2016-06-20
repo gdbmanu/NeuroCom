@@ -89,7 +89,7 @@
 %% \address{Address\fnref{label3}}
 %% \fntext[label3]{}
 
-\title{Sparse online multi-class learning under one-bit feedback}
+\title{Sparse online multi-class learning under a one-bit bandit feedback}
 
 %% use optional labels to link authors explicitly to addresses:
 %% \author[label1,label2]{}
@@ -129,24 +129,25 @@ Mot1 \sep Mot2
 \label{sec:lentete}
 
 
-Categorical online learning is a well-documented class of learning problems in which ($i$) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and ($ii$) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$. The multiclass learning task typically addresses object recognition (such as OCR, face recognition, speech recognition etc.) and recommender systems. In contrast with the offline approach, online learning takes the form of an iterative process, relying on a time-ordered sequence of observations, actions and feedbacks (where the feedback is the observable "result" of the action).   
+Categorical online learning is a well-documented class of learning problems in which ($i$) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and ($ii$) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$. The multiclass learning task typically addresses object recognition (such as OCR, face recognition, speech recognition etc.) and recommender systems. In contrast with the offline approach, online learning takes the form of an iterative process, relying on a time-ordered sequence of observations, actions and feedbacks (where the feedback is the observable ``payoff'' of the action).   
 Two well-known setups obey to this class, i.e. the contextual bandit setup (see  \cite{lai1985asymptotically} and \cite{auer2002finite}) and supervised online learning setup (see  \cite{rosenblatt1958perceptron}, \cite{duda1973pattern} and \cite{freund1999large}), the two setups mainly differing by the nature of the feedback. Whether abundant or scarce, deterministic or stochastic, stationary or adversarial, the feedback characteristics critically shape the design of the learning algorithms.  
 
-The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback (see \cite{kakade2008efficient}). This case lies at the crossroad of the supervised online learning setup and the bandit setup.  A one-bit feedback reflects a ``hit-or-miss'' learning situations, in which a single bit indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, the problem is specific to the online approach and was only recently identified and analyzed by the community (see \cite{kakade2008efficient}, \cite{gentile2012multilabel}, etc.). 
+The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback (see \cite{kakade2008efficient}), for the payoff is either 0 (failure) or 1 (success). This case lies at the crossroad of the supervised online learning setup and the bandit setup.  A one-bit feedback reflects a ``hit-or-miss'' learning situations, in which a single bit indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, this problem is bound to the online approach and was only recently addressed by the community (see \cite{kakade2008efficient}, \cite{gentile2012multilabel}, etc.). 
 Apart from the original work of \cite{kakade2008efficient}, most recent approaches to this problem are based on regularized linear models (see \cite{li2010contextual}, \cite{crammer2013multiclass}, \cite{ngo2013upper}), to which the powerful methods of contextual bandit, including UCB-like non-stochastic exploration strategy (see \cite{lai1985asymptotically}), do apply. While providing almost optimal convergence rates, model-based approaches suffer from a quadratic complexity in space that limits their applicability to large-dimensional datasets.  On contrary, discriminant-based approaches to online classification (see \cite{anlauf1989adatron}, \cite{crammer2006online}) only provide upper bounds on the error rate, but display linear scaling in size with smaller memory footprint. 
 
-We adapt in this paper the quadratic optimization approach proposed by \cite{crammer2006online} to the one-bit feedback case. Online learning relies on a local norm minimization under standard linear-convex constraints. Our conservative approach allows to determine similar regret bounds than in the original paper of \cite{crammer2006online}, providing strong garanties on  convergence capabilities, that are confronted to the other methods over synthetic and real datasets.  
+We adapt in this paper the quadratic optimization approach proposed by \cite{crammer2006online} to the one-bit feedback case, where online learning relies on a local norm minimization under standard linear-convex constraints. Our conservative approach allows to determine similar regret bounds than in the original paper of \cite{crammer2006online}, providing strong guaranties on  convergence capabilities, that are confronted to the other methods over synthetic and real datasets.  
 
 \section{Outlook}
 
-\paragraph{Online learning} Online learning is a \textit{process} in which an agent (the ``learner'') probes its environment sequentially to obtain \textit{information} that is eventually used to improve its \textit{fitness}.
+\subsection{Online learning} Online learning is a \textit{process} in which an agent (the ``learner'') probes its environment sequentially to obtain \textit{information} that is eventually used to improve its \textit{fitness}.
 The universe being initially hidden, the online approach works on probing the database (universe) through individual queries that step-by-step unveil the environment. 
 
 The sequential organization of learning is present in the most traditional setups such as the Bandit problems (see \cite{robbins1952bandit}) and in the Perceptron algorithm (see \cite{rosenblatt1958perceptron}). The general setup we consider here is the case of an ``open-loop'' \textit{actionnable} universe. The time-indexed observations $x_1$, ..., $x_t$, ... are independent (causally disconnected). Each observation causes the learner to output a single action $\tilde{y}_t$ out of $K > 1$ possible actions. Every action provides a feedback $f_t$ that is an \textit{information} about a \textit{value of interest} (or reward) $r_t$ that needs to be maximized over time. The feedback is \textit{explicit} in most contextual bandit setups, i.e. $f_t=r_t$ (see \cite{lai1985asymptotically} and \cite{auer2002finite}) while it takes the form of a category $f_t=y_t$ in traditional online learning setups, that \textit{indirectly} provides a quantity to maximise through a loss function $r(x_t, y_t) = -l(x_t,\tilde{y}_t, y_t)$ (see  \cite{duda1973pattern}, \cite{freund1999large}, \cite{kivinen2004online}, \cite{crammer2006online}). Solving the problem thus means both  learning the universe from experience and optimizing the final reward. 
 
-\paragraph{Linear models}
+\subsection{Linear models}
 Multiclass classification requires  finding an appropriate class $y \in \{1,... K\}$ for every observation vector $x \in \mathbb{R}^d$.
-The \textit{decision function} (or policy) $\tilde{y}_t \sim h(x_t)$ embodies both prior information about the regularity of the universe and experience-based information. A reasonable assumption  is to consider that  close-by contexts should provide close-by rewards distributions. 
+The \textit{decision function} (or policy) $h(x_t)$
+allows to carry out the categorical response $\tilde{y}_t \sim h(x_t)$. The decision function embodies both prior information about the regularity of the universe and experience-based information. A reasonable assumption  is to consider that  close-by contexts should provide close-by rewards distributions. 
 The linear approach to classification means to separate the input space in regions, where the different regions are defined by a set of linear mappings. We consider in that case a  classifier 
 \begin{equation}\label{eq:W}
 W = (w_1,..,w_k) \in \mathbb{R}^{K d}
@@ -163,10 +164,10 @@ The set of linear mappings can either be considered class-prototypes or class-se
 In the second case, the quadratic optimization approach (see \cite{anlauf1989adatron}, \cite{crammer2006online}) only provide upper bounds on the error rate but display linear scaling in size, label-unbalance robustness and more generally provide a smaller memory footprint. 
 
 
-\paragraph{One-bit feedback}
+\subsection{One-bit feedback}
 The one-bit feedback is a specific online learning setup that implements, in a principled way, the scarce labelling information problem. After reading $\tilde{y}_t$, instead of providing a label, the universe provides a single bit of information called the \textit{label hit}, i.e. $f_t = 1$ if  $\tilde{y}_t=y_t$ and $f_t = 0$ elsewhere. The objective, just as in the supervised case, is to avoid label misses and maximise labels hits. A specific update function needs to be defined to allow label hit improvement over time. 
 
-This problem was coined the ``bandit feedback classification problem'' by \cite{kakade2008efficient}. Taking inspiration from the multiclass perceptron (\cite{duda1973pattern}), a time-effective algorithm, called the ``Banditron'', is established:
+\paragraph{Banditron} This problem was coined the ``bandit feedback classification problem'' by \cite{kakade2008efficient}. Taking inspiration from the multiclass perceptron (\cite{duda1973pattern}), a time-effective algorithm, called the ``Banditron'', is established:
 $K$ linear mappings $w_1, ..., w_K$ are defined and the candidate response winner $\hat{y}$ relies on a best-match policy, i.e.
 \begin{equation}\label{eq:argmax}
 \hat{y} = \underset{k \in\{1,..,K\}}{\text{argmax}}  \langle w_k, x \rangle
@@ -192,12 +193,13 @@ X^k \triangleq (\vec{0}, ..., & x, ..., \vec{0}) \in \mathbb{R}^{K d}\\
  \end{equation}
 The expectation of the update is shown to be that of the multiclass perceptron, and a convergence to the correponding perceptron classifier is obtained, with a finite bound on the cumulative error in linearly separable cases. 
 
+\paragraph{Second-order models} 
 {\color{blue}
 Toujours dans le cadre des classifieurs linéaires, plusieurs algorithmes d'apprentissage de bandits contextuels ont été proposés dans la littérature. Dans nos expérimentations numériques, nous considérerons également ici l'algorithme ``Confidit'' proposé par Crammer et Gentile \cite{crammer2013multiclass}, reposant sur le perceptron d'ordre 2 et l'exploration non stochastique basée sur le principe UCB \cite{lai1985asymptotically}, et présentant des profils de convergence plus favorables que le Banditron. A AJOUTER : Newtron, Li et al 2010, ngo 2014}
 
 
 
-\paragraph{Online risk minimization}
+\subsection{Online risk minimization}
 Under the discriminant approach to linear classification, the separating hyperplanes are expected to optimally separate the input space according to the misclassification risk. This risk can for instance be minimized through a margin principle (see \cite{vapnik1998statistical}), imposing a non-zero distance of known class exemplars to the classification boundaries. 
 
 %In contrast with the \textit{offline} setting, where the classifiers are obtained through quadratic optimization over a finite set of classified exemples (see \cite{vapnik1998statistical}), no predefinite database is considered under the online setting. 
@@ -326,7 +328,7 @@ i.e.~:
 \end{align}
 %Dans le premier cas (le choix est correct), la perte décroît avec $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ jusqu'à 0. Au contraire, dans le second cas (choix incorrect), la perte augmente avec le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$.
 %Minimiser la perte revient donc à faire croître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ dans le premier cas, et à faire décroître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$  dans le second cas.}
-{\color{blue} This "agnostic" approach to non-explicitely disclosed labels %avoids weight coefficients asymmetry in the label hit case and 
+{\color{blue} This ``agnosti'' approach to non-explicitely disclosed labels %avoids weight coefficients asymmetry in the label hit case and 
 renders the method (i) independent to the labels set cardinality, (ii) independent to the actual classification achievement (avoiding unnecessary weight updates at high classification rates) (iii) independent to the actual exploration/exploitation rate and (iv) more resilient to label noise.}
 
 \subsection{Quadratic optimization}
@@ -358,8 +360,8 @@ which leads to algorithm \ref{algo:quad}.
 	\end{algorithmic}
 \end{algorithm}
 
-This setup is called "passive-aggressive" for it combines a conservative approach (ignore $x_t$ if $l_t=0$) with a tight update (optimize the classifier according to $x_t$ if $l_t>0$).
-In its original formulation ($C \rightarrow \infty$), this learning setup implements a "one-shot" update, i.e. carries out a zero-loss  after update. A finite stiffness parameter $C$ provides a more progressive (less "aggressive") update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
+This setup is called ``passive-aggressive'' for it combines a conservative approach (ignore $x_t$ if $l_t=0$) with a tight update (optimize the classifier according to $x_t$ if $l_t>0$).
+In its original formulation ($C \rightarrow \infty$), this learning setup implements a ``one-shot'' update, i.e. carries out a zero-loss  after update. A finite stiffness parameter $C$ provides a more progressive (less ``aggressive'') update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
 
 In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good the current choice is, without telling how good or bad other choices would be. Solving the system carries out a single update on the  $\tilde{y}^\text{th}$ separatrix. 
 
@@ -531,7 +533,7 @@ with $\mathbf{1}_u$ equal to 1 when $u$ is true and 0 elsewhere, and $\sigma_t$ 
 $$\sigma_t = \sum_{t^\prime=1}^t \mathbf{1}_{l_{t^\prime} > 0}$$  
 and the cardinality of the non-zero coefficients correspond to the number of observation vectors effectively stored in memory.
 
-Then, following \cite{kivinen2004online}, a strict control on the number of prototype vectors may be imposed, though "old" coefficients exponentially vanish while new updates take place. A $H$-"horizon" truncation principle may be adopted, with every $\alpha_{t^\prime}$ such that $\sigma_t - \sigma_{t^\prime} > H$ set to 0. The truncation error can then be shown to  exponentially decrease with $H$ (see \cite{kivinen2004online}). This approach is of course well-adapted to the non-stationary case, where context-related categories change over time.
+Then, following \cite{kivinen2004online}, a strict control on the number of prototype vectors may be imposed, though ``old'' coefficients exponentially vanish while new updates take place. A $H$-horizon truncation principle may be adopted, with every $\alpha_{t^\prime}$ such that $\sigma_t - \sigma_{t^\prime} > H$ set to 0. The truncation error can then be shown to  exponentially decrease with $H$ (see \cite{kivinen2004online}). This approach is of course well-adapted to the non-stationary case, where context-related categories change over time.
 
 
 
@@ -821,13 +823,14 @@ Moreover, the marked prevailing of BPA over Confidit is also noticeable for its 
 \label{pic:PKT}	
 \end{figure}
 
-Linear BPA, kernel BPA, kernel SGD and kernel Banditron  are applied to the Segment and Pendigits datasets on figures \ref{pic:PKT} and \ref{pic:PKCM}. 
-Online learning with kernels being generally burdened by the increasing size of the prototype vectors set used by the classifier (see \cite{kivinen2004online}), the objective here is mainly to compare the K-BPA native sparsity (algorithm \ref{algo:quad}) to the explicit sparsity control of the SGD method (algorithm \ref{algo:HGD}). The linear BPA provides a baseline reference, while the kernel-Banditron illustrates the upper bound computational costs of a non-sparse update. 
+The Segment and Pendigits datasets, to which Linear BPA, kernel BPA, kernel SGD and kernel Banditron are applied on figures \ref{pic:PKT} and \ref{pic:PKCM}, present a dramatic decrease in size, with vectors of only 19 features in Segment and only 16 in Pendigits.
+These more appealing feature spaces are counterbalanced by a stronger non-separability, that dictates the use of kernel methods. 
+Online learning with kernels being generally burdened by the increasing size of the prototype vectors set (see \cite{kivinen2004online}), we check here for the sparsity of the different setups. In particular, we compare the K-BPA native sparsity (algorithm \ref{algo:quad}) with the explicit sparsity control of the SGD method (algorithm \ref{algo:HGD}), while the linear BPA provides a baseline reference, and the kernel-Banditron illustrates the upper bound computational cost of a non-sparse update. 
 
 %Sparse and conservative updates are thus preferred, for smaller prototype sets, and thus lesser computational costs, should be attained.  
 
 
-The evolving computational cost over time is shown on figure \ref{pic:PKT}. Apart from the linear case, showing a baseline constant cost over time, all kernel-based setups show a monotonic cost rise over time, with the best computational costs obtained for the K-SGD, followed by the K-BPA, and finally the K-Banditron giving an upper bound linear cost rise.  The computational cost of a learning session is consequently $0(T)$ for the linear BPA, $O(T^2)$ for the K-Banditron and in between for the two other cases. The BPA algorithm is expected to reach a constant computational cost after the final number of prototypes is reached, this number being set to 200 on the Segment database and 500  on the Pendigits one. A plateau is roughly observed after 1000 trials on the Segment database, while a continuing rising at slow rate is observed in the other case. The BPA algorithm, while being more costly, show a very close sparsity on the segment database while having a more marked difference on the Pendigits database, showing in general the sparsity effectiveness of the BPA approach.
+The increasing computational cost over time is shown on figure \ref{pic:PKT}. Apart from the linear BPA baseline constant cost, all kernel-based setups show a monotonic rise over time, with the best trend obtained by the K-SGD, followed by the K-BPA, and then the K-Banditron constant trend.  The computational cost of a learning session is consequently $0(T)$ for the linear BPA, $O(T^2)$ for the K-Banditron and in between for the two other cases. The BPA algorithm is expected to reach a constant cost after the final number of prototypes is reached, this number being set to 200 on the Segment database and 500  on the Pendigits one. A plateau is roughly observed after 1000 trials on the Segment database, while a continuing complexity rise is observed at slow rate in the other case. The K-BPA, while still more costly, shows a very close-by trend on the Segment database, and a more marked difference on the Pendigits database. These results confirm in general the sparsity effectiveness, and the subsequent reduced computational cost, of the K-BPA setup.
 
 
 \begin{figure}[htp]
@@ -860,11 +863,11 @@ The evolving computational cost over time is shown on figure \ref{pic:PKT}. Apar
 %	\label{pic:SKM}
 %\end{figure}
 
-Now turning to the classification rates, the cumulative error rates obtained by linear BPA, kernel BPA, kernel SGD and kernel Banditron on the Segment and Pendigits databases are shown on figure~\ref{pic:PKCM}. %, \ref{pic:PKM}, 
+Now turning to the classification rates, the cumulative errors obtained by the linear BPA, kernel BPA, kernel SGD and kernel Banditron on the Segment and Pendigits databases are shown on figure~\ref{pic:PKCM}. %, \ref{pic:PKM}, 
 %et \ref{pic:SKCM} 
 %et \ref{pic:SKM}  
-The first trend to notice is the prevailing of the Kernel setup over the linear one in that case, in particular when considering the Segment database where the linear BPA hardly shows improvement over time. 
- The banditron is generally close to the worst-case scenario while the K-SGD, despite good initial startup, shows difficulty to capitalize improvement after a while (in particular on the Pendigits case). In contrast, the kernel BPA is clearly found to outperform the two other methods, in particular regarding te final error rate. In particular, the final error rate of K-BPA on the Pendigits database is less than 2\%, which is more than 5 time better than the other methods.  This final state-of-the-art classification performances is quite remarkable, given the online setup and partial feedback used here. 
+The first thing to be noticed is the prevailing of the Kernel setups over the linear one in both cases, and particularly on the Segment database where the linear BPA hardly shows improvement over time. 
+ The banditron is generally close to this worst-case scenario, while the K-SGD, despite a good initial startup, experience difficulty to capitalize improvement over time (more particularly on the Pendigits case). In contrast, the kernel BPA is clearly found to outperform the other methods, in particular when regarding the final error rate: the final less than 2\% error rate obtained on the Pendigits database overtakes the other methods, but also approaches the state-of-the-art classification rates obtained in offline/full feedback settings. 
 
 
 %présentent enfin les taux d'erreur moyens et cumulés produits par ces différents algorithmes au cours de l'apprentissage des bases Segment and Pendigits. Les courbes d'erreurs cumulées mettent en évidence dans ce cas de l'approche à noyaux sur l'approche linéaire, du fait du caractère non-linéairement séparable des données utilisées. Par ailleurs, l'algorithme BPA présente dans les deux cas les meilleurs performances d'apprentissage que l'algorithme du Banditron. L'algorithme KSGD présente de bonnes performances en début d'apprentissage, mais tend ensuite à atteindre un plateau de performances (du fait de la troncature) tandis que BPA présente une amélioration plus régulière lui permettant de dépasser les performances de KSGD en fin de session. On constate en particulier des taux d'erreurs très faibles en fin de session pour la base Pendigit. Ces performances d'apprentissage sont remarquables du fait de l'absence d'information de classification complète.  
