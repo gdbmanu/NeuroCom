@@ -197,8 +197,8 @@ X_t^k \triangleq (\vec{0}, ..., & x_t, ..., \vec{0}) \in \mathbb{R}^{K d}\\
 The expectation of the update is shown to be that of the multiclass perceptron, and a convergence to the corresponding  classifier is obtained, with a finite bound on the cumulative error in linearly separable cases. 
 
 \paragraph{Second-order models} 
-Apart from the Banditron, a majority of learning setups address the one-bit bandit feedback classification problem using derivatives of the lin-UCB  (see \cite{auer2002using}) and second-order perceptron (see \cite{cesa2005second}). They allow to carry out confidence intervals over reward predictions, based on the observation vectors covariance matrix $\langle{X_t^{\tilde{y}_t}}^\top {X_t^{\tilde{y}_t}}\rangle$, and adapt the exploration policy through an UCB scheme (see \cite{lai1985asymptotically}), providing $O(\sqrt{T})$ regret bounds in the stationary case (see \cite{li2010contextual}, \cite{hazan2011newtron}, \cite{crammer2013multiclass}, \cite{ngo2013upper}).
-The close to optimal regret bounds obtained here are harmed by an $O(d^2)$ scaling and a lack of sparsity that justifies our closer inspection to the separatrix-based setup.
+Apart from \cite{kakade2008efficient}, a majority of learning setups address the one-bit bandit feedback classification problem using derivatives of the linUCB  (see \cite{auer2002using}) and/or second-order perceptron (see \cite{cesa2005second}). Those setups allow to carry out confidence intervals over reward predictions, based on the observation vectors covariance matrix $\langle{X_t^{\tilde{y}_t}}^\top {X_t^{\tilde{y}_t}}\rangle$, and adopt the UCB exploration policy (see \cite{lai1985asymptotically}), providing $O(\sqrt{T})$ regret bounds in the stationary case (see \cite{li2010contextual}, \cite{hazan2011newtron}, \cite{crammer2013multiclass}, \cite{ngo2013upper}).
+The close to optimal regret bounds obtained in that case are harmed by an $O(d^2)$ scaling and a lack of sparsity that justifies our closer inspection to the separatrix-based setup.
 
 %  predicting both ith explicit storing for each class the expected to the linear projection.
 %{\color{blue}
@@ -238,7 +238,7 @@ Under the multiclass setting, two principal margin constraint schemes can be set
 	\begin{equation}
 	\label{eq:rel-loss} l (x,W,y) =  \left[ 1 +  \langle w_y, x \rangle - \max_{k \neq y} \langle w_k, x\rangle\right]_+\end{equation}
 	with $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
-	\item  Compliant with the one-vs-all (OVA) construction, the \emph{normative} margin setup imposes the classifier to provide a response that overtakes in norm a reference value $a$. Taking  $a = 1$ for reference, it tells $\forall k$: \begin{align}%\label{eq:OVA}
+	\item  Compliant with the one-vs-all (OVA) construction (see also \cite{allwein2000reducing}), the \emph{normative} margin setup imposes the classifier to provide a response that overtakes in norm a reference value $a$. Taking  $a = 1$ for reference, it tells $\forall k$: \begin{align}%\label{eq:OVA}
 	&\langle w_k, x \rangle \geq 1 &\text{ if } y = k \label{eq:OVA-A}\\
 	&\langle w_k, x \rangle \leq -1 &\text{ if }y \neq k \label{eq:OVA-B}
 	\end{align}
@@ -281,16 +281,19 @@ The normative setup puts additional constraints regarding the classification tas
 
 The one-bit feedback provides an asymmetrical situation in which prediction misses provide a poor classification information (eliminates one response out of $K$ possibilities) while prediction hits provide a rich classification information (eliminates $K-1$ responses out of $K$ possibilities). 
 In the starting phase of a learning process, little information is expected on average, and a learner is suggested to try labels at random until a label hit is obtained. This may not seem necessary in the subsequent steps where enough information may have been gathered to provide effective classification accuracy. 
-This intuition should however be considered with care, for information gathering needs to rely on sensing a differences between a prediction and an actual response. {\color{blue} In short, mistakes (predicting a hit and obtaining a miss, or vice-versa) are  more informative than actual classification achievements (this point being exemplified by the perceptron taking only misclassification events for its update). There is thus a set point at which a greedy choice becomes suboptimal from an information gathering perspective (see \cite{kakade2008efficient}).} The choice of an exploration strategy thus depends on the focus put either on gathering information or optimizing rewards. 
+This intuition should however be considered with care, for information gathering needs to rely on sensing a differences between a prediction and an actual response. 
+%{\color{blue} 
+In short, mistakes (predicting a hit and obtaining a miss, or vice-versa) are  more informative than actual classification achievements (this point being exemplified by the perceptron taking only misclassification events for its update). There is thus a set point at which a greedy choice becomes suboptimal from an information gathering perspective (see \cite{kakade2008efficient}).
+%} 
+The choice of an exploration strategy thus depends on the focus put either on gathering information or optimizing rewards. 
 
 Model-based setups (see \cite{lai1985asymptotically}, \cite{auer2003nonstochastic}, \cite{crammer2013multiclass}) generally use model information (number of visits, hits variance, etc.) to optimize rewards, so that exploration steps become rapidly scarce through UCB-based policies. 
 Discriminant-based setups (see \cite{kakade2008efficient}, \cite{zhong2015esann}) keep a focus on classification information gathering through  
 %$\varepsilon$-greedy policies giving a constant budget ($1-\varepsilon + \frac{\varepsilon}{K}$) to the actual prediction and $\frac{\varepsilon}{K}$ to the other choices 
 a constant exploration rate $\varepsilon$, low enough to allow for effective classification rates while allowing continuing information gathering.
 %Unpredicted hit examples play a particular role for they are given a higher coefficient in the update, reflecting a "prediction surprise" (see for instance eq. (\ref{eq:kaka-update})). This information-weighted update is however done at the risk of an increased variance of the update sequence and of course of a linear regret.
-{\color{red} Though expecting a weak dependence on decision policy WHY??}, we consistently adopt an $\varepsilon$-greedy approach in simulations, using the \cite{kakade2008efficient} formula, i.e.:
-$$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ with a (fixed) exploration parameter $\varepsilon \in [0,1]$.
-%, where pure exploration ($\varepsilon = 1$ i.e. uniform prediction) and pure greediness ($\varepsilon = 0$, i.e. hit prediction only) are special cases.
+%{\color{red} Though expecting a weak dependence on decision policy WHY??}, 
+
 
 
 \subsection{Sparse online multiclass discrimination}\label{sec:sparse-online-multiclass-discrimination}
@@ -304,40 +307,34 @@ $$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ w
 
 %A one-bit feedback approach mainly differs from the supervised case by considering with more care exploration requirements.  
 
-The computational efficiency of the perceptron (\cite{rosenblatt1958perceptron}), as well as the SVM (\cite{vapnik1998statistical}),  critically relies on their sparsity, i.e. their capability to separate the example  set between relevant and irrelevant observation vectors, given a classification task. Fewer vectors in a classifier provide better generalization capabilities and participate in regularization.
+The computational efficiency of the perceptron (\cite{rosenblatt1958perceptron}), as well as the SVM (\cite{vapnik1998statistical}),  critically relies on their sparsity, i.e. their capability to keep only the most relevant observation vectors regarding classification task (the so-called ``support vectors''). Fewer vectors in a classifier provide better generalization capabilities and participate in regularization.
 On contrary to their supervised counterpart, class-separatrices updates in the Banditron (\cite{kakade2008efficient}) and PAB (\cite{zhong2015esann}) are dense over time, loosing the Kernel-extension capability (at reasonable computational cost). 
+%{\color{green} Previous generalizations of the relative margin constraint (see eq. (\ref{eq:rel})) were shown dense over time (see \cite{kakade2008efficient} and \cite{zhong2015esann}).} 
+The ability to keep only class-relevant observation vectors is however a critical property of the discriminant approach, that needs to be conserved in the partially supervised setup considered here. 
 
-{\color{green} Previous generalizations of the relative margin constraint (see eq. (\ref{eq:rel})) were shown dense over time (see \cite{kakade2008efficient} and \cite{zhong2015esann}).} 
-
-The ability to choose class-relevant observation vectors is however a critical property of the discriminant approach, that needs to be conserved in the partially supervised setup considered here. 
-We consider here a specific loss function:
-$$l_t = l(x_t,W_{t-1},\tilde{y}_t,f_t)$$
-with $f_t = \delta(y_t,\tilde{y}_t)$,
-that adapts the one-vs-all normative margin constraint (presented in eqs.(\ref{eq:OVA-A}-\ref{eq:OVA-B})) to the one-bit feedback case. 
+On contrary to the supervised case, where a full information set $\{\delta(y,1)$, ..., $\delta(y,K)\}$ is disposable, a single bit $\delta(y,\tilde{y})$ is disclosed in our case, the other bits being hidden. 
+Adapting the one-vs-all normative margin constraint (presented in eqs.(\ref{eq:OVA-A}-\ref{eq:OVA-B})) to the one-bit feedback case, we consider now the loss function:
+\begin{align}\label{eq:loss}
+l_t &= l(x_t,W_{t-1},y_t,\tilde{y}_t)\nonumber\\
+&= [1 + (1 - 2 \delta(y_t,\tilde{y}_t)) \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+
+\end{align}
+with $\tilde{y}_t \in \{1,...,K\}$ the single label to be compared with $y_t$, or~:
+\begin{align}
+l_t = [1 - \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+ &\text{ if }y_t=\tilde{y}_t\label{eq:loss-A}\\
+l_t = [1 + \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+ &\text{ elsewhere} \label{eq:loss-B}
+\end{align}
 %, %allowing an absolute (non difference-based) update that 
 %and show in contrast a conservation of the update sparsity.
 % (see theorem \ref{theo:BPAT1}). %(or conservativeness). 
 
-On contrary to the supervised case, where a full information set $\{\delta(y,1), ..., \delta(y,K)\}$ is disposable, a single bit $\delta(y,\tilde{y})$ is disclosed in our case, the other bits being undisclosed. 
-A rapid inspection shows that the full set could be deduced in the label hit case ($y = \tilde{y}$), allowing for $K$ separatrices updates (see \cite{chen2009beyond}). Following the sparsity argument however,
-%, we follow the "ultraconservative" view proposed by \cite{crammer2003ultraconservative}, 
-only the  currently inspected label $\tilde{y}$ is  considered  for the update, for one separatrix at most may be updated at each round. 
-%under a non-zero loss condition.
+
 
 %{\color{blue}
-The instantaneous loss becomes:
-\begin{equation}\label{eq:loss}
-l_t = [1 + (1 - 2 \delta(y_t,\tilde{y}_t)) \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+
-\end{equation}
-i.e.~:
-\begin{align}
-	l_t = [1 - \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+ &\text{ if }y_t=\tilde{y}_t\label{eq:loss-A}\\
-	l_t = [1 + \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+ &\text{ elsewhere} \label{eq:loss-B}
-\end{align}
+%The instantaneous loss becomes:
+
 %Dans le premier cas (le choix est correct), la perte décroît avec $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ jusqu'à 0. Au contraire, dans le second cas (choix incorrect), la perte augmente avec le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$.
 %Minimiser la perte revient donc à faire croître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ dans le premier cas, et à faire décroître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$  dans le second cas.}
-{\color{blue} This ``agnosti'' approach to non-explicitely disclosed labels %avoids weight coefficients asymmetry in the label hit case and 
-renders the method (i) independent to the labels set cardinality, (ii) independent to the actual classification achievement (avoiding unnecessary weight updates at high classification rates) (iii) independent to the actual exploration/exploitation rate and (iv) more resilient to label noise.}
+{\color{blue} }
 
 \subsection{Quadratic optimization}
  
@@ -371,11 +368,29 @@ which leads to algorithm \ref{algo:quad}.
 This setup is called ``passive-aggressive'' for it combines a conservative approach (ignore $x_t$ if $l_t=0$) with a tight update (optimize the classifier according to $x_t$ if $l_t>0$).
 In its original formulation ($C \rightarrow \infty$), this learning setup implements a ``one-shot'' update, i.e. carries out a zero-loss  after update. A finite stiffness parameter $C$ provides a more progressive (less ``aggressive'') update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
 
-In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good the current choice is, without telling how good or bad other choices would be. Solving the system carries out a single update of the  $\tilde{y}_t^\text{th}$ separatrix. 
+In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good or bad the current choice is, without telling how good or bad other choices would be. Solving the system carries out a single update of the  $\tilde{y}_t^\text{th}$ separatrix. 
+A rapid inspection shows that the full label information set could be used in the label hit case ($y = \tilde{y}$), allowing for $K$ separatrices updates instead of one. This primary intuition is however not considered here, for multiple updates may put a too strong momentum on label hits.  
+We show in the following that our careful and conservative approach %, considering 
+% (see \cite{chen2009beyond}). 
+%Following the sparsity argument however,
+%, we follow the "ultraconservative" view proposed by \cite{crammer2003ultraconservative}, 
+%only 
+%the currently inspected label $\tilde{y}$ for the separatrix update, 
+is enough to provide strong convergence guarantees in most cases. 
+It moreover provides many practical advantages, among which:
+\begin{enumerate}
+	\item sparsity, each observation vector being stuck to one class-separatrix only, 
+	\item independence to the labels set cardinality, 
+	\item independence to the actual classification achievement (avoiding unnecessary weight updates at high classification rates), 
+	\item independence to the actual exploration/exploitation rate and 
+	\item resilience to label noise.
+\end{enumerate}
+%under a non-zero loss condition.
+
 
 \subsection{Linear separability}
 The passive-aggressive setup provides solid error bounds in the linearly-separable case. 
-When trying to upper-bound the number of mistakes, it is worth considering an alternate classifier $U$ that provides an alternate feedback $l^*_t = l(x_t,U,\tilde{y}_t,f_t)$. By construction, if the data vectors are separable under OVA constraints (see eq. (\ref{eq:OVA-A}-\ref{eq:OVA-B})), there exist at least one classifier $U$ such that $\forall (t, \tilde{y}_t), l^*_t = 0$. In that case, the following theorem holds:
+When trying to upper-bound the number of mistakes, it is worth considering an alternate classifier $U$ that provides an alternate feedback $l^*_t = l(x_t,U,y_t,\tilde{y}_t)$. By construction, if the data vectors are separable under OVA constraints (see eq. (\ref{eq:OVA-A}-\ref{eq:OVA-B})), there exist at least one classifier $U$ such that $\forall (t, \tilde{y}_t), l^*_t = 0$. In that case, the following theorem holds:
 
 %\subsubsection{Analyse}
 
@@ -392,7 +407,9 @@ When trying to upper-bound the number of mistakes, it is worth considering an al
 \end{theorem}
 (proof in \ref{app:thm1})
 
-The result obtained in that case is formally similar to that of  \cite{crammer2006online}. It states, in short, that a finite number of updates are needed to fit the classification constraints expressed by the observed series of losses. In particular, for large series ($\tilde{y}_1, ...,\tilde{y}_t, ...$), there is a point $t^*$ at which all subsequent observed losses are equal to zero. This result grants the classifier finite complexity in the separable case whatever the number of samples.
+The result obtained in that case is formally similar to that of  \cite{crammer2006online}. Note however that the reference classifier $U$ being defined in $\mathbb{R}^{Kd}$, while observation vectors are in $\mathbb{R}^{d}$, a dependence on the label set cardinality $K$ is to be expected. 
+
+This result states, in short, that a finite number of updates are needed to fit the classification constraints expressed by the observed series of losses. In particular, for large series ($\tilde{y}_1, ...,\tilde{y}_t, ...$), there is a point $t^*$ at which all subsequent observed losses are equal to zero. This result grants the classifier finite complexity in the separable case whatever the number of samples. 
 
 There is however an important caveat to be mentioned. 
 %The possible sequences $\tilde{y}_1$, ..., $\tilde{y}_T$ include constant sequences, greedy sequence and pure random sequences. In other words, it is independent from the policy.
@@ -406,7 +423,7 @@ The sequence probes the environment without necessarily uncovering all of it. Th
 %An appropriate uniform exploration policy is thus needed in order {\color{red} to provide effective classification improvement.}
 Consequently, the loss (or squared loss) \emph{is not an upper bound of the classification mistake.} The theorem thus does not guarantees that every example will be correctly classified in the end. This would depends on (i) the particular policy followed in the course of learning and (ii)  additional assumptions on sample regularity.   
 
-Let us now consider  that a fixed policy is applied throughout the session. Depending on the particular policy applied and dataset regularity assumptions, additional guarantees can be obtained. Let us now assume that \emph{every sample $x$ from class $k$ lies in a convex set $\mathcal{C}_k$}. 
+Let us now consider  that a fixed policy is applied throughout the session, and let us assume that \emph{every sample $x$ from class $k$ lies in a convex set $\mathcal{C}_k$}. 
 Considering the theorem grants a zero loss after a fixed number of updates, let us note  $W^*$ this zero-loss final classifier. Then $\forall k \in 1,...,K$, 
 %First, the classifier $U$ is composed of $K$ different separatrices, so that its norm is expected to grow linearly with $K$.
 
@@ -441,8 +458,12 @@ Considering the theorem grants a zero loss after a fixed number of updates, let 
 %		$\langle w_y^*,x^\prime \rangle \leq -1$ and $\langle w_y^*,-x^\prime \rangle \leq -1$ which is also contradictory.
 %	\end{itemize}
 
+\vspace{.5cm} 
+We consistently adopt an $\varepsilon$-greedy approach in simulations, using the \cite{kakade2008efficient} formula, i.e.:
+$$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ with a (fixed) exploration parameter $\varepsilon \in [0,1]$.
+%, where pure exploration ($\varepsilon = 1$ i.e. uniform prediction) and pure greediness ($\varepsilon = 0$, i.e. hit prediction only) are special cases.
 
-%\vspace{.5cm} 
+
 \subsection{Stationary case}
 If we turn now to an arbitrary classifier $U$, and withdraw the separability assumption. Then, for any given dataset, the following theorem holds~:
 
@@ -462,7 +483,7 @@ classifier $U$ (including that of a loss-minimizer classifier $U^*$).
 
 Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA losses is visited in one run. For the classification error to be bounded, stationarity of samples generation as well as policy uniformity need to be assumed for the exhaustion of constraints be statistically granted.  
 
-This bound is moreover less tight than that of \cite{freund1997decision}, and  additional regularization needs to be set up to attain $O(\sqrt{T})$ regret (see \cite{crammer2006online}),  
+This bound is moreover less tight than that of \cite{freund1997decision}, and  additional regularization (with finite $C$) needs to be set up to attain $O(\sqrt{T})$ regret (see \cite{crammer2006online}),  
 we do not develop here for brevity. 
 
 %{\color{blue} Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est borné en $O(\sqrt{T})$ dans le cas non séparable.}
@@ -1123,7 +1144,15 @@ The first thing to be noticed is the prevailing of the Kernel setups over the li
 
 1. les bornes obtenues
 
-2. approx memes perf que confidit (ou ordre 2) avec en plus : (1) une moindre complexité et (2) la parcimonie des mises à jour. }
+2. approx memes perf que confidit (ou ordre 2) avec en plus : (1) une moindre complexité et (2) la parcimonie des mises à jour. 
+
+Generalités : le 1-bit feedback est specifique --> simplifie les preuves (preuves directement transposables)
+
+overconstrained/subsampling problem
+
+no optimal set point for epsilon (free choice)
+
+policy independent}
 
 We compare in this paper several online learning setups that apply to the case  when the expected label is not fully disclosed, but instead a single bit, telling whether the current output is correct or incorrect, is provided. The  absence of explicit label information XXX to randomly sample the label space, in the manner of contextual bandits, and consider the exploration exploitation trade-off in the decision process. 
 
