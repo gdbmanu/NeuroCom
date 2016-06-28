@@ -1147,89 +1147,91 @@ For instance, when adapting the passive aggressive setup as proposed in the supe
 we prove  similar bounds on the observed cumulative squared loss. 
 Here, however, the bound is not an upper bound of the classification error. Additional regularity assumptions, such as observation sets convexity, or a partly uniform sampling of the realization space, need to be considered to provide comparable error upper bounds. In addition, as in \cite{crammer2006online}, a misclassification stiffness parameter $C$ need to be set to reach $O(\sqrt{T})$ regret in the stationary case.  
 
-The numerical simulations provide favorable results on both large scale text mining  datasets and more classical non-linearly separable machine learning datasets. 
+The numerical simulations provide favorable results on both large scale text mining  datasets and on more classical non-linearly separable machine learning datasets. 
 When comparing our approach with the Banditron, a first result is the exploration parameter $\varepsilon$ insensitivity, allowing to consider $\varepsilon$ decrease  over time in practical implementations. 
 
 
-A comparison with the classical contextual bandit approach, using second order statistics and confidence interval estimates (see \cite{crammer2013multiclass}), is also shown favorable to our approach on a scale-realistic dataset, while owning a much lesser complexity. More surprisingly, a good resilience to label noise is also shown on a synthetic dataset, for the method was not specifically designed to address this aspect. 
+A comparison with the contextual bandit approach, using second order statistics and confidence interval estimates (see \cite{crammer2013multiclass}), is also shown favorable to our approach on a scale-realistic dataset, while owning a much lesser complexity. More surprisingly, a good resilience to label noise is also shown on a synthetic dataset, for the method was not specifically designed to address this aspect. 
 
-While most contextual bandit setups concentrate to large-scale text-mining and recommendation datasets, we actually implemented a kernel approach on more traditional non-linearly separable datasets, and show it effective when both considering sparsity (such as addressed by \cite{kivinen2004online}), and final classification accuracy, for a close to state-of-the-art 98\% final accuracy is observed after one pass on the Pendigits 10-class problem.
-
-A generalization to multi-label 
-
-From a more general standpoint, the generally good outcome of the bandit classification problem OVA reduction strongly rely on specific assumptions, namely a strict 
-
-{\color{green}
+While most contextual bandit setups concentrate to large-scale text-mining and recommendation datasets, we actually implemented a kernel approach on more traditional non-linearly separable datasets, and show it effective when both considering sparsity (such as addressed by \cite{kivinen2004online}), and final classification accuracy, with, for instance, a close to state-of-the-art 98\% final accuracy observed after one pass on the Pendigits 10-class problem.
 
 
-1. les bornes obtenues
-
-2. approx memes perf que confidit (ou ordre 2) avec en plus : (1) une moindre complexité et (2) la parcimonie des mises à jour. 
-
-Generalités : le 1-bit feedback est specifique --> simplifie les preuves (preuves directement transposables)
-
-overconstrained/subsampling problem
-
-no optimal set point for epsilon (free choice)
-
-policy independent}
-
-We compare in this paper several online learning setups that apply to the case  when the expected label is not fully disclosed, but instead a single bit, telling whether the current output is correct or incorrect, is provided. The  absence of explicit label information XXX to randomly sample the label space, in the manner of contextual bandits, and consider the exploration exploitation trade-off in the decision process. 
-
-%Nous avons proposé dans cet article un nouvel algorithme d'apprentissage en ligne de classifieurs multiclasses dans le cas où l'information de classification est binaire (réponse correcte ou incorrecte). L'absence d'information de label explicite conduit à échantillonner de manière aléatoire l'espace des labels, sur le modèle des bandits contextuels. L'approche utilisée ici pour l'exploration est $\varepsilon$-glouton, soit une alternance entre échantillonnage uniforme et exploitation. 
-
-L'algorithme développé repose  sur l'optimisation à chaque essai d'une fonction de coût spécifique, sur le modèle de l'approche ``Passive Agressive'' proposée par \cite{crammer2006online}. 
-L'analyse mathématique permet de mettre en évidence des bornes sur la somme des coûts cumulés, à la fois dans le cas séparable et dans le cas non séparable, comparables aux bornes obtenues dans le cas supervisé.
-
-Les expériences numériques confirment le bon comportement de l'algorithme d'apprentissage, à la fois sur des données de grande dimension et sur des jeux de données non-linéairement séparables. Tout en présentant une complexité algorithmique similaire, notre approche dépasse systématiquement les performances de l'algorithme du Banditron \cite{kakade2008efficient}. En particulier, nous observons une faible sensibilité au taux d'exploration $\varepsilon$, soit une conservations des performances depuis l'échantillonnage pur jusqu'à l'exploitation ``gloutonne'' de la réponse du classifieur. Cette propriété permet en conditions réelles d'envisager une implémentation de l'algorithme avec un $\varepsilon$ décroissant au cours de l'apprentissage.    
-
-Les courbes d'apprentissage montrent des performances similaires aux méthodes d'ordre 2, tout en présentant une complexité linéaire en espace. 
-Cette complexité faible permet en particulier d'appliquer aisément cette approche aux données de grande dimension. Les expériences montrent également un bon comportement dans le cas où le nombre de classes est assez élevé (ici 53 classes dans le cas de la base Reuters).  
-Dans le cas où les données ne sont pas linéairement séparables, l'algorithme présente une bonne parcimonie, permettant d'éviter une croissance trop importante du nombre de vecteurs supports au cours de l'apprentissage.
-
-Plus généralement, ces résultats illustrent le fait qu'une information de classification minimale (ici binaire) se révèle suffisante pour un apprentissage multi-classes performant, offrant en particulier des bornes de convergence comparable en ordre de grandeur à celles reposant sur une information de classification complète.
+From a more general standpoint, the bandit classification problem implements a form of active learning in scarcely labeled environments, with a limited (1 bit) information budget at each round. This budget is here used in the form of a single margin constraint under the OVA setup. Solving sequentially the observed margin constraints is then expected to solve in approximation the total (unobserved) set of margin constraints, provided enough redundancy is present in the data. This approach is exactly fitted to the specific stationary classification tasks considered here, and for that reason is shown to powerfully compete with the more demanding confidence-based second-order bandits setups. On one side, the OVA reduction may even generalize to slightly more demanding tasks, like the multi-label setup generally considered in recommender systems. On the other side, it should be overcome as soon as non-stationary and adversarial settings are considered.
+The H-horizon window-based approach, as proposed by \cite{kivinen2004online}, may in some cases be substituted, for it  shows both effectiveness, sparsity and adaptivity in our simulations.  
+    
 
 
-
-%In the next section, we will take BPA to deal with non-linear data sets  by combining the Kernel method. 
-
-
-
-%Reading :
-%Fundamental Limits of Online and Distributed Algorithms for Statistical Learning and Estimation Ohad Shamir (NIPS’14)
-%Many machine learning approaches are characterized by information constraints on how they interact with the training data. These include 
-%memory and sequential access constraints (e.g. fast first-order methods to solve stochastic optimization problems); 
-%communication constraints (e.g. distributed learning); 
-%partial access to the underlying data (e.g. missing features and multi-armed bandits) 
-%algorithm with small memory footprint
-%The standard implementation of many common learning tasks requires memory which is super-linear in the data dimension
-%The need for fast and scalable learning algorithms has popularised the use of online algorithms, which work by sequentially going over the training data, and incrementally updating a (usually small) state vector
-%There has also been considerable interest in online learning with partial information, where the learner only gets partial feedback on his performance. This has been used to model various problems in web advertising, routing and multiclass learning. Perhaps the most well-known case is the multi-armed bandits problem with many other variants being developed, such as contextual bandits, combinatorial bandits, and more general models such as partial monitoring [Bubeck, Cesa-Bianchi]
-%sequential decisions
-
-
-%% The Appendices part is started with the command \appendix;
-%% appendix sections are then done as normal sections
-%% \appendix
-
-%% \section{}
-%% \label{}
-
-%% If you have bibdatabase file and want bibtex to generate the
-%% bibitems, please use
-%%
-
-%% else use the following coding to input the bibitems directly in the
-%% TeX file.
-
-% %\begin{thebibliography}{00}
-
-%% \bibitem[Author(year)]{label}
-%% Text of bibliographic item
-
-%% \bibitem[ ()]{}
-
-% %\end{thebibliography}
+%{\color{green}
+%
+%
+%1. les bornes obtenues
+%
+%2. approx memes perf que confidit (ou ordre 2) avec en plus : (1) une moindre complexité et (2) la parcimonie des mises à jour. 
+%
+%Generalités : le 1-bit feedback est specifique --> simplifie les preuves (preuves directement transposables)
+%
+%overconstrained/subsampling problem
+%
+%no optimal set point for epsilon (free choice)
+%
+%policy independent}
+%
+%We compare in this paper several online learning setups that apply to the case  when the expected label is not fully disclosed, but instead a single bit, telling whether the current output is correct or incorrect, is provided. The  absence of explicit label information XXX to randomly sample the label space, in the manner of contextual bandits, and consider the exploration exploitation trade-off in the decision process. 
+%
+%%Nous avons proposé dans cet article un nouvel algorithme d'apprentissage en ligne de classifieurs multiclasses dans le cas où l'information de classification est binaire (réponse correcte ou incorrecte). L'absence d'information de label explicite conduit à échantillonner de manière aléatoire l'espace des labels, sur le modèle des bandits contextuels. L'approche utilisée ici pour l'exploration est $\varepsilon$-glouton, soit une alternance entre échantillonnage uniforme et exploitation. 
+%
+%L'algorithme développé repose  sur l'optimisation à chaque essai d'une fonction de coût spécifique, sur le modèle de l'approche ``Passive Agressive'' proposée par \cite{crammer2006online}. 
+%L'analyse mathématique permet de mettre en évidence des bornes sur la somme des coûts cumulés, à la fois dans le cas séparable et dans le cas non séparable, comparables aux bornes obtenues dans le cas supervisé.
+%
+%Les expériences numériques confirment le bon comportement de l'algorithme d'apprentissage, à la fois sur des données de grande dimension et sur des jeux de données non-linéairement séparables. Tout en présentant une complexité algorithmique similaire, notre approche dépasse systématiquement les performances de l'algorithme du Banditron \cite{kakade2008efficient}. En particulier, nous observons une faible sensibilité au taux d'exploration $\varepsilon$, soit une conservations des performances depuis l'échantillonnage pur jusqu'à l'exploitation ``gloutonne'' de la réponse du classifieur. Cette propriété permet en conditions réelles d'envisager une implémentation de l'algorithme avec un $\varepsilon$ décroissant au cours de l'apprentissage.    
+%
+%Les courbes d'apprentissage montrent des performances similaires aux méthodes d'ordre 2, tout en présentant une complexité linéaire en espace. 
+%Cette complexité faible permet en particulier d'appliquer aisément cette approche aux données de grande dimension. Les expériences montrent également un bon comportement dans le cas où le nombre de classes est assez élevé (ici 53 classes dans le cas de la base Reuters).  
+%Dans le cas où les données ne sont pas linéairement séparables, l'algorithme présente une bonne parcimonie, permettant d'éviter une croissance trop importante du nombre de vecteurs supports au cours de l'apprentissage.
+%
+%Plus généralement, ces résultats illustrent le fait qu'une information de classification minimale (ici binaire) se révèle suffisante pour un apprentissage multi-classes performant, offrant en particulier des bornes de convergence comparable en ordre de grandeur à celles reposant sur une information de classification complète.
+%
+%
+%
+%%In the next section, we will take BPA to deal with non-linear data sets  by combining the Kernel method. 
+%
+%
+%
+%%Reading :
+%%Fundamental Limits of Online and Distributed Algorithms for Statistical Learning and Estimation Ohad Shamir (NIPS’14)
+%%Many machine learning approaches are characterized by information constraints on how they interact with the training data. These include 
+%%memory and sequential access constraints (e.g. fast first-order methods to solve stochastic optimization problems); 
+%%communication constraints (e.g. distributed learning); 
+%%partial access to the underlying data (e.g. missing features and multi-armed bandits) 
+%%algorithm with small memory footprint
+%%The standard implementation of many common learning tasks requires memory which is super-linear in the data dimension
+%%The need for fast and scalable learning algorithms has popularised the use of online algorithms, which work by sequentially going over the training data, and incrementally updating a (usually small) state vector
+%%There has also been considerable interest in online learning with partial information, where the learner only gets partial feedback on his performance. This has been used to model various problems in web advertising, routing and multiclass learning. Perhaps the most well-known case is the multi-armed bandits problem with many other variants being developed, such as contextual bandits, combinatorial bandits, and more general models such as partial monitoring [Bubeck, Cesa-Bianchi]
+%%sequential decisions
+%
+%
+%%% The Appendices part is started with the command \appendix;
+%%% appendix sections are then done as normal sections
+%%% \appendix
+%
+%%% \section{}
+%%% \label{}
+%
+%%% If you have bibdatabase file and want bibtex to generate the
+%%% bibitems, please use
+%%%
+%
+%%% else use the following coding to input the bibitems directly in the
+%%% TeX file.
+%
+%% %\begin{thebibliography}{00}
+%
+%%% \bibitem[Author(year)]{label}
+%%% Text of bibliographic item
+%
+%%% \bibitem[ ()]{}
+%
+%% %\end{thebibliography}
 \section*{Acknowledgements}
 
 This work was supported by the China Studentship Council (CSC). Thanks to Liva Ralaivola (LIF, Marseille, France) for fruitful discussions.
