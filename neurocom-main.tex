@@ -1141,13 +1141,23 @@ The first thing to be noticed is the prevailing of the Kernel setups over the li
 \section{Conclusion}
 \label{sec:conclusion}
 
-We have shown that a conservative reduction of the OVA hinge-loss setup provides an effective and lightweight solution the online bandit classification problem (defined by \cite{kakade2008efficient}). 
-Adopting the passive aggressive approach proposed  in the supervised case by \cite{crammer2006online}, we provide similar bounds on the observed cumulative squared loss in the bandit case. This bound is however not an upper bound of the classification error in our case. Additional observation set regularities, as well as a partly uniform sampling of the realization space, need to be assumed to provide a classification error upper bound in the linearly separable case. 
+We have shown that a conservative reduction of the OVA hinge-loss  provides effective and lightweight solutions to the online bandit classification problem (defined by \cite{kakade2008efficient}). 
+For instance, when adapting the passive aggressive setup as proposed in the supervised case by \cite{crammer2006online}, 
+%i.e. sequentially solving local quadratic optimization problems,
+we prove  similar bounds on the observed cumulative squared loss. 
+Here, however, the bound is not an upper bound of the classification error. Additional regularity assumptions, such as observation sets convexity, or a partly uniform sampling of the realization space, need to be considered to provide comparable error upper bounds. In addition, as in \cite{crammer2006online}, a misclassification stiffness parameter $C$ need to be set to reach $O(\sqrt{T})$ regret in the stationary case.  
 
-The numerical simulation provide favorable results on both large scale text mining  datasets and more classical non-linearly separable machine learning datasets. The comparison with classical contextual bandit approaches, using second order statistics and confidence interval estimates (see \cite{crammer2013multiclass}), is also shown favorable to our approach on a scale-realistic dataset, while owning a much lesser complexity. More surprisingly, a good resilience to label noise is also shown on a synthetic dataset, for the method was not specifically designed to address this aspect. 
+The numerical simulations provide favorable results on both large scale text mining  datasets and more classical non-linearly separable machine learning datasets. 
+When comparing our approach with the Banditron, a first result is the exploration parameter $\varepsilon$ insensitivity, allowing to consider $\varepsilon$ decrease  over time in practical implementations. 
 
-While most contextual bandit setups concentrate to large-scale text-mining and recommendation datasets, we actually realized a kernel-based implementation on more traditional non-linearly separable datasets, and show it effective when both considering sparsity (as adressed by \cite{kivinen2004online}), and the final classification accuracy, for a close to state-of-the-art 98\% final accuracy is observed after one pass on the Pendigits 10-class problem.
 
+A comparison with the classical contextual bandit approach, using second order statistics and confidence interval estimates (see \cite{crammer2013multiclass}), is also shown favorable to our approach on a scale-realistic dataset, while owning a much lesser complexity. More surprisingly, a good resilience to label noise is also shown on a synthetic dataset, for the method was not specifically designed to address this aspect. 
+
+While most contextual bandit setups concentrate to large-scale text-mining and recommendation datasets, we actually implemented a kernel approach on more traditional non-linearly separable datasets, and show it effective when both considering sparsity (such as addressed by \cite{kivinen2004online}), and final classification accuracy, for a close to state-of-the-art 98\% final accuracy is observed after one pass on the Pendigits 10-class problem.
+
+A generalization to multi-label 
+
+From a more general standpoint, the generally good outcome of the bandit classification problem OVA reduction strongly rely on specific assumptions, namely a strict 
 
 {\color{green}
 
