@@ -107,14 +107,14 @@
 
 \begin{abstract}
 %% Text of abstract
-The bandit classification problem implements a form of active learning in scarcely labeled environments, with a limited (1 bit) information budget at each round. This information is here used to settle a single margin constraint under the OVA (``one-versus-all'') setup. A corresponding constrained sequential norm-minimal update is shown to solve the total classification problem in the separable case, provided enough redundancy is present in the data. This approach is moreover shown to powerfully compete in simulation with the more demanding confidence-based second-order bandits setups on large scale text-mining datasets.
+The bandit classification problem implements a form of active learning in scarcely labeled environments, with a limited (1 bit) information budget at each round. This information is here used to settle a single margin constraint under the OVA (``one-versus-all'') setup. A corresponding constrained sequential norm-minimal update is shown to solve the classification problem in the separable case, provided enough redundancy is present in the data. This approach is moreover shown to powerfully compete in simulation with the more demanding confidence-based second-order bandits setups on large scale text-mining datasets.
 A kernel implementation is also shown effective on non-linearly separable datasets, when both considering sparsity and final classification accuracy.
 %The non-stationary and adversarial setting  may be treated with horizon-based approaches, as proposed by \cite{kivinen2004online}, for it  shows both effectiveness, sparsity and adaptivity in  simulations.  
 \end{abstract}
 
 \begin{keyword}
 %% keywords here, in the form: keyword \sep keyword
-Mot1 \sep Mot2
+Bandit feedback \sep Online learning \sep 
 %% PACS codes here, in the form: \PACS code \sep code
 
 %% MSC codes here, in the form: \MSC code \sep code
@@ -414,7 +414,7 @@ When trying to upper-bound the number of mistakes, it is worth considering an al
 
 The result obtained in that case is formally similar to that of  \cite{crammer2006online}. Note however that the reference classifier $U$ being defined in $\mathbb{R}^{Kd}$, while observation vectors are in $\mathbb{R}^{d}$, a linear dependence on the label set cardinality $K$ is to be expected. 
 
-This result states, in short, that a finite number of updates are needed to fit the classification constraints expressed by the observed series of losses. In particular, for large series ($\tilde{y}_1, ...,\tilde{y}_t, ...$), there is a point $t^*$ at which all subsequent observed losses are equal to zero. This result grants the classifier finite complexity in the separable case whatever the number of samples. 
+This result states, in short, that a finite number of updates is needed to fit the classification constraints expressed by the observed series of losses. In particular, for large series ($\tilde{y}_1, ...,\tilde{y}_t, ...$), there is a point $t^*$ at which all subsequent observed losses are equal to zero. This result grants the classifier finite complexity in the separable case whatever the number of samples. 
 
 There is however an important caveat to be mentioned. 
 %The possible sequences $\tilde{y}_1$, ..., $\tilde{y}_T$ include constant sequences, greedy sequence and pure random sequences. In other words, it is independent from the policy.
