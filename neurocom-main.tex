@@ -89,7 +89,7 @@
 %% \address{Address\fnref{label3}}
 %% \fntext[label3]{}
 
-\title{Sparse online multi-class learning under a one-bit bandit feedback}
+\title{Sparse online multi-class learning under one-bit bandit feedback}
 
 %% use optional labels to link authors explicitly to addresses:
 %% \author[label1,label2]{}
@@ -107,7 +107,9 @@
 
 \begin{abstract}
 %% Text of abstract
-
+The bandit classification problem implements a form of active learning in scarcely labeled environments, with a limited (1 bit) information budget at each round. This information is here used to settle a single margin constraint under the OVA (``one-versus-all'') setup. A corresponding constrained sequential norm-minimal update is shown to solve the total classification problem in the separable case, provided enough redundancy is present in the data. This approach is moreover shown to powerfully compete in simulation with the more demanding confidence-based second-order bandits setups on large scale text-mining datasets.
+A kernel implementation is also shown effective on non-linearly separable datasets, when both considering sparsity and final classification accuracy.
+%The non-stationary and adversarial setting  may be treated with horizon-based approaches, as proposed by \cite{kivinen2004online}, for it  shows both effectiveness, sparsity and adaptivity in  simulations.  
 \end{abstract}
 
 \begin{keyword}
@@ -132,7 +134,7 @@ Mot1 \sep Mot2
 Categorical online learning is a well-documented class of learning problems in which ($i$) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and ($ii$) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$. The multiclass learning task typically addresses object recognition (such as OCR, face recognition, speech recognition etc.) and recommender systems. In contrast with the offline approach, online learning takes the form of an iterative process, relying on a time-ordered sequence of observations, actions and feedbacks (where the feedback is the observable outcome of the action).   
 Two well-known setups obey to this class, i.e. the contextual bandit setup (see  \cite{lai1985asymptotically} and \cite{auer2002finite}) and supervised online learning setup (see  \cite{rosenblatt1958perceptron}, \cite{duda1973pattern} and \cite{freund1999large}), the two setups mainly differing by the nature of the feedback. Whether abundant or scarce, deterministic or stochastic, stationary or adversarial, the feedback characteristics critically shape the design of the learning algorithms.  
 
-The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback (see \cite{kakade2008efficient}), for the outcome is either 0 (failure) or 1 (success). This case lies at the crossroad of the supervised online learning setup and the bandit setup.  A one-bit feedback reflects a ``hit-or-miss'' learning situations, in which a single bit indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, this problem is bound to the online approach and was only recently addressed by the community (see \cite{kakade2008efficient}, \cite{crammer2013multiclass}, etc.). 
+The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback classification problem (see \cite{kakade2008efficient}), for the outcome is either 0 (failure) or 1 (success). This case lies at the crossroad of the supervised online learning setup and the bandit setup.  A one-bit feedback reflects a ``hit-or-miss'' learning situations, in which a single bit indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, this problem is bound to the online approach and was only recently addressed by the community (see \cite{kakade2008efficient}, \cite{crammer2013multiclass}, etc.). 
 Apart from the original work of \cite{kakade2008efficient}, most recent approaches to this problem are based on regularized linear models (see \cite{li2010contextual}, \cite{hazan2011newtron}, \cite{crammer2013multiclass}, \cite{ngo2013upper}), to which the powerful methods of contextual bandit, including UCB-like non-stochastic exploration strategy (see \cite{lai1985asymptotically}), do apply. While providing almost optimal convergence rates, online multivariate setups suffer from a quadratic complexity in space that limits their applicability to large-dimensional datasets.  
 
 In contrast, the sequential approach to quadratic optimization, as proposed by \cite{anlauf1989adatron} and \cite{crammer2006online}, may both provide upper bounds on error rate and a smaller memory footprint, i.e. only display linear scaling in space. 
@@ -147,8 +149,8 @@ The sequential organization of learning is present in the most traditional setup
 
 \subsection{Linear models}
 Multiclass classification requires  finding an appropriate class $y \in \{1,... K\}$ for every observation vector $x \in \mathbb{R}^d$.
-The \textit{decision function} (or policy) $h$
-allows to carry out a categorical response $\tilde{y} \sim h(x)$. The decision function embodies both prior information about the regularity of the universe and experience-based information. A reasonable assumption  is to consider that  close-by contexts should provide close-by rewards distributions. 
+The \textit{decision function} (or policy) 
+allows to carry out a categorical response $\tilde{y}$. The decision function embodies both prior information about the regularity of the universe and experience-based information. A reasonable assumption  is to consider that  close-by contexts should provide close-by rewards distributions. 
 The linear approach to classification means 
 %to separate the input space in regions, where the different regions are 
 define a set of linear mappings:
@@ -279,20 +281,20 @@ The normative setup puts additional constraints on the classification task (see 
 
 \section{Our approach}
 
-\subsection{Exploration policy}
+%\subsection{Exploration policy}
 
-The one-bit feedback provides an asymmetrical situation in which prediction misses provide a poor classification information (eliminates one response out of $K$ possibilities) while prediction hits provide a rich classification information (eliminates $K-1$ responses out of $K$ possibilities). 
-In the starting phase of a learning process, little information is expected on average, and a learner is suggested to try labels at random until a label hit is obtained. This may not seem necessary in the subsequent steps where enough information may have been gathered to provide effective classification accuracy. 
-This intuition should however be considered with care, for information gathering needs to rely on sensing a differences between a prediction and an actual response. 
+%The one-bit feedback provides an asymmetrical situation in which prediction misses provide a poor classification information (eliminates one response out of $K$ possibilities) while prediction hits provide a rich classification information (eliminates $K-1$ responses out of $K$ possibilities). 
+%In the starting phase of a learning process, little information is expected on average, and a learner is suggested to try labels at random until a label hit is obtained. This may not seem necessary in the subsequent steps where enough information may have been gathered to provide effective classification accuracy. 
+%This intuition should however be considered with care, for information gathering needs to rely on sensing a differences between a prediction and an actual response. 
 %{\color{blue} 
-In short, mistakes (predicting a hit and obtaining a miss, or vice-versa) are  more informative than actual classification achievements (this point being exemplified by the perceptron taking only misclassification events for its update). There is thus a set point at which a greedy choice becomes suboptimal from an information gathering perspective (see \cite{kakade2008efficient}).
+%In short, mistakes (predicting a hit and obtaining a miss, or vice-versa) are  more informative than actual classification achievements (this point being exemplified by the perceptron taking only misclassification events for its update). There is thus a set point at which a greedy choice becomes suboptimal from an information gathering perspective (see \cite{kakade2008efficient}).
 %} 
-The choice of an exploration strategy thus depends on the focus put either on gathering information or optimizing rewards. 
+%The choice of an exploration strategy thus depends on the focus put either on gathering information or optimizing rewards. 
 
-Model-based setups (see \cite{lai1985asymptotically}, \cite{auer2003nonstochastic}, \cite{crammer2013multiclass}) generally use model information (number of visits, hits variance, etc.) to optimize rewards, so that exploration steps become rapidly scarce through UCB-based policies. 
-Discriminant-based setups (see \cite{kakade2008efficient}, \cite{zhong2015esann}) keep a focus on classification information gathering through  
+%Model-based setups (see \cite{lai1985asymptotically}, \cite{auer2003nonstochastic}, \cite{crammer2013multiclass}) generally use model information (number of visits, hits variance, etc.) to optimize rewards, so that exploration steps become rapidly scarce through UCB-based policies. 
+%Discriminant-based setups (see \cite{kakade2008efficient}, \cite{zhong2015esann}) keep a focus on classification information gathering through  
 %$\varepsilon$-greedy policies giving a constant budget ($1-\varepsilon + \frac{\varepsilon}{K}$) to the actual prediction and $\frac{\varepsilon}{K}$ to the other choices 
-a constant exploration rate $\varepsilon$, low enough to allow for effective classification rates through continuing information gathering.
+%a constant exploration rate $\varepsilon$, low enough to allow for effective classification rates through continuing information gathering.
 %Unpredicted hit examples play a particular role for they are given a higher coefficient in the update, reflecting a "prediction surprise" (see for instance eq. (\ref{eq:kaka-update})). This information-weighted update is however done at the risk of an increased variance of the update sequence and of course of a linear regret.
 %{\color{red} Though expecting a weak dependence on decision policy WHY??}, 
 
@@ -370,7 +372,8 @@ which leads to algorithm \ref{algo:quad}.
 This setup is called ``passive-aggressive'' for it combines a conservative approach (ignore $x_t$ if $l_t=0$) with a tight update (optimize the classifier according to $x_t$ if $l_t>0$).
 In its original formulation ($C \rightarrow \infty$), this learning setup implements a ``one-shot'' update, i.e. carries out a zero-loss  after update. A finite stiffness parameter $C$ provides a more progressive (less ``aggressive'') update, allowing to deal more smoothly with outliers at the cost of a lesser sparsity.
 
-In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good or bad the current choice is, without telling how good or bad other choices would be. Solving the system carries out a single update of the  $\tilde{y}_t^\text{th}$ separatrix. 
+%In the setup we consider, the loss $l_t$ relies on the current choice (or action) $\tilde{y}_t$. The loss exactly probes how good or bad the current choice is, without telling how good or bad other choices would be. 
+Solving the system carries out in our case a single update of the  $\tilde{y}_t^\text{th}$ separatrix. 
 A rapid inspection shows that the full label information set could be used in the label hit case ($y = \tilde{y}$), allowing for $K$ separatrices updates instead of one. This primary intuition is however not considered here, for multiple updates may put a too strong momentum on label hits.  
 We show in the following that our careful and conservative approach %, considering 
 % (see \cite{chen2009beyond}). 
@@ -426,7 +429,7 @@ The sequence probes the environment without necessarily uncovering all of it. Th
 Consequently, the loss (or squared loss) \emph{is not an upper bound of the classification mistake.} The theorem thus does not guarantees that every example will be correctly classified in the end. This would depends on (i) the particular policy followed in the course of learning and (ii)  additional assumptions on sample regularity.   
 
 Let us now consider  that a fixed policy is applied throughout the session, and let us assume that \emph{every sample $x$ from class $k$ lies in a convex set $\mathcal{C}_k$} (observation sets convexity). 
-Considering the theorem grants a zero loss after a fixed number of updates, let us note  $W^*$ this zero-loss final classifier. Then $\forall k \in 1,...,K$, 
+Considering the theorem grants a zero loss after a fixed number of updates, let us note  $W^*$ this zero-loss final classifier and $t^*$ the date of the final update. Then $\forall k \in 1,...,K$, 
 %First, the classifier $U$ is composed of $K$ different separatrices, so that its norm is expected to grow linearly with $K$.
 
 %if a single policy $h$ is followed in the course of learning, 
@@ -435,10 +438,16 @@ Considering the theorem grants a zero loss after a fixed number of updates, let 
 
 %Two important cases need here to be examined:
 
-	\paragraph{Greedy deterministic policy} If $\tilde{y}_1, ...,\tilde{y}_t, ...$ obey to a greedy deterministic choice $h$, and if $\exists t$ such that $\tilde{y}_t = y_t = k$, then, as $l_t$ is satisfied by $W^*$, $\langle w_k^*, x_t\rangle \geq 1$.  Then, if $\exists x \in \mathcal{C}_k$ with $h(x) \neq k$ and zero loss, then $\langle w_k^*, x\rangle < \langle w_{h(x)}^*, x\rangle \leq -1$. Then $\exists \rho \in [0,1]$ such that $x_\rho = \rho x + (1-\rho) x_t \in \mathcal{C}_k$ and 
-	$-1 < \langle w_k^*,x_\rho \rangle < 1 $, which breaks out the zero loss condition. So, $\nexists x \in \mathcal{C}_k$ with $h(x) \neq k$, i.e. every sample from $\mathcal{C}_k$ is correctly classified.
-	\paragraph{Uniform random policy} If $\tilde{y}_1, ...,\tilde{y}_T$ obey to a uniform random choice (independent from $W$), the separatrix $w_k$ is probed on average $T/K$ times. By a simple combinatorial argument, the chance not finding ${t^\prime}<t$ such that $\tilde{y}_{t^\prime} = y_{t^\prime} = k$ exponentially decreases with $t$.
-	\paragraph{$\varepsilon$-greedy policy} Finally, an $\varepsilon$-greedy choice, that alternates between uniform sampling and greedy choice, guarantees a correct classification in the end.  
+	\paragraph{Greedy deterministic policy} If $\tilde{y}_1, ...,\tilde{y}_t, ...$ obey to a greedy deterministic choice, i.e. 
+	$$\forall t \in \{1,...,T\}, \tilde{y}_t = h(x_t) = \underset{l \in \{1,...,K\}}{\text{argmax}} \langle w_{l,t}, x_t \rangle$$  
+	and if $\exists t \geq t^*$ such that $\tilde{y}_t = y_t = k$, then, as $l_t$ is satisfied by $W^*$, $\langle w_k^*, x_t\rangle \geq 1$.  Then, if $\exists x \in \mathcal{C}_k$ with $h(x) \neq k$, the zero-loss constraint implies that  $\langle w_k^*, x\rangle < \langle w_{h(x)}^*, x\rangle \leq -1$. Then, following the convexity assumption, $\exists \rho \in [0,1]$ such that $x_\rho = \rho x + (1-\rho) x_t \in \mathcal{C}_k$ with 
+	$-1 < \langle w_k^*,x_\rho \rangle < 1 $, so that $l(x_\rho,W^*,k,h(x_\rho))\neq 0$ in any case, which breaks the zero loss condition. So, $\nexists x \in \mathcal{C}_k$ with $h(x) \neq k$, i.e. every sample from $\mathcal{C}_k$ is correctly classified.
+	\paragraph{Uniform random policy} If $\tilde{y}_1, ...,\tilde{y}_T$ obey to a uniform random choice (independent from $W$), i.e.
+	$$\forall t \in \{1,...,T\}, P(\tilde{Y}_t=l) =  \frac{1}{K} $$
+	 the separatrix $w_k$ is probed on average $T/K$ times. By a simple combinatorial argument, the chance not finding $t > t^*$ such that $\tilde{y}_t = y_t = k$ exponentially decreases with $t - t^*$.
+	\paragraph{$\varepsilon$-greedy policy} Finally, an $\varepsilon$-greedy choice, i.e. 
+	$$\forall t \in \{1,...,T\}, P(\tilde{Y}_t=l) = (1-\varepsilon) \delta(l,h(x_t)) + \frac{\varepsilon}{K}$$ with a (fixed) exploration parameter $\varepsilon \in [0,1]$
+	alternates between uniform sampling and greedy choice. Then, finding $t > t^*$ such that $\tilde{y}_t = y_t = k$ is provided almost surely by the uniform sampling, while the greedy choice combined with the convexity assumption leverages the correct classification of every sample belonging to class $k$.  
 
 %	at least one of the two constraints of (\ref{eq:OVA-A}-\ref{eq:OVA-B}) is satisfied. 
 %	\begin{itemize}
@@ -461,8 +470,8 @@ Considering the theorem grants a zero loss after a fixed number of updates, let 
 %	\end{itemize}
 
 \vspace{.5cm} 
-We consistently adopt an $\varepsilon$-greedy approach in simulations, using the \cite{kakade2008efficient} formula, i.e.:
-$$P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}$$ with a (fixed) exploration parameter $\varepsilon \in [0,1]$.
+We consistently adopt an $\varepsilon$-greedy approach in simulations, i.e. comply with the \cite{kakade2008efficient} formula.
+
 %, where pure exploration ($\varepsilon = 1$ i.e. uniform prediction) and pure greediness ($\varepsilon = 0$, i.e. hit prediction only) are special cases.
 
 
@@ -480,12 +489,11 @@ If we turn now to an arbitrary classifier $U$, i.e. do not take for granted the 
 This bound is once again identical to that obtained by 
 \cite{crammer2006online} in the supervised case. 
 It tells in short that, for large $T$, the average squared 
-loss will be at most four time that of any linear 
+loss will be in the worst case four time that of any linear 
 classifier $U$ (including that of a loss-minimizer classifier $U^*$). 
 
-Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA losses is visited in one run. For the classification error to be bounded, stationarity of samples generation, convexity of observation sets as well as policy (partial) uniformity need to be assumed for the error bound be statistically granted.  
-
-This bound is moreover less tight than that of \cite{freund1997decision}, and  additional regularization (with finite $C$) needs to be considered to attain $O(\sqrt{T})$ regret (see \cite{crammer2006online}),  
+Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA losses is visited in one run. Specific policies need thus to be assumed to provide additional guarantees, with the separability assumption taken as a boundary constraint.  
+The error bound provided by theorem \ref{theo:BPAT2} is moreover less tight than that of \cite{freund1997decision}, and  additional regularization (with finite $C$) needs to be considered to attain $O(\sqrt{T})$ regret (see \cite{crammer2006online}),  
 we do not develop here for brevity. 
 
 %{\color{blue} Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est borné en $O(\sqrt{T})$ dans le cas non séparable.}
@@ -625,7 +633,7 @@ The total number of prototypes is incremented each time a non-zero loss is read 
 
 %Nous évaluons ici notre algorithme à l'aide de deux jeux de données synthétiques et trois jeu de données réels dont les caractéristiques sont fournies dans la table Table~\ref{table:mce}.
 %In order to test different aspects of the multiclass setting, the 
-Different algorithms are evaluated on two synthetic datasets and three real-world datasets.  Their principal characteristics are provided in table ~\ref{table:mce}.
+Different algorithms are evaluated on two synthetic and three real-world datasets.  Their principal characteristics are provided in table ~\ref{table:mce}.
 
 \begin{table}[h]
 	\caption{Five datasets considered, with $n$ the number of instances, $d$ the vectors dimension and $K$ the number of labels.}
@@ -772,11 +780,12 @@ The metrics used to compare the different algorithms are the cumulative error ra
 \begin{itemize}
 \item The cumulative error rate is defined at each round $t$ as the sum of errors until $t$, i.e.:
 $$M_t = \sum_{t'=1}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}} $$
+with $\hat{y}_t$ as defined in eq. (\ref{eq:argmax}).
 \item The average error rate, carried out over 100-round sliding windows, allows for a more refined estimate of the continuing improvement over learning sessions, i.e.:
 $$\forall t>99, \bar{m}_t = \frac{1}{100} \sum_{t'=t - 99}^t \mathbf{1}_{\hat{y}_{t^\prime}\neq y_{t^\prime}}$$
 \end{itemize}
 
-\paragraph{Remark} Both the Banditron and our bandit extension to the OVA Passive-Aggressive setup (Algorithm \ref{algo:quad}) use an $\varepsilon$-greedy exploration policy, that has direct effect on the  classification rate, for the actual response  $\tilde{y}_t$ differs from $\hat{y}_t$ in a proportion equal to $\varepsilon$. This residual exploration error persists whatever effective the classifier $W$ is at separating the data. In order to properly compare algorithms, we need to evenly evaluate improvement across $\varepsilon$ values, i.e. only use the internal noise-free estimate $\hat{y}_t$ for evaluation.
+\paragraph{Remark} Both the Banditron and our bandit reduction to the OVA Passive-Aggressive setup (Algorithm \ref{algo:quad}) use an $\varepsilon$-greedy exploration policy, that has direct effect on the  classification rate, for the actual response  $\tilde{y}_t$ differs from $\hat{y}_t$ in a proportion equal to $\varepsilon$. This residual exploration error persists whatever effective the classifier $W$ is at separating the data. In order to properly compare algorithms, we need to evenly evaluate improvement across $\varepsilon$ values, i.e. only use the internal noise-free estimate $\hat{y}_t$ for evaluation.
 
 %Dans le cas du Banditron et du Bandit Passif-Agressif qui utilisent une politique d'exploration $\varepsilon$-glouton, le choix effectif $\tilde{y}_t$ diffère de $\hat{y}_t$ dans une proportion égale à $\varepsilon$. Une erreur résiduelle subsiste donc nécessairement, même lorsque le classifieur sépare correctement les données. Pour l'évaluation, nous considérons l'erreur de classification et non l'erreur effective, autrement dit nous négligeons l'erreur d'exploration des algorithmes de Banditron et de Bandit Passif Agressif, afin de comparer de manière équitable les caractéristiques des classifieurs calculés par les différents algorithmes.
 
@@ -1142,21 +1151,20 @@ The first thing to be noticed is the prevailing of the Kernel setups over the li
 \label{sec:conclusion}
 
 We have shown that a conservative reduction of the OVA hinge-loss  provides effective and lightweight solutions to the online bandit classification problem (defined by \cite{kakade2008efficient}). 
-For instance, when adapting the passive aggressive setup as proposed in the supervised case by \cite{crammer2006online}, 
+For instance, when adapting the passive aggressive setup, as proposed in the supervised case by \cite{crammer2006online}, 
 %i.e. sequentially solving local quadratic optimization problems,
 we prove  similar bounds on the observed cumulative squared loss. 
-Here, however, the bound is not an upper bound of the classification error. Additional regularity assumptions, such as observation sets convexity, or a partly uniform sampling of the realization space, need to be considered to provide comparable error upper bounds. In addition, as in \cite{crammer2006online}, a misclassification stiffness parameter $C$ need to be set to reach $O(\sqrt{T})$ regret in the stationary case.  
+Here, however, the bound is not an upper bound of the classification error. Additional regularity assumptions, such as observation sets convexity, or a partly uniform sampling of the label space, need to be considered to provide comparable error upper bounds. In addition, as in \cite{crammer2006online}, a misclassification stiffness parameter $C$ need to be set to reach $O(\sqrt{T})$ regret in the stationary case.  
 
-The numerical simulations provide favorable results on both large scale text mining  datasets and on more classical non-linearly separable machine learning datasets. 
-When comparing our approach with the Banditron, a first result is the exploration parameter $\varepsilon$ insensitivity, allowing to consider $\varepsilon$ decrease  over time in practical implementations. 
+The numerical simulations provide favorable results on both large scale text mining  datasets and non-linearly separable machine learning datasets. 
+When comparing our approach with the Banditron, a first result is the exploration parameter $\varepsilon$ insensitivity, allowing to consider $\varepsilon$ decrease  over time in practical implementations.
+ 
+When comparing with confidence-based second-order contextual bandit approaches (see \cite{crammer2013multiclass}), our approach also shows favorable results on a scale-realistic dataset, while owning a much lesser complexity. More surprisingly, a good resilience to label noise is also shown on a synthetic dataset, for the method was not specifically designed to address this aspect. 
+
+While most contextual bandit setups concentrate to large-scale text-mining and recommendation datasets, we actually implemented a kernel approach on non-linearly separable datasets, and show it effective when both considering sparsity (such as addressed by \cite{kivinen2004online}), and final classification accuracy, with, for instance, a close to state-of-the-art 98\% final accuracy observed after one pass on the Pendigits 10-class problem.
 
 
-A comparison with the contextual bandit approach, using second order statistics and confidence interval estimates (see \cite{crammer2013multiclass}), is also shown favorable to our approach on a scale-realistic dataset, while owning a much lesser complexity. More surprisingly, a good resilience to label noise is also shown on a synthetic dataset, for the method was not specifically designed to address this aspect. 
-
-While most contextual bandit setups concentrate to large-scale text-mining and recommendation datasets, we actually implemented a kernel approach on more traditional non-linearly separable datasets, and show it effective when both considering sparsity (such as addressed by \cite{kivinen2004online}), and final classification accuracy, with, for instance, a close to state-of-the-art 98\% final accuracy observed after one pass on the Pendigits 10-class problem.
-
-
-From a more general standpoint, the bandit classification problem implements a form of active learning in scarcely labeled environments, with a limited (1 bit) information budget at each round. This budget is here used to settle a single margin constraint under the OVA setup. Solving sequentially the observed margin constraints is then expected to solve in approximation the total (unobserved) set of margin constraints, provided enough redundancy is present in the data. This approach is exactly fitted to the specific stationary classification tasks considered here, and for that reason is shown to powerfully compete with the more demanding confidence-based second-order bandits setups. On one side, the OVA reduction may even generalize to slightly more demanding tasks, like the multi-label setup generally considered in recommender systems. On the other side, it should be overcome as soon as non-stationary and adversarial settings are considered.
+From a more general standpoint, the bandit classification problem implements a form of active learning in scarcely labeled environments, with a limited (1 bit) information budget at each round. This information is here used to settle a single margin constraint under the OVA setup. Solving sequentially the observed margin constraints is then expected to solve in approximation the total (unobserved) set of margin constraints, provided enough redundancy is present in the data. This approach is exactly fitted to the specific stationary classification tasks considered here, and for that reason is shown to powerfully compete with the more demanding confidence-based second-order bandits setups. On one side, this OVA reduction may even generalize to slightly more demanding tasks, like the multi-label setup generally considered in recommender systems. On the other side, it should be overcome as soon as non-stationary and adversarial settings are considered.
 The H-horizon window-based approach, as proposed by \cite{kivinen2004online}, may in some cases be substituted, for it  shows both effectiveness, sparsity and adaptivity in our simulations.  
     
 
