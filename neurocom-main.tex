@@ -493,9 +493,9 @@ This bound is once again identical to that obtained by
 \cite{crammer2006online} in the supervised case. 
 It tells in short that, for large $T$, the average squared 
 loss will be in the worst case four time that of any linear 
-classifier $U$ (including that of a loss-minimizer classifier $U^*$). The average final loss is thus at most twice that of the best classifier. Given the aggressiveness of the algorithm, each encountered outlier is thus expected to provoke an erroneous update, with a non-zero loss that will need at most a same loss amount in the future to recover.
+classifier $U$ (including that of a loss-minimizer classifier $U^*$). {\color{red} The  final average loss is thus at most twice that of the best classifier.} Given the aggressiveness of the algorithm, each encountered outlier is thus expected to provoke an erroneous update, with a non-zero loss that will need at most a same amount of loss in the future to recover.
 
-Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA losses is visited in one run. Specific policies need thus to be assumed to provide additional guarantees. If the proportion of outliers is not to strong, one can for instance consider the separability assumption as a boundary condition to which the classifier periodically returns between temporary excursions through erroneous updates and recovery. 
+Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA losses is visited in one run. Specific policies need thus to be assumed to provide additional guarantees. If the proportion of outliers is not to strong, one can for instance consider the separability assumption as a boundary condition to which the classifier periodically returns between temporary excursions throughout erroneous updates and recovery. 
 
 The error bound provided by theorem \ref{theo:BPAT2} is moreover less tight than that of \cite{freund1997decision}, and  additional regularization (with finite $C$) needs to be considered to attain $O(\sqrt{T})$ regret (see \cite{crammer2006online}),  
 we do not develop here for brevity. 
