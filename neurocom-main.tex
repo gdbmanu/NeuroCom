@@ -385,14 +385,7 @@ We show in the following that our careful and conservative approach %, consideri
 %only 
 %the currently inspected label $\tilde{y}$ for the separatrix update, 
 is enough to provide strong convergence guarantees in most cases. 
-It moreover provides many practical advantages, among which:
-\begin{enumerate}
-	\item sparsity, each observation vector being stuck to one class-separatrix only, 
-	\item independence to the labels set cardinality, 
-	\item independence to the actual classification achievement (avoiding unnecessary weight updates at high classification rates), 
-	\item independence to the actual exploration/exploitation rate and 
-	\item resilience to label noise.
-\end{enumerate}
+
 %under a non-zero loss condition.
 
 
@@ -445,7 +438,7 @@ Considering the theorem grants a zero loss after a fixed number of updates, let 
 	$$\forall t \in \{1,...,T\}, \tilde{y}_t = h(x_t) = \underset{l \in \{1,...,K\}}{\text{argmax}} \langle w_{l,t}, x_t \rangle$$  
 	and if $\exists t \geq t^*$ such that $\tilde{y}_t = y_t = k$, then, as $l_t$ is satisfied by $W^*$, $\langle w_k^*, x_t\rangle \geq 1$.  Then, if $\exists x \in \mathcal{C}_k$ with $h(x) \neq k$, the zero-loss constraint implies that  $\langle w_k^*, x\rangle < \langle w_{h(x)}^*, x\rangle \leq -1$. Then, following the convexity assumption, $\exists \rho \in [0,1]$ such that $x_\rho = \rho x + (1-\rho) x_t \in \mathcal{C}_k$ with 
 	$-1 < \langle w_k^*,x_\rho \rangle < 1 $, so that $l(x_\rho,W^*,k,h(x_\rho))\neq 0$ in any case, which breaks the zero loss condition. So, $\nexists x \in \mathcal{C}_k$ with $h(x) \neq k$, i.e. every sample from $\mathcal{C}_k$ is correctly classified.
-	\paragraph{Uniform random policy} If $\tilde{y}_1, ...,\tilde{y}_T$ obey to a uniform random choice (independent from $W$), i.e.
+	\paragraph{Random uniform  policy} If $\tilde{y}_1, ...,\tilde{y}_T$ obey to a uniform random choice (independent from $W$), i.e.
 	$$\forall t \in \{1,...,T\}, P(\tilde{Y}_t=l) =  \frac{1}{K} $$
 	 the separatrix $w_k$ is probed on average $T/K$ times. By a simple combinatorial argument, the chance not finding $t > t^*$ such that $\tilde{y}_t = y_t = k$ exponentially decreases with $t - t^*$.
 	\paragraph{$\varepsilon$-greedy policy} Finally, an $\varepsilon$-greedy choice, i.e. 
@@ -493,12 +486,14 @@ This bound is once again identical to that obtained by
 \cite{crammer2006online} in the supervised case. 
 It tells in short that, for large $T$, the average squared 
 loss will be in the worst case four time that of any linear 
-classifier $U$ (including that of a loss-minimizer classifier $U^*$). In approximation,  the  final loss is thus expected on average to be twice that of the best classifier. Given the aggressiveness of the algorithm, each encountered outlier is thus expected to provoke an erroneous update, with a non-zero loss that will need at most a same amount of loss in the future to recover.
-
-Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA losses is visited in one run. Specific policies need thus to be assumed to provide additional guarantees. If the proportion of outliers is not to strong, one can for instance consider the separability assumption as a boundary condition to which the classifier periodically returns between temporary excursions throughout erroneous updates and recovery. 
-
-The error bound provided by theorem \ref{theo:BPAT2} is moreover less tight than that of \cite{freund1997decision}, and  additional regularization (with finite $C$) needs to be considered to attain $O(\sqrt{T})$ regret (see \cite{crammer2006online}),  
+classifier $U$ (including that of a loss-minimizer classifier $U^*$). In approximation\footnote{If the loss variance is small, i.e. \langle l_t^2\rangle_t \simeq \langle l_t \rangle_t^2.},  the  final loss is thus expected to be on average twice that of the best classifier. As shown in  \cite{crammer2006online}), this error bound is less tight than that of \cite{freund1997decision}, and additional regularization (with finite $C$) is needed to attain $O(\sqrt{T})$ regret,  
 we do not develop here for brevity. 
+
+Given the aggressiveness of the algorithm, this ``loss-doubling'' can be interpreted the following way: in the long run, each non-zero loss  encountered is expected to provoke an aggressive and disrupting update, that will need on average a same amount of loss in subsequent rounds to recover. When the proportion of outliers is not to strong, the separability assumption can be seen as a boundary condition to which the classifier periodically turns back between temporary excursions throughout disrupting updates and recovery. 
+
+Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA losses is visited in one run. Specific policies need thus to be assumed to provide additional classification guarantees in the boundary condition (see previous section). 
+
+
 
 %{\color{blue} Crammer montre que dans le cas linéairement séparable, la somme des pertes au carré est bornée (ce qui est comparable au perceptron). Mais, de manière plus intéressante, il montre également que le regret est borné en $O(\sqrt{T})$ dans le cas non séparable.}
 
@@ -1154,23 +1149,66 @@ The first thing to be noticed is the prevailing of the Kernel setups over the li
 \section{Conclusion}
 \label{sec:conclusion}
 
-We have shown that a conservative reduction of the OVA hinge-loss  provides effective and lightweight solutions to the online bandit classification problem (defined by \cite{kakade2008efficient}). 
+We have shown that a conservative reduction of the OVA hinge-loss  provides an effective and lightweight solutions to the  bandit classification problem (defined by \cite{kakade2008efficient}). 
 In particular, when adapting the passive aggressive setup as proposed in the supervised case by \cite{crammer2006online}, 
 %i.e. sequentially solving local quadratic optimization problems,
 we prove  similar bounds on the observed cumulative squared loss. 
-Here, however, the bound is not an upper bound of the classification error. Additional regularity assumptions, such as observation sets convexity, or a partly uniform sampling of the label space, need to be considered to provide comparable error upper bounds. In addition, as in \cite{crammer2006online}, a misclassification stiffness parameter $C$ need to be set to reach $O(\sqrt{T})$ regret in the stationary case.  
+Here, however, the bound is not an upper bound of the classification error. Additional regularity assumptions, such as observation sets convexity, or a partly uniform sampling of the label space, need to be considered to provide comparable error upper bounds. In addition, as in \cite{crammer2006online}, a misclassification stiffness parameter $C$ need to be optimized to reach $O(\sqrt{T})$ regret in the stationary case.  
+
+SUBSAMPLING OF AN OVERCONSTRAINED PROBLEM. NOt ALL CONSTRAINTS ARE SOLVED, BUT NONETHELESS ENOUGH CONSTRAINTS ARE SATISFIED FOR A CORRECT CLASSIFICATION TO BE REACHED IN THE LONG RUN. 
 
 The numerical simulations provide favorable results on both large scale text mining  datasets and non-linearly separable machine learning datasets. 
 When comparing our approach with the Banditron, a first result is the exploration parameter $\varepsilon$ insensitivity, allowing to consider $\varepsilon$ decrease  over time in practical implementations.
+
+EXPECTED / NOT EXPECTED? CONSEQUENCES?
  
 When comparing with confidence-based second-order contextual bandit approaches (see \cite{crammer2013multiclass}), our approach also shows favorable results on a scale-realistic dataset, while owning a much lesser complexity. More surprisingly, a good resilience to label noise is also shown on a synthetic dataset, for the method was not specifically designed to address this aspect. 
 
+RESILIENCE TO LABEL NOISE IS CONTRADICTORY WITH AGGRESSIVENESS
+
+
 While most contextual bandit setups concentrate to large-scale text-mining and recommendation datasets, we actually implemented a kernel approach on non-linearly separable datasets, and show it effective when both considering sparsity (such as addressed by \cite{kivinen2004online}), and final classification accuracy, with, for instance, a close to state-of-the-art 98\% final accuracy observed after one pass on the Pendigits 10-class problem.
 
+In conclusion, our approach is found to provide many practical advantages, among which:
+\begin{enumerate}
+	\item simplicity, with easy numerical implementation
+	\item linear scaling in space
+	\item sparsity, each observation vector being stuck to one class-separatrix only, 
+	\item linear scaling to the labels space cardinality, 
+	%\item independence to the actual classification achievement (avoiding unnecessary weight updates at high classification rates), 
+	\item independence to the actual exploration/exploitation rate and 
+	\item resilience to label noise.
+\end{enumerate}
+
+EPSILON EXPLORATION RATE PROVIDES A LINEAR REGRET. THIS POINT IS TO
+BE CONSIDERED WITH CARE.
+
+ALTERNATIVE POLICIES? UCB? PURE GREEDY?
+
+NOISE RESILIENCE IS UNEXPECTED. OUR APPROACH IS AT ODD TO THE NOISE-AWARE CONFIDENCE-BASED METHODS. IT MAY RESULT BOTH FROM THE CONSERVATIVENESS AND 
+
+
+HEAVILY RELIES ON C PARAMETER (cross validation) WHICH SHOULD BE SPECIFIC TO THE DATASET. 
+HOW THE SETUP WOULD BEHAVE IN MORE ADVERSARIAL SETTINGS IS UNKNOWN. 
+
+OUR APPROACH IS TIGHTLY LINKED TO ONLINE BINARY SUPERVISION. DIFFERENT UPDATES MAY BE CONSIDERED, LIKE THE PERCPTRON UPDATE, LOGISTIC REGRESSION, MULTI-LAYERED PERCEPTRON ETC. THERE Is HOWEVER A STRONG ROLE OF 'ONE-SHOT'-AGGRESSIVENESS AND IMMEDIATE MARGIN CONSTRAINT SATISFACTION THAT RENDERS HE METHOD INSENSITIVE TO CLASS IMBALANCE THAT  BECOME MORE AND MORE CRITICAL AS THE NUMBER OF LABELS INCREASES. 
+
+OUR PARADOXICAL RESULT IN THE SEPARABLE CASE SEEMS TO RELY ON THE GREEDINESS AND AGGRESSIVENESS OF THE PA SETUP THAT, IN PRINCIPLE, RENDERS THE METHOD SENSIBLE TO LABEL NOISE.
+
+It appears quite surprising the approach was not much considered up to now in the machine learning community. One possible reason is that it is not fitted to deal with label noise and adversarial, and does not implement UCB, and the convergence to correct classifier was not clearly established. The many advantages developped here should allow reconsider this point. 
+
+The reason why quadratic was not considered up to now relies mainly on those two aspects : linear regret in practice and unfitted to the adversarial case.
 
 From a more general standpoint, the bandit classification problem implements a form of active learning in scarcely labeled environments, with a limited (1 bit) information budget at each round. This budget is here used to settle a single margin constraint under the OVA setup. Solving sequentially the observed margin constraints is then expected to solve in approximation the total (unobserved) set of margin constraints, provided enough redundancy is present in the data. This approach is well fitted to the specific stationary classification tasks considered here, and for that reason is shown to powerfully compete with the more demanding confidence-based second-order bandits setups. On one side, the OVA reduction may even generalize to slightly more demanding tasks, like the multi-label setup generally considered in recommender systems. On the other side, it should be overcome as soon as non-stationary and adversarial settings are considered.
 The H-horizon window-based approach, as proposed by \cite{kivinen2004online}, may in some cases be substituted, for it  shows both effectiveness, sparsity and adaptivity in our simulations.  
     
+Apart from text mining and recommender systems, the one-bit feedback  reduction of the bandit setup would  probably need additional developments to reach full relevance in real-world problems, in cases where both a sequential approach is adopted and a strict ``win-or-loose'' return is observed.
+% than the mere classification problems covered here. 
+%It is still difficult to figure out the exact span of problems it may address.
+This is for instance clearly the case in artificial games, where, in addition, both multiple moves and temporal credit assignment (see \cite{sutton1998reinforcement})  need to be considered.    
+Problems implying non-vectorial spaces and similarity metrics may more generally be considered, just like it is the case for any margin-based risk-minimizer technique (see \cite{chen2009similarity}).
+
+ 
 
 
 %{\color{green}
