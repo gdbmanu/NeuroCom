@@ -175,11 +175,11 @@ The one-bit feedback is a specific online learning setup that implements, in a p
 \paragraph{Banditron} This problem was coined the ``bandit feedback classification problem'' by \cite{kakade2008efficient}. Taking inspiration from the multiclass perceptron (\cite{duda1973pattern}), a time-effective algorithm, called the ``Banditron'', is established:
 $K$ linear mappings $w_1, ..., w_K$ are defined and the candidate response  $\hat{y}$ relies on a best-match policy, i.e.
 \begin{equation}\label{eq:argmax}
-\hat{y} = \underset{k \in\{1,..,K\}}{\text{argmax}}  \langle w_k, x \rangle
+\hat{y}_t = \underset{k \in\{1,..,K\}}{\text{argmax}}  \langle w_{k,t-1}, x_t \rangle
 \end{equation}
 Contrarily to the supervised case, an \textit{exploration} policy needs to be defined to efficiently sample the decision space. The Banditron adopts a simple  $\varepsilon-greedy$ search allowing  non-matching responses to be occasionally chosen in a uniform way:
 \begin{equation}\label{eq:eps-greedy}
-P(\tilde{Y}=k) = (1-\varepsilon) \delta(k,\hat{y}) + \frac{\varepsilon}{K}
+P(\tilde{Y}_t=k) = (1-\varepsilon) \delta(k,\hat{y}_t) + \frac{\varepsilon}{K}
 \end{equation}
  with $\varepsilon \in [0,1]$ and $\delta(i,j) =1$ if $i = j$, and 0 elsewhere.
 Given a set of linear mappings $W_{t-1}$ % = (w_{1,t-1}, ..., w_{K,t-1})$ 
@@ -244,7 +244,7 @@ Under the multiclass setting, two principal margin constraint schemes can be set
 	\end{equation}
 	and a corresponding relative multiclass \emph{hinge loss} is:
 	\begin{equation}
-	\label{eq:rel-loss} l (x,W,y) =  \left[ 1 +  \langle w_y, x \rangle - \max_{k \neq y} \langle w_k, x\rangle\right]_+\end{equation}
+	\label{eq:rel-loss} l (x,W,y) =  \left[ 1 -  \langle w_y, x \rangle + \max_{k \neq y} \langle w_k, x\rangle\right]_+\end{equation}
 	with $[u]_+$ equal to $u$ if $u\geq 0$ and 0 elsewhere.
 	\item  Compliant with the one-vs-all (OVA) construction (see also \cite{allwein2000reducing}), the \emph{normative} margin setup imposes the classifier to provide a response that overtakes in norm a reference value $a$. Taking  $a = 1$ for reference, it tells $\forall k$: \begin{align}%\label{eq:OVA}
 	&\langle w_k, x \rangle \geq 1 &\text{ if } y = k \label{eq:OVA-A}\\
@@ -341,7 +341,7 @@ l_t = [1 + \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+ &\text{ elsewhere} \labe
 
 %Dans le premier cas (le choix est correct), la perte décroît avec $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ jusqu'à 0. Au contraire, dans le second cas (choix incorrect), la perte augmente avec le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$.
 %Minimiser la perte revient donc à faire croître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$ dans le premier cas, et à faire décroître le produit $\langle W_{t-1}, X_t^{\tilde{y}_t}\rangle$  dans le second cas.}
-{\color{blue} }
+%{\color{blue} }
 
 
  
@@ -408,7 +408,7 @@ When trying to upper-bound the number of mistakes, it is worth considering an al
 \end{theorem}
 (proof in \ref{app:thm1})
 
-The result obtained in that case is formally similar to that of  \cite{crammer2006online}. Note however that the reference classifier $U$ being defined in $\mathbb{R}^{Kd}$, while observation vectors are in $\mathbb{R}^{d}$, a linear dependence on the label set cardinality $K$ is to be expected. 
+The result obtained in that case is formally similar, and even slightly tighter\footnote{using a relative hinge-loss, the multiclass upper bound is $4R^2 \parallel{U}\parallel^2$.}, than the one obtained by \cite{crammer2006online} in the multiclass case. Note however that the reference classifier $U$ being defined in $\mathbb{R}^{Kd}$, while observation vectors are in $\mathbb{R}^{d}$, a linear dependence on the label set cardinality $K$ is to be expected. 
 
 This result states, in short, that a finite number of updates is needed to fit the classification constraints expressed by the observed series of losses. In particular, for large series ($\tilde{y}_1, ...,\tilde{y}_t, ...$), there is a point $t^*$ at which all subsequent observed losses are equal to zero. This result grants the classifier finite complexity in the separable case whatever the number of samples. 
 
@@ -482,7 +482,7 @@ If we turn now to an arbitrary classifier $U$, i.e. do not take for granted the 
 
 (proof in \ref{app:thm2})
 
-This bound is once again identical to that obtained by 
+This bound is once again similar to that obtained by 
 \cite{crammer2006online} in the supervised case. 
 It tells in short that, for large $T$, the average squared 
 loss will be in the worst case four time that of any linear 
@@ -1149,8 +1149,8 @@ The first thing to be noticed is the prevailing of the Kernel setups over the li
 \section{Conclusion}
 \label{sec:conclusion}
 
-We have shown that a conservative reduction of the OVA hinge-loss  provides an effective and lightweight solutions to the  bandit classification problem (defined by \cite{kakade2008efficient}). 
-In particular, when adapting the passive aggressive setup as proposed in the supervised case by \cite{crammer2006online}, 
+We have shown that a conservative reduction of the OVA hinge-loss  provides an effective and lightweight solutions to the  bandit classification problem (as defined by \cite{kakade2008efficient}). 
+In particular, when adapting the passive aggressive setup proposed in the supervised case by \cite{crammer2006online}, 
 %i.e. sequentially solving local quadratic optimization problems,
 we prove  similar bounds on the observed cumulative squared loss. 
 Here, however, the bound is not an upper bound of the classification error. Additional regularity assumptions, such as observation sets convexity, or a partly uniform sampling of the label space, need to be considered to provide comparable error upper bounds. In addition, as in \cite{crammer2006online}, a misclassification stiffness parameter $C$ needs to be optimized to reach $O(\sqrt{T})$ regret in the stationary case.  
@@ -1186,8 +1186,11 @@ BE CONSIDERED WITH CARE.
 
 ALTERNATIVE POLICIES? UCB? PURE GREEDY?
 
+PLUSIEURS PARADOXES EXPLIQUENT LE RETARD DANS L'UTILISATION D'OVA :
+
 NOISE RESILIENCE IS UNEXPECTED. OUR APPROACH IS AT ODD TO THE NOISE-AWARE CONFIDENCE-BASED METHODS. IT MAY RESULT BOTH FROM THE CONSERVATIVENESS AND 
 
+AUTRE PARADOXE : OVA EST PREFERABLE (PLUS SPARSE) ALORS QUE C'EST LE CONTRAIRE (RELATIF) QUI EST SPARSE DANS LE CAS SUPERVISE
 
 HEAVILY RELIES ON C PARAMETER (cross validation) WHICH SHOULD BE SPECIFIC TO THE DATASET. 
 HOW THE SETUP WOULD BEHAVE IN MORE ADVERSARIAL SETTINGS IS UNKNOWN. 
