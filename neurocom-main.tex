@@ -96,19 +96,19 @@
 %% \address[label1]{}
 %% \address[label2]{}
 
-\author[centrale,lif]{Hongliang Zhong}
-\author[centrale,ins]{Emmanuel Dauc\'e \corref{cor1}}
+\author[centralif]{Hongliang Zhong}
+\author[ins]{Emmanuel Dauc\'e \corref{cor1}}
 
-\address[centrale]{Ecole Centrale de Marseille}
-\address[lif]{Laboratoire d'informatique Fondamentale}
-\address[ins]{Institut de Neurosciences des Syst\`emes}
+\address[centralif]{Aix Marseille Univ, CNRS, Centrale Marseille, LIF, Laboratoire d'Informatique Fondamentale, Marseille, France}
+\address[ins]{Aix Marseille Univ, Inserm, INS, Institut de Neurosciences des Systèmes, Marseille, France}
 
 \cortext[cor1]{Corresponding author}
 
 \begin{abstract}
 %% Text of abstract
-The bandit classification problem implements a form of active learning in scarcely labeled environments, with a limited (1 bit) information budget at each round. This information is here used to settle a single margin constraint under the OVA (``one-versus-all'') setup. A corresponding constrained sequential norm-minimal update is shown to solve the classification problem in the separable case, provided enough redundancy is present in the data. This approach is moreover shown to powerfully compete in simulation with the more demanding confidence-based second-order bandits setups on large scale text-mining datasets.
-A kernel implementation is also shown effective on non-linearly separable datasets, when both considering sparsity and final classification accuracy.
+The bandit classification problem considers learning the label of unknown samples using only one bit of feedback  at each trial.
+A sparse and lightweight solution to this problem is proposed, using a straightforward reduction of the OVA (``one-versus-all'') hinge loss setup. The issued sequential norm-minimal update solves the classification problem in finite time in the separable case, provided enough redundancy is present in the data. An $O(\sqrt{T})$ regret in moreover expected in the non-separable case.
+The algorithm shows effectiveness on both large scale text-mining and machine learning datasets, with ($i$) a favorable comparison with the more demanding confidence-based second-order bandits setups on large scale datasets and ($ii$) a good sparsity and efficacy when a kernel approach is applied to non-separable datasets.
 %The non-stationary and adversarial setting  may be treated with horizon-based approaches, as proposed by \cite{kivinen2004online}, for it  shows both effectiveness, sparsity and adaptivity in  simulations.  
 \end{abstract}
 
@@ -131,10 +131,10 @@ Contextual bandit \sep Hinge loss \sep Online learning \sep Kernel methods
 \label{sec:lentete}
 
 
-Categorical online learning is a well-documented class of learning problems in which ($i$) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and ($ii$) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$. The multiclass learning task typically addresses object recognition (such as OCR, face recognition, speech recognition etc.) and recommender systems. In contrast with the offline approach, online learning takes the form of an iterative process, relying on a time-ordered sequence of observations, actions and feedbacks (where the feedback is the observable outcome of the action).   
+Categorical online learning is a well-documented family of learning problems in which ($i$) a time order is defined on the sequence of input examples  $x_1$, ..., $x_t$, ... with the classifier update taking place after each example presentation and ($ii$) the output space is categorical, i.e. a single response $y_t$, among $K>1$ possibilities, is expected at trial $t$. The multiclass learning task typically addresses object recognition (such as OCR, face recognition, speech recognition etc.) and recommender systems. In contrast with the offline approach, online learning takes the form of an iterative process, relying on a time-ordered sequence of observations, actions and feedbacks (where the feedback is the observable outcome of the action).   
 Two well-known setups obey to this class, i.e. the contextual bandit setup (see  \cite{lai1985asymptotically} and \cite{auer2002finite}) and supervised online learning setup (see  \cite{rosenblatt1958perceptron}, \cite{duda1973pattern} and \cite{freund1999large}), the two setups mainly differing by the nature of the feedback. Whether abundant or scarce, deterministic or stochastic, stationary or adversarial, the feedback characteristics critically shape the design of the learning algorithms.  
 
-The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback classification problem (see \cite{kakade2008efficient}), for the outcome is either 0 (failure) or 1 (success). This case lies at the crossroad of the supervised online learning setup and the bandit setup.  A one-bit bandit feedback reflects a ``hit-or-miss'' learning situations, in which a single bit indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, this problem is bound to the online approach and was only recently addressed by the community (see \cite{kakade2008efficient}, \cite{crammer2013multiclass}, etc.). 
+The case we address in the following is the one-bit feedback in multiclass classification tasks, occasionally called the bandit feedback classification problem (see \cite{kakade2008efficient}), for the outcome is either 0 (failure) or 1 (success). This case lies at the crossroad of the supervised online learning setup and the bandit setup.  A one-bit feedback reflects a ``hit-or-miss'' learning situations, in which a single bit indicates to the learner whether its categorical response was correct (``hit'') or incorrect (``miss''). Wether simple in its principle, this problem is bound to the online approach and was only recently addressed by the community (see \cite{kakade2008efficient}, \cite{crammer2013multiclass}, etc.). 
 Apart from the original work of \cite{kakade2008efficient}, most recent approaches to this problem are based on regularized linear models (see \cite{li2010contextual}, \cite{hazan2011newtron}, \cite{crammer2013multiclass}, \cite{ngo2013upper}), to which the powerful methods of contextual bandit, including UCB-like non-stochastic exploration strategy (see \cite{lai1985asymptotically}), do apply. While providing almost optimal convergence rates, online multivariate setups suffer from a quadratic complexity in space that limits their applicability to large-dimensional datasets.  
 
 In contrast, the sequential approach to quadratic optimization, as proposed by \cite{anlauf1989adatron} and \cite{crammer2006online}, may both provide upper bounds on error rate and a smaller memory footprint, i.e. only display linear scaling in space. 
@@ -145,7 +145,7 @@ We adapt in this paper a similar view to the bandit feedback case, where online 
 \subsection{Online learning} Online learning is a \textit{process} in which an agent (the ``learner'') probes its environment sequentially to obtain \textit{information} that is eventually used to improve its \textit{fitness}.
 The universe being initially hidden, the online approach works on probing the database (universe) through individual queries that step-by-step unveil the environment. 
 
-The sequential organization of learning is present in the most traditional setups such as the Bandit problems (see \cite{robbins1952bandit}) and in the Perceptron algorithm (see \cite{rosenblatt1958perceptron}). The general setup we consider here is the case of an ``open-loop'' \textit{actionnable} universe. The time-indexed observations $x_1$, ..., $x_t$, ... are independent (causally disconnected). Each observation causes the learner to output a single action $\tilde{y}_t$ out of $K > 1$ possible actions. Every action provides a feedback $f_t$ that is an \textit{information} about a \textit{value of interest} (or reward) $r_t$ that needs to be maximized over time. The feedback is \textit{explicit} in most contextual bandit setups, i.e. $f_t=r_t$ (see \cite{lai1985asymptotically} and \cite{auer2002finite}) while it takes the form of a category $f_t=y_t$ in traditional online learning setups, that \textit{indirectly} provides a quantity to maximise through a loss function $r(x_t, y_t) = -l(x_t,\tilde{y}_t, y_t)$ (see  \cite{duda1973pattern}, \cite{freund1999large}, \cite{kivinen2004online}, \cite{crammer2006online}). Solving the problem thus means both  learning the universe from experience and optimizing the final reward. 
+The sequential organization of learning is present in the most traditional setups such as the Bandit problems (see \cite{robbins1952bandit}) and in the Perceptron algorithm (see \cite{rosenblatt1958perceptron}). The general setup we consider here is the case of an ``open-loop'' \textit{actionnable} universe. The time-indexed observations $x_1$, ..., $x_t$, ... are independent (causally disconnected). Each observation causes the learner to output a single action $\tilde{y}_t$ out of $K > 1$ possible actions. Every action provides a feedback $f_t$ that is an \textit{information} about a \textit{value of interest} (or reward) $r_t$ that needs to be maximized over time. The feedback is \textit{explicit} in most contextual bandit setups, i.e. $f_t=r_t$ (see \cite{lai1985asymptotically} and \cite{auer2002finite}) while it takes the form of a category $f_t=y_t$ in traditional online learning setups, that \textit{indirectly} provides a quantity to maximise through a loss function $l(x_t,\tilde{y}_t,f_t)  = - r(x_t, \tilde{y}_t,f_t)$ (see  \cite{duda1973pattern}, \cite{freund1999large}, \cite{kivinen2004online}, \cite{crammer2006online}). Solving the problem thus means both  learning the universe from experience and optimizing the final reward. 
 
 \subsection{Linear models}
 Multiclass classification requires  finding an appropriate class $y \in \{1,... K\}$ for every observation vector $x \in \mathbb{R}^d$.
@@ -226,15 +226,11 @@ Following   \cite{kivinen2004online} and \cite{crammer2006online}, we consider a
 %Our objective here is to provide a way to extend those local online optimization approaches  to the \emph{binary feedback} case, where the feedback is composed of a single bit of information $f_t \in\{0,1\}$, i.e. $f_t = 1$ if the class proposed by the clasifier is correct and 0 otherwise. This setup may provide avenues toward the more general contextual bandit and  reinforcement learning setups.
 %given an objective (or loss) function considered defined over the full input space.
 %A feedback is a \emph{local} measure of  learning achievement (or failure), 
-where classifiers are updated through local measures of a loss function: 
+where classifiers are updated through local measures of a hinge loss function: 
 $$l_t = l(x_t,W_{t-1},y_t)$$
- %
- Contrarily to a mere reward (or penalty), a loss function comes with an implicit set point, namely $l_t=0$, that grants response correctness under a margin constraint. In \cite{kivinen2004online}, a loss-minimizer gradient descent update is combined with a norm-minimizer on the decision function, while \cite{crammer2006online} adopt a quadratic norm-minimal condition $\min_W ||W - W_{t-1}||^2$ on each update. In both cases local changes are shown to provide global improvement, e.g. \cite{kivinen2004online} show the stochastic gradient to converge to a global minimum and \cite{crammer2006online} show the total number of updates to be bounded in the linearly-separable case.
 
-%,  The loss function combines the feedback signal $f_t$ with the actual response $\tilde{y}_t$ and the current classifier's parameters $W_t$ to provide additional information about the direction to be followed for future classification improvement (i.e. risk minimization). 
-%The loss thus relies on a combiation of \emph{internal} information (current classifier's parameters, current choice) and \emph{external} information (input vector, feedback). On contrary to the offline setting, the classifier's current value $W_t$ plays a significant role in defining the future direction. 
 
-Different loss function and margin constraints can be defined depending on task and feedback characteristics. 
+Different hinge loss functions and corresponding margin constraints can be defined depending on the task and feedback characteristics. 
 Under the multiclass setting, two principal margin constraint schemes can be set up, namely the \emph{relative} margin and the \emph{normative} margin. 
 
 \begin{itemize}
@@ -257,6 +253,15 @@ Under the multiclass setting, two principal margin constraint schemes can be set
 
 
 The normative setup puts additional constraints on the classification task (see \cite{crammer2003ultraconservative}), but in counterpart provides mapping-independence across the different classes.
+
+ %
+ %Contrarily to a mere reward (or penalty), a 
+The hinge loss function comes with an implicit set point, namely $l_t=0$, that grants response correctness under a margin constraint. In \cite{kivinen2004online}, a loss-minimizer gradient descent update is combined with a norm-minimizer on the decision function, while \cite{crammer2006online} adopt a quadratic norm-minimal condition $\min_W ||W - W_{t-1}||^2$ on each update. In both cases local changes are shown to provide global improvement, e.g. \cite{kivinen2004online} show the stochastic gradient to converge to a global minimum and \cite{crammer2006online} show the total number of updates to be bounded in the linearly-separable case.
+
+%,  The loss function combines the feedback signal $f_t$ with the actual response $\tilde{y}_t$ and the current classifier's parameters $W_t$ to provide additional information about the direction to be followed for future classification improvement (i.e. risk minimization). 
+%The loss thus relies on a combiation of \emph{internal} information (current classifier's parameters, current choice) and \emph{external} information (input vector, feedback). On contrary to the offline setting, the classifier's current value $W_t$ plays a significant role in defining the future direction. 
+
+
 
 %{\color{red} Except for the multiclass perceptron (see  \cite{duda1973pattern} and \cite{freund1999large}), which does not rely on 
 %Not all multiclass online learning algorithms fall either into the normative or the relative category. 
@@ -348,7 +353,7 @@ l_t = [1 + \langle W_{t-1}, X_t^{\tilde{y}_t}\rangle]_+ &\text{ elsewhere} \labe
 In \cite{crammer2006online}, a quadratic update norm minimization objective under a class-accuracy linear constraint $ l_t $ is considered.  
 The weight update is the solution of ~:
 $$W_{t} = \arg \min_W \frac{1}{2} \| W - W_{t-1}\|^2 + C \xi^2 \hbox{ s.t. } l_t \leq \xi$$
-where $C$ is an optional misclassification stiffness parameter. It provides the following update~:
+where $C$ is an optional misclassification stiffness parameter. It provides here the following update~:
 $$W_{t} =  W_{t-1} + \frac{l_t}{\|x_t\|^2 + \frac{1}{2C}} (2\delta(y_t,\tilde{y}_t) - 1) X_t^{\tilde{y}_t}$$
 which leads to algorithm \ref{algo:quad}.
 
@@ -489,10 +494,10 @@ loss will be in the worst case four time that of any linear
 classifier $U$ (including that of a loss-minimizer classifier $U^*$). In approximation\footnote{If the loss variance is small, i.e. $\langle l_t^2\rangle_t \simeq \langle l_t \rangle_t^2$.},  the  final loss is thus expected to be on average twice that of the best classifier. As shown in  \cite{crammer2006online}), this error bound is less tight than that of \cite{freund1997decision}, and additional regularization (with finite $C$) is needed to attain $O(\sqrt{T})$ regret,  
 we do not develop here for brevity. 
 
-Given the aggressiveness of the algorithm, this ``loss-doubling'' can be interpreted the following way: in the long run, each non-zero loss  encountered is expected to provoke an aggressive (overfitting) update, that will need on average a same amount of loss in subsequent rounds to recover. When the proportion of outliers is not to strong, the separability assumption can be seen as a boundary condition to which the classifier periodically turns back between temporary excursions throughout disrupting updates and recovery. 
+Given the aggressiveness of the algorithm, this ``loss-doubling'' can be interpreted the following way: in the long run, each non-zero loss  encountered is expected to provoke an aggressive (overfitting) update, that will need on average a same amount of loss in subsequent rounds to recover. When the proportion of outliers is not to strong, the separability assumption can be seen as a boundary condition to which the classifier periodically returns between temporary excursions throughout disrupting updates and recovery. 
 
 Like previously, this result is not a strict bound on the classification error, for a mere sample of the total OVA losses is visited in one run.
-The separable case is now the boundary condition toward which the classifier continually returns, for which specific policies need to be assumed to provide effective convergence guarantees (see previous section). 
+The separable case is now the boundary condition toward which the classifier continually returns, for which specific policies need to be assumed to provide effective final classification (see previous section). 
 
 
 
@@ -748,10 +753,10 @@ The fifth dataset, named \textit{Pendigits} (UCI's Pen-Based Recognition of Hand
 
 Only  online learning methods are here considered for comparison. For a given dataset, each instance is presented once. The classifier update starts right after the first instance presentation, and finishes at the last one. For each instance, a single response is carried out, and a single corresponding feedback is obtained.
 
-For comparison, both full-feedback and 1-bit feedback learning setups are tested:
+For comparison, both full-feedback and one-bit feedback learning setups are tested:
 \begin{itemize}
 	\item The multiclass perceptron (see \cite{duda1973pattern}) and the multiclass passive-aggressive setup (see  \cite{crammer2006online}) have a full feedback at disposal.
-	\item The Banditron (\cite{kakade2008efficient}), Confidit (\cite{crammer2013multiclass}), and our algorithms BPA (algorithm \ref{algo:quad}) and HGD (algorithm \ref{algo:HGD}) only have a 1-bit feedback at disposal.
+	\item The Banditron (\cite{kakade2008efficient}), Confidit (\cite{crammer2013multiclass}), and our algorithms BPA (algorithm \ref{algo:quad}) and HGD (algorithm \ref{algo:HGD}) only have a one-bit feedback at disposal.
 \end{itemize} 
 
 
@@ -1154,67 +1159,64 @@ We have shown that a conservative reduction of the OVA hinge-loss  provides an e
 In particular, when adapting the passive aggressive setup proposed in the supervised case by \cite{crammer2006online}, 
 %i.e. sequentially solving local quadratic optimization problems,
 we prove  similar bounds on the observed cumulative squared loss. 
-Here, however, the bound is not an upper bound of the classification error. Additional regularity assumptions, such as observation sets convexity, or a partly uniform sampling of the label space, need to be considered to provide comparable error upper bounds. In addition, as in \cite{crammer2006online}, a misclassification stiffness parameter $C$ needs to be optimized to reach $O(\sqrt{T})$ regret in the stationary case.  
+Here, however, the bound is not an upper bound of the classification error. Additional regularity assumptions, such as observation sets convexity, or a partly uniform sampling of the label space, need to be considered to provide comparable  upper error bounds. In addition, as in \cite{crammer2006online}, a soft margin stiffness parameter $C$ needs to be optimized to reach $O(\sqrt{T})$ regret in the stationary case.  
 
-SUBSAMPLING OF AN OVERCONSTRAINED PROBLEM. NOt ALL CONSTRAINTS ARE SOLVED, BUT NONETHELESS ENOUGH CONSTRAINTS ARE SATISFIED FOR A CORRECT CLASSIFICATION TO BE REACHED IN THE LONG RUN. 
+%SUBSAMPLING OF AN OVERCONSTRAINED PROBLEM. NOt ALL CONSTRAINTS ARE SOLVED, BUT NONETHELESS ENOUGH CONSTRAINTS ARE SATISFIED FOR A CORRECT CLASSIFICATION TO BE REACHED IN THE LONG RUN. 
 
 The numerical simulations provide favorable results on both large scale text mining  datasets and non-linearly separable machine learning datasets. 
 When comparing our approach with the Banditron, a first result is the exploration parameter $\varepsilon$ insensitivity, allowing to consider $\varepsilon$ decrease  over time in practical implementations.
+%EXPECTED / NOT EXPECTED? CONSEQUENCES?
+When comparing with confidence-based second-order contextual bandit approaches (see \cite{crammer2013multiclass}), our approach also shows favorable results on a scale-realistic dataset, while owning a much lesser complexity. A good resilience to label noise is also shown on a synthetic dataset, for the passive-aggressive method encompass a soft margin principle allowing to efficiently deal with outliers. 
 
-EXPECTED / NOT EXPECTED? CONSEQUENCES?
- 
-When comparing with confidence-based second-order contextual bandit approaches (see \cite{crammer2013multiclass}), our approach also shows favorable results on a scale-realistic dataset, while owning a much lesser complexity. More surprisingly, a good resilience to label noise is also shown on a synthetic dataset, for the method was not specifically designed to address this aspect. 
-
-RESILIENCE TO LABEL NOISE IS CONTRADICTORY WITH AGGRESSIVENESS
+%RESILIENCE TO LABEL NOISE IS CONTRADICTORY WITH AGGRESSIVENESS
 
 
 %While most contextual bandit setups concentrate to large-scale text-mining and recommendation datasets, 
 In complement, a kernel approach was implemented on non-linearly separable datasets, and shown effective when both considering sparsity (such as addressed by \cite{kivinen2004online}), and final classification accuracy, with, for instance, a close to state-of-the-art 98\% final accuracy observed after one pass on the Pendigits 10-class problem.
 
-In conclusion, our approach is found to provide many practical advantages, among which:
-\begin{enumerate}
-	\item simplicity, with easy numerical implementation
-	\item linear scaling in space
-	\item sparsity, each observation vector being stuck to one class-separatrix only, 
-	\item linear scaling to the labels space cardinality, 
+In conclusion, our approach  provides many practical advantages when considering the bandit classification problem, among which ($i$) simplicity, with easy algorithmic implementation, ($ii$) linear scaling in space, ($iii$) sparsity, ($iv$) linear scaling to the labels space cardinality, 
 	%\item independence to the actual classification achievement (avoiding unnecessary weight updates at high classification rates), 
-	\item independence to the actual exploration/exploitation rate and 
-	\item resilience to label noise.
-\end{enumerate}
+	%\item independence to the actual exploration/exploitation rate and
+($v$) kernel compatibility and ($vi$) resilience to label noise.
+It moreover reveals surprisingly effective when compared to the more elaborate noise-aware UCB-like setups.
+This is, to our best knowledge, the first adaptation of sparse online learning principles to the bandit case, providing avenue toward effective kernel implementations of  non-linearly separable contextual bandit setups.   %One possible reason is that soft margins are as effective to deal with   incorrectly labelled samples, which is at odd with many real world situations having to deal with label noise, and more generally adversarial settings. 
+%Although the approach does not provide second-order estimates, it may allow implement simple UCB policies. 
+%XXX resilience to label noise
+Our OVA reduction may even generalize to slightly more demanding tasks, like the multi-label setup generally considered in recommender systems. Complement investigations are however needed to address both the non-stationary and adversarial cases.
+The H-horizon window approach, as proposed by \cite{kivinen2004online}, may in some cases be substituted, for it  shows both effectiveness, sparsity and adaptivity in simulations. 
 
-EPSILON EXPLORATION RATE PROVIDES A LINEAR REGRET. THIS POINT IS TO
-BE CONSIDERED WITH CARE.
+%EPSILON EXPLORATION RATE PROVIDES A LINEAR REGRET. THIS POINT IS TO
+%BE CONSIDERED WITH CARE.
 
-ALTERNATIVE POLICIES? UCB? PURE GREEDY?
+%ALTERNATIVE POLICIES? UCB? PURE GREEDY?
 
-PLUSIEURS PARADOXES EXPLIQUENT LE RETARD DANS L'UTILISATION D'OVA :
+%PLUSIEURS PARADOXES EXPLIQUENT LE RETARD DANS L'UTILISATION D'OVA :
 
-NOISE RESILIENCE IS UNEXPECTED. OUR APPROACH IS AT ODD TO THE NOISE-AWARE CONFIDENCE-BASED METHODS. IT MAY RESULT BOTH FROM THE CONSERVATIVENESS AND 
+%NOISE RESILIENCE IS UNEXPECTED. OUR APPROACH IS AT ODD TO THE NOISE-AWARE CONFIDENCE-BASED METHODS. IT MAY RESULT BOTH FROM THE CONSERVATIVENESS AND 
 
-AUTRE PARADOXE : OVA EST PREFERABLE (PLUS SPARSE) ALORS QUE C'EST LE CONTRAIRE (RELATIF) QUI EST SPARSE DANS LE CAS SUPERVISE
+%AUTRE PARADOXE : OVA EST PREFERABLE (PLUS SPARSE) ALORS QUE C'EST LE CONTRAIRE (RELATIF) QUI EST SPARSE DANS LE CAS SUPERVISE
 
-HEAVILY RELIES ON C PARAMETER (cross validation) WHICH SHOULD BE SPECIFIC TO THE DATASET. 
-HOW THE SETUP WOULD BEHAVE IN MORE ADVERSARIAL SETTINGS IS UNKNOWN. 
+%HEAVILY RELIES ON C PARAMETER (cross validation) WHICH SHOULD BE SPECIFIC TO THE DATASET. 
+%HOW THE SETUP WOULD BEHAVE IN MORE ADVERSARIAL SETTINGS IS UNKNOWN. 
 
-OUR APPROACH IS TIGHTLY LINKED TO ONLINE BINARY SUPERVISION. DIFFERENT UPDATES MAY BE CONSIDERED, LIKE THE PERCPTRON UPDATE, LOGISTIC REGRESSION, MULTI-LAYERED PERCEPTRON ETC. THERE Is HOWEVER A STRONG ROLE OF 'ONE-SHOT'-AGGRESSIVENESS AND IMMEDIATE MARGIN CONSTRAINT SATISFACTION THAT RENDERS HE METHOD INSENSITIVE TO CLASS IMBALANCE THAT  BECOME MORE AND MORE CRITICAL AS THE NUMBER OF LABELS INCREASES. 
+%OUR APPROACH IS TIGHTLY LINKED TO ONLINE BINARY SUPERVISION. DIFFERENT UPDATES MAY BE CONSIDERED, LIKE THE PERCPTRON UPDATE, LOGISTIC REGRESSION, MULTI-LAYERED PERCEPTRON ETC. THERE Is HOWEVER A STRONG ROLE OF 'ONE-SHOT'-AGGRESSIVENESS AND IMMEDIATE MARGIN CONSTRAINT SATISFACTION THAT RENDERS HE METHOD INSENSITIVE TO CLASS IMBALANCE THAT  BECOME MORE AND MORE CRITICAL AS THE NUMBER OF LABELS INCREASES. 
 
-OUR PARADOXICAL RESULT IN THE SEPARABLE CASE SEEMS TO RELY ON THE GREEDINESS AND AGGRESSIVENESS OF THE PA SETUP THAT, IN PRINCIPLE, RENDERS THE METHOD SENSIBLE TO LABEL NOISE.
+%OUR PARADOXICAL RESULT IN THE SEPARABLE CASE SEEMS TO RELY ON THE GREEDINESS AND AGGRESSIVENESS OF THE PA SETUP THAT, IN PRINCIPLE, RENDERS THE METHOD SENSIBLE TO LABEL NOISE.
 
 
 %The many advantages developped here should allow reconsider this point. 
 
 %The reason why quadratic was not considered up to now relies mainly on those two aspects : linear regret in practice and unfitted to the adversarial case.
 
-From a more general standpoint, the bandit classification problem implements a form of active learning in scarcely labeled environments, with a limited (1 bit) information budget at each round. We here translated this information into a reduced OVA hinge loss, and shown that sequentially fixing the series of observed losses allow the convergence toward an adapted classifier. 
+
+%Here translated into a reduced OVA hinge loss, we  show that sequentially fixing the series of observed losses allow convergence toward an adapted classifier. 
 %This budget is here used to settle a single margin constraint under the OVA setup.  margin constraints is then expected to solve in approximation the total (unobserved) set of margin constraints, provided enough redundancy is present in the data. 
-This approach is well fitted to the specific stationary classification tasks considered here, and for that reason is shown to powerfully compete with the more demanding confidence-based second-order bandits setups. On one side, the OVA reduction may even generalize to slightly more demanding tasks, like the multi-label setup generally considered in recommender systems. On the other side, it should be overcome as soon as non-stationary and adversarial settings are considered.
-The H-horizon window-based approach, as proposed by \cite{kivinen2004online}, may in some cases be substituted, for it  shows both effectiveness, sparsity and adaptivity in our simulations. 
+%This approach is well fitted to the specific stationary classification tasks considered here, and for that reason is shown to powerfully compete with the more demanding confidence-based second-order bandits setups. 
 
-It appears quite surprising the sparse online approach to the contextual bandit problem was not much considered up to now in the machine learning community. One possible reason is that a sparse setup is generally prone to overfit incorrectly labelled samples, which is at odd with many real world situations having to deal with label noise, and more generally adversarial settings. Moreover, the approach does not provide second-order estimates that may allow implement UCB, and the convergence to a correct classifier was seemingly not clearly established up to now.  
 
-XXX resilience to label noise
-    
-Apart from text mining and recommender systems it naturally addresses, the one-bit bandit classification setup would  probably need additional developments to reach full relevance in real-world problems obeying to a sequential organization and undergoing a strict ``win-or-loose'' return.
+
+From a more general standpoint, the bandit classification problem implements a form of active learning in scarcely labeled environments, with a limited (1 bit) information budget at each round. 
+Apart for text mining and recommender systems, it would  probably need additional developments to reach full relevance in real-world problems having both a sequential organization and undergoing a strict ``win-or-loose'' return.
 % than the mere classification problems covered here. 
 %It is still difficult to figure out the exact span of problems it may address.
 In the case of artificial games, for instance, both multiple moves and temporal credit assignment (see \cite{sutton1998reinforcement}) would need to be considered in addition.    
