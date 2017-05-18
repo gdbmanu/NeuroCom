@@ -106,15 +106,15 @@
 
 \begin{abstract}
 %% Text of abstract
-The bandit classification problem considers learning the label of unknown samples using only one bit of feedback  at each trial.
-A sparse and lightweight solution to this problem is proposed, using a straightforward reduction of the OVA (``one-versus-all'') hinge loss setup. The issued sequential norm-minimal update solves the classification problem in finite time in the separable case, provided enough redundancy is present in the data. An $O(\sqrt{T})$ regret in moreover expected in the non-separable case.
+The bandit classification problem considers learning the labels of a time-indexed data stream under a mere ``hit-or-miss'' binary guiding.
+Adapting the OVA (``one-versus-all'') hinge loss setup, we develop a sparse and lightweight solution to this problem. The issued sequential norm-minimal update solves the classification problem in finite time in the separable case, provided enough redundancy is present in the data. An $O(\sqrt{T})$ regret in moreover expected in the non-separable case.
 The algorithm shows effectiveness on both large scale text-mining and machine learning datasets, with ($i$) a favorable comparison with the more demanding confidence-based second-order bandits setups on large scale datasets and ($ii$) a good sparsity and efficacy when a kernel approach is applied to non-separable datasets.
 %The non-stationary and adversarial setting  may be treated with horizon-based approaches, as proposed by \cite{kivinen2004online}, for it  shows both effectiveness, sparsity and adaptivity in  simulations.  
 \end{abstract}
 
 \begin{keyword}
 %% keywords here, in the form: keyword \sep keyword
-Contextual bandit \sep Hinge loss \sep Online learning \sep Kernel methods 
+Contextual bandits \sep Hinge loss \sep Online learning \sep Kernel methods 
 %% PACS codes here, in the form: \PACS code \sep code
 
 %% MSC codes here, in the form: \MSC code \sep code
@@ -138,7 +138,9 @@ The case we address in the following is the one-bit feedback in multiclass class
 Apart from the original work of \cite{kakade2008efficient}, most recent approaches to this problem are based on regularized linear models (see \cite{li2010contextual}, \cite{hazan2011newtron}, \cite{crammer2013multiclass}, \cite{ngo2013upper}), to which the powerful methods of contextual bandit, including UCB-like non-stochastic exploration strategy (see \cite{lai1985asymptotically}), do apply. While providing almost optimal convergence rates, online multivariate setups suffer from a quadratic complexity in space that limits their applicability to large-dimensional datasets.  
 
 In contrast, the sequential approach to quadratic optimization, as proposed by \cite{anlauf1989adatron} and \cite{crammer2006online}, may both provide upper bounds on error rate and a smaller memory footprint, i.e. only display linear scaling in space. 
-We adapt in this paper a similar view to the bandit feedback case, where online learning relies on a local norm minimization under standard linear-convex constraints. Our conservative approach allows to determine similar regret bounds than the original paper of \cite{crammer2006online}, providing strong guaranties on  convergence capabilities, that are confronted to other methods over synthetic and real datasets.  
+We adapt in this paper a similar view to the bandit feedback case, where online learning relies on a local norm minimization under standard linear-convex constraints. Our conservative approach allows to determine similar regret bounds than the original paper of \cite{crammer2006online}, providing strong guaranties on  convergence capabilities, that are confronted to other methods over synthetic and real datasets\footnote{  
+This work was partly presented at the ECML-PKDD doctoral consortium (see \cite{zhong2015b}). Substantial refinements and new notations are used in the present paper. The kernel extension, with corresponding developments and simulations, were not present in the conference article.}.   
+
 
 \section{Outlook}
 
